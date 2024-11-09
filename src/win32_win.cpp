@@ -158,7 +158,7 @@ void winclose(winhandle win)
 
 }
 
-bool winclosed(winhandle win)
+bool winactive(winhandle win)
 {
     Win32Window* win32 = (Win32Window*)win;
     return !IsWindow(win32->Handle);
