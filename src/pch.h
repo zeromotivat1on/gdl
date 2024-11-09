@@ -43,7 +43,7 @@ using f64 = double;
 #define ASSERT(x)               if (!(x)) { *(int*)0 = 0; }
 #define STRUCT_ZERO(x)          x{0}
 
-#define FPS(n)                  (1.0f / n)
+#define FPS(n)                  (1.0f / (n))
 #define ARRAY_COUNT(arr)        (sizeof(arr) / sizeof(arr[0]))
 
 #define BIT(x)                  (1ull << (x))
