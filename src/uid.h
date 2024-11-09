@@ -2,12 +2,12 @@
 
 #include "hash.h"
 
-#define UID()   uidgen()
+#define UID     uidgen()
 #define UID(n)  uidgen(n)
 
 typedef u64 uid;
 
-inline uidhash(u64 n)
+inline uid uidhash(u64 n)
 {
     return hashpcg64(n);
 }

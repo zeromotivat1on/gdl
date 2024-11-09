@@ -13,15 +13,15 @@ inline u32 hashpcg32(u32 input)
 
 inline u64 hashpcg64(u64 input)
 {
-    return hashpcg32(input) + hashpcg32(input >> 32);
+    return hashpcg32((u32)input) + hashpcg32(input >> 32);
 }
 
 // ------
 // FNV-1a
 // ------
 
-#define FNV_BASIS = 14695981039346656037ull;
-#define FNV_PRIME = 1099511628211ull;
+#define FNV_BASIS 14695981039346656037ull;
+#define FNV_PRIME 1099511628211ull;
 
 inline u64 hashfnv(const char* str, u64 hash = FNV_BASIS)
 {
