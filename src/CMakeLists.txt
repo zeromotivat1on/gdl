@@ -3,7 +3,6 @@ add_library(gdl STATIC
                 bit.h file.h gdlmath.h hash.h input.h matrix.h mem.h quat.h sid.h str.h thread.h time.h uid.h vector.h win.h workq.h
                 gdlmath.cpp matrix.cpp quat.cpp workq.cpp)
 target_precompile_headers(gdl PUBLIC pch.h)
-target_include_directories(gdl PUBLIC "${PROJECT_SOURCE_DIR}")
 
 if (WIN32)
    target_sources(gdl PRIVATE win32_win.h

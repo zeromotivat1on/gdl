@@ -3,6 +3,7 @@
 // ------------
 
 #include <cstdint>
+#include <cstring>
 
 // -----------------
 // Platform Includes
