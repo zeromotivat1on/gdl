@@ -29,7 +29,7 @@ bool    fwritesync(fhandle handle, u8* buffer, u64 size, u64* nbytes);
 
 // Convenient wrappers to read/write from/to existing file.
 
-inline bool freadsyncex(const char* fpath, u8* buffer, u64 size, u64* nbytes)
+inline bool freadsync(const char* fpath, u8* buffer, u64 size, u64* nbytes)
 {
     if (fhandle handle = fstart(fpath, FILE_ACCESS_READ, FILE_OPEN_EXISTING))
     {
@@ -41,7 +41,7 @@ inline bool freadsyncex(const char* fpath, u8* buffer, u64 size, u64* nbytes)
     return false;
 }
 
-inline bool fwritesyncex(const char* fpath, u8* buffer, u64 size, u64* nbytes)
+inline bool fwritesync(const char* fpath, u8* buffer, u64 size, u64* nbytes)
 {
     if (fhandle handle = fstart(fpath, FILE_ACCESS_WRITE, FILE_OPEN_EXISTING))
     {
