@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "log.h"
+#include "msg.h"
 
 void* stdout()
 {
