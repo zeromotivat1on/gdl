@@ -48,7 +48,7 @@ struct Arena
 #define mpushtype(arena, type)          (type*)mpushzero(arena, sizeof(type))
 
 // Push array of types.
-#define mpusharr(arena, type, count)    (type*)mpushzero(arena, sizeof(type) * count)
+#define mpusharray(arena, type, count)  (type*)mpushzero(arena, sizeof(type) * count)
 
 inline Arena minit(void* base, u64 size)
 {
