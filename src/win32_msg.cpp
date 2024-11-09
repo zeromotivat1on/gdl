@@ -1,10 +1,11 @@
 #include "pch.h"
 #include "msg.h"
+#include <cstdio>
 
-void* stdout()
+void* stdouthandle()
 {
-    static void* stdouthandle = GetStdHandle(STD_OUTPUT_HANDLE)
-    return stdouthandle;
+    static void* handle = GetStdHandle(STD_OUTPUT_HANDLE);
+    return handle;
 }
 
 void msgva(void* outstream, MsgCategory category, const char* msg, va_list args)
@@ -18,5 +19,5 @@ void msgva(void* outstream, MsgCategory category, const char* msg, va_list args)
     vsnprintf(vamsg, sizeof(buffer[0]), msg, args);
     sprintf(fmtmsg, "[%s]: %s\n", msgnames[category], vamsg);
 
-    WriteFile(outstream, fmtmsg, strlen(fmtmsg), nullptr, nullptr);
+    WriteFile(outstream, fmtmsg, (DWORD)strlen(fmtmsg), nullptr, nullptr);
 }
