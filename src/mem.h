@@ -78,3 +78,8 @@ inline void mpop(Arena* arena, u64 size)
     ASSERT(arena->Used >= size);
     arena->Used -= size;
 }
+
+inline void mclear(Arena* arena)
+{
+    arena->Used = 0;
+}
