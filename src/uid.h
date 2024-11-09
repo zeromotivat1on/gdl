@@ -2,7 +2,7 @@
 
 #include "hash.h"
 
-#define UID     uidgen()
+#define UID()   uidgen()
 #define UID(n)  uidgen(n)
 
 typedef u64 uid;
