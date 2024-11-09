@@ -41,13 +41,8 @@ struct Arena
     u64 Used;
 };
 
-// Push size bytes.
 #define mpushsize(arena, size)          (u8*)mpushzero(arena, size)
-
-// Push specific type.
 #define mpushtype(arena, type)          (type*)mpushzero(arena, sizeof(type))
-
-// Push array of types.
 #define mpusharray(arena, type, count)  (type*)mpushzero(arena, sizeof(type) * count)
 
 inline Arena minit(void* base, u64 size)
