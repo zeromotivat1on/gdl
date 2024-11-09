@@ -13,13 +13,13 @@ inline constexpr f32 gMatrixEpsilon = 1e-06f;
 inline constexpr f32 gMatrixInvEpsilon = 1e-14f;
 
 // Right-handed look at view matrix.
-mat4 LookAtMat4(const vec3& eye, const vec3& at, const vec3& up);
+mat4 mat4lookat(const vec3& eye, const vec3& at, const vec3& up);
 
 // Right-handed perspective matrix.
-mat4 PerspectiveMat4(f32 rfovy, f32 aspect, f32 n, f32 f);
+mat4 mat4perspective(f32 rfovy, f32 aspect, f32 n, f32 f);
 
 // Right-handed orthographic matrix.
-mat4 OrthographicMat4(f32 l, f32 r, f32 b, f32 t, f32 n, f32 f);
+mat4 mat4orthographic(f32 l, f32 r, f32 b, f32 t, f32 n, f32 f);
 
 // Row-major matrix 2x2.
 struct mat2
