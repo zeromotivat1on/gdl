@@ -30,7 +30,7 @@ struct SysInfo
     u32 LgCoreNum;
 };
 
-void sysmstatus(MemStatus* status);
+void sysmemstatus(MemStatus* status);
 void sysinfo(SysInfo* info);
 
 // --------------
@@ -64,13 +64,13 @@ struct Arena
 };
 
 // Push size bytes.
-#define mpushsz(arena, size)            (u8*)mpushz(arena, size)
+#define mpushsize(arena, size)          (u8*)mpushzero(arena, size)
 
 // Push specific type.
-#define mpusht(arena, type)             (type*)mpushz(arena, sizeof(type))
+#define mpushtype(arena, type)          (type*)mpushzero(arena, sizeof(type))
 
 // Push array of types.
-#define mpusharr(arena, type, count)    (type*)mpushz(arena, sizeof(type) * count)
+#define mpusharr(arena, type, count)    (type*)mpushzero(arena, sizeof(type) * count)
 
 inline void* mpush(Arena* arena, u64 size)
 {
@@ -80,7 +80,7 @@ inline void* mpush(Arena* arena, u64 size)
     return data;
 }
 
-inline void* mpushz(Arena* arena, u64 size)
+inline void* mpushzero(Arena* arena, u64 size)
 {
     void* data = mpush(arena, size);
     memset(data, 0, size);
