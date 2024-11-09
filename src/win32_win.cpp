@@ -170,7 +170,7 @@ void winsize(winhandle win, u16* w, u16* h)
     RECT rect;
     if (GetWindowRect(win32->Handle, &rect))
     {
-        if (w) *w = rect.right - rect.left;
-        if (h) *h = rect.bottom - rect.top;
+        if (w) *w = (u16)(rect.right - rect.left);
+        if (h) *h = (u16)(rect.bottom - rect.top);
     }
 }

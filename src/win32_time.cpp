@@ -1,12 +1,12 @@
 #include "pch.h"
 #include "time.h"
 
-u64 tmcurr()
+u64 timecurr()
 {
     return hpcounter() * 1000ull / hpfrequency();
 }
 
-u64 tmsysboot()
+u64 timesysboot()
 {
     return GetTickCount64();
 }

@@ -23,7 +23,7 @@ void        thterminate(thhandle handle);
 // Semaphore
 // ---------
 
-#define SEMAPHORE_WAIT_MAX 0xFFFFFFFFu
+#define SM_MAX_WAIT_TIME    0xFFFFFFFFu
 
 typedef void*   smhandle; // semaphore handle
 

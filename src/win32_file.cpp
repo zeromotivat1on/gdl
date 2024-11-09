@@ -23,10 +23,10 @@ bool fstop(fhandle handle)
 
 bool freadsync(fhandle handle, u8* buffer, u64 size, u64* nbytes)
 {
-    return ReadFile(handle, buffer, size, (LPDWORD)nbytes, NULL);
+    return ReadFile(handle, buffer, (DWORD)size, (LPDWORD)nbytes, NULL);
 }
 
 bool fwritesync(fhandle handle, u8* buffer, u64 size, u64* nbytes)
 {
-    return WriteFile(handle, buffer, size, (LPDWORD)nbytes, NULL);
+    return WriteFile(handle, buffer, (DWORD)size, (LPDWORD)nbytes, NULL);
 }

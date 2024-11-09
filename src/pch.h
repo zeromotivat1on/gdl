@@ -36,6 +36,9 @@ using f64 = double;
 #define MACRO_EXPAND(x)         x
 #define MACRO_STRING(x)         #x
 
+#define MACRO_GLUE_(a, b)       a ## b
+#define MACRO_GLUE(a, b)        MACRO_GLUE_(a, b)
+
 #define ASSERT(x)               if (!(x)) { *(int*)0 = 0; }
 #define STRUCT_ZERO(x)          x{0}
 
@@ -47,3 +50,6 @@ using f64 = double;
 #define BIT_CLEAR(val, pos)     ((val) &= ~(1ull << (pos)))
 #define BIT_TOGGLE(val, pos)    ((val) ^= (1ull << (pos)))
 #define BIT_CHECK(val, pos)     (((val) & (1ull << (pos))) != 0)
+
+#define INDEX_NONE              -1
+

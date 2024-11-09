@@ -11,6 +11,28 @@
 #define GB(n)   (MB(n) * 1024ull)
 #define TB(n)   (GB(n) * 1024ull)
 
+// ------
+// System
+// ------
+
+struct MemStatus
+{
+    u64 TotalPhys;
+    u64 TotalVirt;
+    u64 AvailPhys;
+    u64 AvailVirt;
+};
+
+struct SysInfo
+{
+    u32 PageSize;
+    u32 AllocGran;
+    u32 LgCoreNum;
+};
+
+void sysmstatus(MemStatus* status);
+void sysinfo(SysInfo* info);
+
 // --------------
 // Virtual memory
 // --------------
