@@ -174,3 +174,9 @@ void winsize(winhandle win, u16* w, u16* h)
         if (h) *h = (u16)(rect.bottom - rect.top);
     }
 }
+
+void* winnative(winhandle win)
+{
+    Win32Window* win32 = (Win32Window*)win;
+    return win32->Handle;
+}

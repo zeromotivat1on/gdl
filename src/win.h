@@ -29,6 +29,7 @@ void    winupdate(winhandle win);
 void    winclose(winhandle win);
 bool    winactive(winhandle win);
 void    winsize(winhandle win, u16* w, u16* h);
+void*   winnative(winhandle win);
 
 // -----
 // Extra
