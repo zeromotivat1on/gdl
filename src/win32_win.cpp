@@ -49,6 +49,13 @@ static LRESULT CALLBACK win32_winproc(HWND hwnd, UINT umsg, WPARAM wparam, LPARA
             win32->MouseAxes[MOUSE_Y] = (f32)GET_Y_LPARAM(lparam);
             break;
         }
+
+        case WM_MOUSEWHEEL:
+        {
+            win32->MouseAxes[MOUSE_SCROLL_X] = (f32)GET_X_LPARAM(lparam);
+            win32->MouseAxes[MOUSE_SCROLL_Y] = (f32)GET_Y_LPARAM(lparam);
+            break;
+        }
     }
     
     return DefWindowProcW(hwnd, umsg, wparam, lparam);
@@ -116,6 +123,9 @@ void windestroy(winhandle win)
 
 void winupdate(winhandle win)
 {
+    win32->MouseAxes[MOUSE_SCROLL_X] = 0.0f;
+    win32->MouseAxes[MOUSE_SCROLL_Y] = 0.0f;
+    
     Win32Window* win32 = (Win32Window*)win;
     MSG msg = STRUCT_ZERO(MSG);
     msg.hwnd = win32->Handle;
