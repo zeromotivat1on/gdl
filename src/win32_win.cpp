@@ -3,6 +3,7 @@
 #include "str.h"
 #include "win32_win.h"
 #include <malloc.h>
+#include <windowsx.h>
 
 const u16 WIN_ALLOC_SIZE = sizeof(Win32Window);
 
@@ -42,10 +43,17 @@ static LRESULT CALLBACK win32_winproc(HWND hwnd, UINT umsg, WPARAM wparam, LPARA
     	case WM_RBUTTONUP: BIT_CLEAR(win32->MouseButtons, MOUSE_RIGHT); break; 
     	case WM_MBUTTONUP: BIT_CLEAR(win32->MouseButtons, MOUSE_MIDDLE); break; 
     	case WM_XBUTTONUP: break;
-    	case WM_MOVE:
+    	case WM_MOUSEMOVE:
         {
-            // const s32 winx = GET_X_LPARAM(lparam);
-            // const s32 winy = GET_Y_LPARAM(lparam);
+            win32->MouseAxes[MOUSE_LAST_X] = win32->MouseAxes[MOUSE_X];
+            win32->MouseAxes[MOUSE_LAST_Y] = win32->MouseAxes[MOUSE_Y];
+                
+            win32->MouseAxes[MOUSE_X] = (f32)GET_X_LPARAM(lparam);
+            win32->MouseAxes[MOUSE_Y] = (f32)GET_Y_LPARAM(lparam);
+
+            win32->MouseAxes[MOUSE_OFFSET_X] = win32->MouseAxes[MOUSE_X] - win32->MouseAxes[MOUSE_LAST_X];
+            win32->MouseAxes[MOUSE_OFFSET_Y] = win32->MouseAxes[MOUSE_LAST_Y] - win32->MouseAxes[MOUSE_Y];
+            
             break;
         }
     }

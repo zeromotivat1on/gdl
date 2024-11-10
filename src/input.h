@@ -195,6 +195,8 @@ enum MouseAxis : s16
 
     MOUSE_X = 0,
     MOUSE_Y,
+    MOUSE_LAST_X,
+    MOUSE_LAST_Y,
     MOUSE_OFFSET_X,
     MOUSE_OFFSET_Y,
     MOUSE_SCROLL_X,
