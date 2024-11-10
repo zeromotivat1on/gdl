@@ -184,6 +184,17 @@ void winsize(winhandle win, u16* w, u16* h)
     }
 }
 
+void winsizeclient(winhandle win, u16* w, u16* h)
+{
+    Win32Window* win32 = (Win32Window*)win;
+    RECT rect;
+    if (GetClientRect(win32->Handle, &rect))
+    {
+        if (w) *w = (u16)(rect.right - rect.left);
+        if (h) *h = (u16)(rect.bottom - rect.top);
+    }
+}
+
 void* winnative(winhandle win)
 {
     Win32Window* win32 = (Win32Window*)win;
