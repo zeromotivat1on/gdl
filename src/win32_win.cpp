@@ -161,7 +161,7 @@ void winclose(winhandle win)
 bool winactive(winhandle win)
 {
     Win32Window* win32 = (Win32Window*)win;
-    return !IsWindow(win32->Handle);
+    return IsWindow(win32->Handle);
 }
 
 void winsize(winhandle win, u16* w, u16* h)
