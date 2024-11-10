@@ -52,8 +52,8 @@ static LRESULT CALLBACK win32_winproc(HWND hwnd, UINT umsg, WPARAM wparam, LPARA
 
         case WM_MOUSEWHEEL:
         {
-            win32->MouseAxes[MOUSE_SCROLL_X] = (f32)GET_X_LPARAM(lparam);
-            win32->MouseAxes[MOUSE_SCROLL_Y] = (f32)GET_Y_LPARAM(lparam);
+            win32->MouseAxes[MOUSE_SCROLL_X] = 0.0f;
+            win32->MouseAxes[MOUSE_SCROLL_Y] = GET_WHEEL_DELTA_WPARAM(wparam);
             break;
         }
     }
