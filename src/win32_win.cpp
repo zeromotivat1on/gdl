@@ -44,16 +44,9 @@ static LRESULT CALLBACK win32_winproc(HWND hwnd, UINT umsg, WPARAM wparam, LPARA
     	case WM_MBUTTONUP: BIT_CLEAR(win32->MouseButtons, MOUSE_MIDDLE); break; 
     	case WM_XBUTTONUP: break;
     	case WM_MOUSEMOVE:
-        {
-            win32->MouseAxes[MOUSE_LAST_X] = win32->MouseAxes[MOUSE_X];
-            win32->MouseAxes[MOUSE_LAST_Y] = win32->MouseAxes[MOUSE_Y];
-                
+        {   
             win32->MouseAxes[MOUSE_X] = (f32)GET_X_LPARAM(lparam);
             win32->MouseAxes[MOUSE_Y] = (f32)GET_Y_LPARAM(lparam);
-
-            win32->MouseAxes[MOUSE_OFFSET_X] = win32->MouseAxes[MOUSE_X] - win32->MouseAxes[MOUSE_LAST_X];
-            win32->MouseAxes[MOUSE_OFFSET_Y] = win32->MouseAxes[MOUSE_LAST_Y] - win32->MouseAxes[MOUSE_Y];
-            
             break;
         }
     }
@@ -158,6 +151,14 @@ void winupdate(winhandle win)
         win32->MouseButtonsLast = win32->MouseButtons;
     }
 
+    // Update mouse offset.
+    {
+         win32->MouseAxes[MOUSE_OFFSET_X] = win32->MouseAxes[MOUSE_X] - win32->MouseAxes[MOUSE_LAST_X];
+         win32->MouseAxes[MOUSE_OFFSET_Y] = win32->MouseAxes[MOUSE_LAST_Y] - win32->MouseAxes[MOUSE_Y];
+
+         win32->MouseAxes[MOUSE_LAST_X] = win32->MouseAxes[MOUSE_X];
+         win32->MouseAxes[MOUSE_LAST_Y] = win32->MouseAxes[MOUSE_Y];   
+    }
     // TODO: gamepad.
 }
 

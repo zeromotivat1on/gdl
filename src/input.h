@@ -224,7 +224,7 @@ enum GamepadAxis : s16
 // -----
 
 // Initialize input tables.
-void    winkeymaps(winhandle win);
+void        winkeymaps(winhandle win);
 
 // Button states.
 
