@@ -164,7 +164,8 @@ void winupdate(winhandle win)
 
 void winclose(winhandle win)
 {
-
+    Win32Window* win32 = (Win32Window*)win;
+    PostMessage(win32->Handle, WM_CLOSE, 0, 0);
 }
 
 bool winactive(winhandle win)
