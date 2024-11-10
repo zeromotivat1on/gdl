@@ -123,10 +123,11 @@ void windestroy(winhandle win)
 
 void winupdate(winhandle win)
 {
+    Win32Window* win32 = (Win32Window*)win;
+        
     win32->MouseAxes[MOUSE_SCROLL_X] = 0.0f;
     win32->MouseAxes[MOUSE_SCROLL_Y] = 0.0f;
     
-    Win32Window* win32 = (Win32Window*)win;
     MSG msg = STRUCT_ZERO(MSG);
     msg.hwnd = win32->Handle;
 
