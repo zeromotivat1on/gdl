@@ -17,8 +17,8 @@ typedef void*   fhandle; // file handle
 // Core
 // ----
 
-fhandle fstart(const char* fpath, s32 access, s32 start);
-bool    fstop(fhandle handle);
+fhandle fopen(const char* fpath, s32 access, s32 start);
+bool    fclose(fhandle handle);
 
 bool    freadsync(fhandle handle, u8* buffer, u64 size, u64* nbytes);
 bool    fwritesync(fhandle handle, u8* buffer, u64 size, u64* nbytes);
@@ -31,10 +31,10 @@ bool    fwritesync(fhandle handle, u8* buffer, u64 size, u64* nbytes);
 
 inline bool freadsync(const char* fpath, u8* buffer, u64 size, u64* nbytes)
 {
-    if (fhandle handle = fstart(fpath, FILE_ACCESS_READ, FILE_OPEN_EXISTING))
+    if (fhandle handle = fopen(fpath, FILE_ACCESS_READ, FILE_OPEN_EXISTING))
     {
         const bool res = freadsync(handle, buffer, size, nbytes);
-        fstop(handle);
+        fclose(handle);
         return res;
     }
 
@@ -43,10 +43,10 @@ inline bool freadsync(const char* fpath, u8* buffer, u64 size, u64* nbytes)
 
 inline bool fwritesync(const char* fpath, u8* buffer, u64 size, u64* nbytes)
 {
-    if (fhandle handle = fstart(fpath, FILE_ACCESS_WRITE, FILE_OPEN_EXISTING))
+    if (fhandle handle = fopen(fpath, FILE_ACCESS_WRITE, FILE_OPEN_EXISTING))
     {
         const bool res = fwritesync(handle, buffer, size, nbytes);
-        fstop(handle);
+        fclose(handle);
         return res;
     }
 
