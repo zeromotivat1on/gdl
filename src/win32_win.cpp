@@ -215,14 +215,19 @@ void* wnative(whandle win)
 
 bool wcrlock(whandle win, bool lock)
 {
-    Win32Window* win32 = (Win32Window*)win;
-    RECT rect;
-    if (GetWindowRect(win32->Handle, &rect))
+    if (lock)
     {
-        return ClipCursor(&rect);
+        Win32Window* win32 = (Win32Window*)win;
+        RECT rect;
+        if (GetWindowRect(win32->Handle, &rect))
+        {
+            return ClipCursor(&rect);
+        }
+
+        return false;
     }
 
-    return false;
+    return ClipCursor(NULL);
 }
 
 s32 wcrshow(whandle win, bool show)
