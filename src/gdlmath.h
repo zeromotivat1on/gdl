@@ -10,7 +10,7 @@ inline constexpr f32 PI = 3.14159265358979323846f;
 // Functions
 // ---------
 
-template<typename T> T Sign(const T& n) { return (n > 0) - (n < 0); }
+template<typename T> s32 Sign(const T& n) { return (n > 0) - (n < 0); }
 template<typename T> T Square(const T& n) { return n * n; }
 template<typename T> T Cube(const T& n) { return n * n * n; }
 template<typename T> T Clamp(const T& n, const T& min, const T& max) { return (n < min) ? min : (n > max ? max : n); }
