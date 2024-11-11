@@ -213,7 +213,7 @@ void* wnative(whandle win)
     return win32->Handle;
 }
 
-bool wcursor(whandle win, bool lock)
+bool wcrlock(whandle win, bool lock)
 {
     Win32Window* win32 = (Win32Window*)win;
     RECT rect;
@@ -223,4 +223,9 @@ bool wcursor(whandle win, bool lock)
     }
 
     return false;
+}
+
+s32 wcrshow(whandle win, bool show)
+{
+    return ShowCursor(show);
 }
