@@ -14,8 +14,8 @@ inline uid uidhash(u64 n)
 
 inline uid uidgen()
 {
-    const u64 ctime = (u64)(timecurr() << 32);
-    const u64 stime = (u64)(timesysboot() << 8);
+    const u64 ctime = (u64)(tmcurr() << 32);
+    const u64 stime = (u64)tmsysboot();
     return uidhash(ctime + stime);
 }
 
