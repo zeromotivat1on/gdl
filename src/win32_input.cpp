@@ -3,7 +3,7 @@
 #include "input.h"
 #include "win32_win.h"
 
-void winkeymaps(void* win)
+void wkeymaps(void* win)
 {
     Win32Window* win32 = (Win32Window*)win;
 
