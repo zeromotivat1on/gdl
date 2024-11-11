@@ -212,3 +212,15 @@ void* wnative(whandle win)
     Win32Window* win32 = (Win32Window*)win;
     return win32->Handle;
 }
+
+bool wcursor(whandle win, bool lock)
+{
+    Win32Window* win32 = (Win32Window*)win;
+    RECT rect;
+    if (GetClientRect(win32->Handle, &rect))
+    {
+        return ClipCursor(&rect);
+    }
+
+    return false;
+}

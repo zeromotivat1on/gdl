@@ -30,6 +30,7 @@ bool    wactive(whandle win);                       // window not closed
 void    wsize(whandle win, u16* w, u16* h);         // window whole size
 void    wsizeinner(whandle win, u16* w, u16* h);    // window inner renderable size
 void*   wnative(whandle win);                       // window native platform handle
+bool    wcursor(whandle win, bool lock);            // lock/unlock cursor from window
 
 // -----
 // Extra
