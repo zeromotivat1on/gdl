@@ -5,7 +5,7 @@
 #include <malloc.h>
 #include <windowsx.h>
 
-const u16 WIN_ALLOC_SIZE = sizeof(Win32Window);
+const u16 WINDOW_ALLOC_SIZE = sizeof(Win32Window);
 
 EXTERN_C IMAGE_DOS_HEADER __ImageBase;
 
@@ -61,7 +61,7 @@ static LRESULT CALLBACK win32_winproc(HWND hwnd, UINT umsg, WPARAM wparam, LPARA
     return DefWindowProcW(hwnd, umsg, wparam, lparam);
 }
 
-bool wincreate(WindowInfo* info, winhandle win)
+bool wcreate(WindowInfo* info, whandle win)
 {
     Win32Window* win32 = (Win32Window*)win;
 
@@ -114,14 +114,14 @@ bool wincreate(WindowInfo* info, winhandle win)
     return true;
 }
 
-void windestroy(winhandle win)
+void wdestroy(whandle win)
 {
     Win32Window* win32 = (Win32Window*)win;
     DestroyWindow(win32->Handle);
     UnregisterClassW(win32->ClassName, win32->Instance);
 }
 
-void winupdate(winhandle win)
+void wupdate(whandle win)
 {
     Win32Window* win32 = (Win32Window*)win;
         
@@ -173,19 +173,19 @@ void winupdate(winhandle win)
     // TODO: gamepad.
 }
 
-void winclose(winhandle win)
+void wclose(whandle win)
 {
     Win32Window* win32 = (Win32Window*)win;
     PostMessage(win32->Handle, WM_CLOSE, 0, 0);
 }
 
-bool winactive(winhandle win)
+bool wactive(whandle win)
 {
     Win32Window* win32 = (Win32Window*)win;
     return IsWindow(win32->Handle);
 }
 
-void winsize(winhandle win, u16* w, u16* h)
+void wsize(whandle win, u16* w, u16* h)
 {
     Win32Window* win32 = (Win32Window*)win;
     RECT rect;
@@ -196,7 +196,7 @@ void winsize(winhandle win, u16* w, u16* h)
     }
 }
 
-void winsizeclient(winhandle win, u16* w, u16* h)
+void wsizeinner(whandle win, u16* w, u16* h)
 {
     Win32Window* win32 = (Win32Window*)win;
     RECT rect;
@@ -207,7 +207,7 @@ void winsizeclient(winhandle win, u16* w, u16* h)
     }
 }
 
-void* winnative(winhandle win)
+void* wnative(whandle win)
 {
     Win32Window* win32 = (Win32Window*)win;
     return win32->Handle;

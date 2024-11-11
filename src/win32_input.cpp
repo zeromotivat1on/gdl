@@ -155,103 +155,103 @@ void winkeymaps(void* win)
     }    
 }
 
-bool keyup(winhandle win, s16 key)
+bool keyup(whandle win, s16 key)
 {
     ASSERT(key < KEY_COUNT);
     return !keydown(win, key);
 }
 
-bool keydown(winhandle win, s16 key)
+bool keydown(whandle win, s16 key)
 {
     ASSERT(key < KEY_COUNT);
     Win32Window* win32 = (Win32Window*)win;
     return bitcheck(win32->Keys.Buckets, key);
 }
 
-bool keypressed(winhandle win, s16 key)
+bool keypressed(whandle win, s16 key)
 {
     ASSERT(key < KEY_COUNT);
     Win32Window* win32 = (Win32Window*)win;
     return bitcheck(win32->KeysPressed.Buckets, key);
 }
 
-bool keyreleased(winhandle win, s16 key)
+bool keyreleased(whandle win, s16 key)
 {
     ASSERT(key < KEY_COUNT);
     Win32Window* win32 = (Win32Window*)win;
     return bitcheck(win32->KeysReleased.Buckets, key);
 }
 
-const char* keyname(winhandle win, s16 key)
+const char* keyname(whandle win, s16 key)
 {
     ASSERT(key < KEY_COUNT);
     Win32Window* win32 = (Win32Window*)win;
     return win32->Keynames[key];
 }
 
-bool mouseup(winhandle win, s16 button)
+bool mouseup(whandle win, s16 button)
 {
     ASSERT(button < MOUSE_BUTTON_COUNT);
     return !mousedown(win, button);
 }
 
-bool mousedown(winhandle win, s16 button)
+bool mousedown(whandle win, s16 button)
 {
     ASSERT(button < MOUSE_BUTTON_COUNT);
     Win32Window* win32 = (Win32Window*)win;
     return BIT_CHECK(win32->MouseButtons, button);
 }
 
-bool mousepressed(winhandle win, s16 button)
+bool mousepressed(whandle win, s16 button)
 {
     ASSERT(button < MOUSE_BUTTON_COUNT);
     Win32Window* win32 = (Win32Window*)win;
     return BIT_CHECK(win32->MouseButtonsPressed, button);
 }
 
-bool mousereleased(winhandle win, s16 button)
+bool mousereleased(whandle win, s16 button)
 {
     ASSERT(button < MOUSE_BUTTON_COUNT);
     Win32Window* win32 = (Win32Window*)win;
     return BIT_CHECK(win32->MouseButtonsReleased, button);
 }
 
-bool gamepadup(winhandle win, u8 gamepad, s16 button)
+bool gamepadup(whandle win, u8 gamepad, s16 button)
 {
     ASSERT(button < GAMEPAD_BUTTON_COUNT);
     Win32Window* win32 = (Win32Window*)win;
     return false;
 }
 
-bool gamepaddown(winhandle win, u8 gamepad, s16 button)
+bool gamepaddown(whandle win, u8 gamepad, s16 button)
 {
     ASSERT(button < GAMEPAD_BUTTON_COUNT);
     Win32Window* win32 = (Win32Window*)win;
     return false;
 }
 
-bool gamepadpressed(winhandle win, u8 gamepad, s16 button)
+bool gamepadpressed(whandle win, u8 gamepad, s16 button)
 {
     ASSERT(button < GAMEPAD_BUTTON_COUNT);
     Win32Window* win32 = (Win32Window*)win;
     return false;
 }
 
-bool gamepadreleased(winhandle win, u8 gamepad, s16 button)
+bool gamepadreleased(whandle win, u8 gamepad, s16 button)
 {
     ASSERT(button < GAMEPAD_BUTTON_COUNT);
     Win32Window* win32 = (Win32Window*)win;
     return false;
 }
 
-f32 mouseaxis(winhandle win, s16 axis)
+f32 mouseaxis(whandle win, s16 axis)
 {
     ASSERT(axis < MOUSE_AXIS_COUNT);
     Win32Window* win32 = (Win32Window*)win;
     return win32->MouseAxes[axis];
 }
 
-f32 gamepadxis(winhandle win, u8 gamepad, s16 axis)
+f32 gamepadxis(whandle win, u8 gamepad, s16 axis)
 {
     ASSERT(axis < GAMEPAD_AXIS_COUNT);
     Win32Window* win32 = (Win32Window*)win;

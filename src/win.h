@@ -4,7 +4,7 @@
 // Types
 // -----
 
-typedef void*   winhandle; // window handle
+typedef void*   whandle; // window handle
 
 struct WindowInfo
 {
@@ -16,21 +16,20 @@ struct WindowInfo
 };
 
 // Desired platform window allocation size.
-extern const u16 WIN_ALLOC_SIZE;
+extern const u16 WINDOW_ALLOC_SIZE;
 
 // ----
 // Core
 // ----
 
-// To create a window, pointer to preallocated memory should be passed.
-bool    wincreate(WindowInfo* info, winhandle win);
-void    windestroy(winhandle win);
-void    winupdate(winhandle win);
-void    winclose(winhandle win);
-bool    winactive(winhandle win);
-void    winsize(winhandle win, u16* w, u16* h);
-void    winsizeclient(winhandle win, u16* w, u16* h);
-void*   winnative(winhandle win);
+bool    wcreate(WindowInfo* info, whandle win);     // create window in preallocated memory
+void    wdestroy(whandle win);                      // destroy the window
+void    wupdate(whandle win);                       // poll window events
+void    wclose(whandle win);                        // close the window
+bool    wactive(whandle win);                       // window not closed
+void    wsize(whandle win, u16* w, u16* h);         // window whole size
+void    wsizeinner(whandle win, u16* w, u16* h);    // window inner renderable size
+void*   wnative(whandle win);                       // window native platform handle
 
 // -----
 // Extra
@@ -53,16 +52,16 @@ inline f32 aspect(f32 w, f32 h)
     return w / h;
 }
 
-inline void winorthocenter(winhandle win, f32* ortho)
+inline void worthocenter(whandle win, f32* ortho)
 {
     u16 w, h;
-    winsize(win, &w, &h);
+    wsize(win, &w, &h);
     orthocenter(w, h, ortho);
 }
 
-inline f32 winaspect(winhandle win)
+inline f32 waspect(whandle win)
 {
     u16 w, h;
-    winsize(win, &w, &h);
+    wsize(win, &w, &h);
     return aspect(w, h);
 }

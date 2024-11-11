@@ -1,12 +1,12 @@
 #include "pch.h"
 #include "time.h"
 
-u64 timecurr()
+u64 tmcurr()
 {
     return hpcounter() * 1000ull / hpfrequency();
 }
 
-u64 timesysboot()
+u64 tmsysboot()
 {
     return GetTickCount64();
 }
@@ -28,7 +28,7 @@ u64 hpfrequency()
         LARGE_INTEGER frequency;
         const BOOL res = QueryPerformanceFrequency(&frequency);
         ASSERT(res);
-        frequency64 = frequency.QuadPart;
+        frequency64 = (u64)frequency.QuadPart;
     }
     
     return frequency64;
