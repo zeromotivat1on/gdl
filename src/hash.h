@@ -13,7 +13,7 @@ inline u32 hash_pcg32(u32 input)
 
 inline u64 hash_pcg64(u64 input)
 {
-    return hashpcg32((u32)input) + hashpcg32(input >> 32);
+    return hash_pcg32((u32)input) + hash_pcg32(input >> 32);
 }
 
 // ------
@@ -25,5 +25,5 @@ inline u64 hash_pcg64(u64 input)
 
 inline u64 hash_fnv(const char* str, u64 hash = FNV_BASIS)
 {
-    return *str ? hashfnv(str + 1, (hash ^ *str) * FNV_PRIME) : hash;
+    return *str ? hash_fnv(str + 1, (hash ^ *str) * FNV_PRIME) : hash;
 }
