@@ -31,10 +31,10 @@ bool    file_write_sync(hfile handle, u8* buffer, u64 size, u64* nbytes);
 
 inline bool file_read_sync(const char* fpath, u8* buffer, u64 size, u64* nbytes)
 {
-    if (hfile handle = fopen(fpath, FILE_ACCESS_READ, FILE_OPEN_EXISTING))
+    if (hfile handle = file_open(fpath, FILE_ACCESS_READ, FILE_OPEN_EXISTING))
     {
-        const bool res = freadsync(handle, buffer, size, nbytes);
-        fclose(handle);
+        const bool res = file_read_sync(handle, buffer, size, nbytes);
+        file_close(handle);
         return res;
     }
 
@@ -43,10 +43,10 @@ inline bool file_read_sync(const char* fpath, u8* buffer, u64 size, u64* nbytes)
 
 inline bool file_write_sync(const char* fpath, u8* buffer, u64 size, u64* nbytes)
 {
-    if (hfile handle = fopen(fpath, FILE_ACCESS_WRITE, FILE_OPEN_EXISTING))
+    if (hfile handle = file_open(fpath, FILE_ACCESS_WRITE, FILE_OPEN_EXISTING))
     {
-        const bool res = fwritesync(handle, buffer, size, nbytes);
-        fclose(handle);
+        const bool res = file_write_sync(handle, buffer, size, nbytes);
+        file_close(handle);
         return res;
     }
 
