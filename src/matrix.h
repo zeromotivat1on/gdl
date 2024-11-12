@@ -9,8 +9,8 @@
 struct mat4;
 struct quat;
 
-inline constexpr f32 gMatrixEpsilon = 1e-06f;
-inline constexpr f32 gMatrixInvEpsilon = 1e-14f;
+#define MATRIX_EPSILON		1e-06f
+#define MATRIX_INV_EPSILON	1e-14f
 
 // Right-handed look at view matrix.
 mat4 mat4lookat(const vec3& eye, const vec3& at, const vec3& up);
@@ -56,9 +56,9 @@ struct mat2
 
 	mat2&			Zero();
 	mat2&			Identity();
-	bool			Identity(f32 epsilon = gMatrixEpsilon) const;
-	bool			Symmetric(f32 epsilon = gMatrixEpsilon) const;
-	bool			Diagonal(f32 epsilon = gMatrixEpsilon) const;
+	bool			Identity(f32 epsilon = MATRIX_EPSILON) const;
+	bool			Symmetric(f32 epsilon = MATRIX_EPSILON) const;
+	bool			Diagonal(f32 epsilon = MATRIX_EPSILON) const;
 
 	f32				Trace() const;
 	f32				Determinant() const;
@@ -295,7 +295,7 @@ inline bool mat2::InverseSelf()
 {
 	f32 det = mat[0][0] * mat[1][1] - mat[0][1] * mat[1][0];
 
-	if (Absf(det) < gMatrixInvEpsilon)
+	if (Absf(det) < MATRIX_INV_EPSILON)
 	{
 		return false;
 	}
@@ -361,9 +361,9 @@ struct mat3
 
 	mat3&			Zero();
 	mat3&			Identity();
-	bool			Identity(f32 epsilon = gMatrixEpsilon) const;
-	bool			Symmetric(f32 epsilon = gMatrixEpsilon) const;
-	bool			Diagonal(f32 epsilon = gMatrixEpsilon) const;
+	bool			Identity(f32 epsilon = MATRIX_EPSILON) const;
+	bool			Symmetric(f32 epsilon = MATRIX_EPSILON) const;
+	bool			Diagonal(f32 epsilon = MATRIX_EPSILON) const;
 	bool			Rotated() const;
 
 	f32				Trace() const;
@@ -701,9 +701,9 @@ struct mat4
 
 	mat4&			Zero();
 	mat4&			Identity();
-	bool			Identity(f32 epsilon = gMatrixEpsilon) const;
-	bool			Symmetric(f32 epsilon = gMatrixEpsilon) const;
-	bool			Diagonal(f32 epsilon = gMatrixEpsilon) const;
+	bool			Identity(f32 epsilon = MATRIX_EPSILON) const;
+	bool			Symmetric(f32 epsilon = MATRIX_EPSILON) const;
+	bool			Diagonal(f32 epsilon = MATRIX_EPSILON) const;
 	bool			Rotated() const;
 
 	f32				Trace() const;

@@ -11,17 +11,17 @@ enum MsgCategory
     MSG_COUNT
 };
 
-inline const char* msgnames[MSG_COUNT] = { "Verbose", "Debug", "Log", "Warning", "Error", "Critical" };
+inline const char* MSG_NAMES[MSG_COUNT] = { "Verbose", "Debug", "Log", "Warning", "Error", "Critical" };
 
-void* stdouthandle(); // standart output handle
+void* stdout_handle(); // standart output handle
 
-void msgva(void* outstream, MsgCategory category, const char* msg, va_list args);
+void msg_va(void* stream, MsgCategory category, const char* msg, va_list args);
 
-inline void msg(void* outstream, MsgCategory category, const char* msg, ...)
+inline void msg(void* stream, MsgCategory category, const char* msg, ...)
 {
     va_list args;
     va_start(args, msg);
-    msgva(outstream, category, msg, args);
+    msg_va(stream, category, msg, args);
     va_end(args);
 }
 
@@ -29,55 +29,55 @@ inline void msg(MsgCategory category, const char* msg, ...)
 {
     va_list args;
     va_start(args, msg);
-    msgva(stdouthandle(), category, msg, args);
+    msg_va(stdout_handle(), category, msg, args);
     va_end(args);
 }
 
-inline void msgverb(const char* msg, ...)
+inline void msg_verbose(const char* msg, ...)
 {
     va_list args;
     va_start(args, msg);
-    msgva(stdouthandle(), MSG_VERBOSE, msg, args);
+    msg_va(stdout_handle(), MSG_VERBOSE, msg, args);
     va_end(args);
 }
 
-inline void msgdbg(const char* msg, ...)
+inline void msg_debug(const char* msg, ...)
 {
     va_list args;
     va_start(args, msg);
-    msgva(stdouthandle(), MSG_DEBUG, msg, args);
+    msg_va(stdout_handle(), MSG_DEBUG, msg, args);
     va_end(args);
 }
 
-inline void msglog(const char* msg, ...)
+inline void msg_log(const char* msg, ...)
 {
     va_list args;
     va_start(args, msg);
-    msgva(stdouthandle(), MSG_LOG, msg, args);
+    msg_va(stdout_handle(), MSG_LOG, msg, args);
     va_end(args);
 }
 
-inline void msgwarn(const char* msg, ...)
+inline void msg_warning(const char* msg, ...)
 {
     va_list args;
     va_start(args, msg);
-    msgva(stdouthandle(), MSG_WARNING, msg, args);
+    msg_va(stdout_handle(), MSG_WARNING, msg, args);
     va_end(args);
 }
 
-inline void msgerr(const char* msg, ...)
+inline void msg_error(const char* msg, ...)
 {
     va_list args;
     va_start(args, msg);
-    msgva(stdouthandle(), MSG_ERROR, msg, args);
+    msg_va(stdout_handle(), MSG_ERROR, msg, args);
     va_end(args);
 }
 
-inline void msgcrit(const char* msg, ...)
+inline void msg_critical(const char* msg, ...)
 {
     va_list args;
     va_start(args, msg);
-    msgva(stdouthandle(), MSG_CRITICAL, msg, args);
+    msg_va(stdout_handle(), MSG_CRITICAL, msg, args);
     va_end(args);
 }
 

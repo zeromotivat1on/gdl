@@ -6,8 +6,8 @@
 #define MIN(ms)     (SEC(ms) / 60)
 #define HOUR(ms)    (MIN(ms) / 60)
 
-u64 tmcurr();       // current time
-u64 tmsysboot();    // time since system boot
+u64 time_curr();		// current time
+u64 time_sys_boot();	// time since system boot
 
-u64 hpcounter();    // high precision counter
-u64 hpfrequency();  // high precision frequency
+u64 hp_counter();		// high precision counter
+u64 hp_frequency();		// high precision frequency

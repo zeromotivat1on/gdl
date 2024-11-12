@@ -1,30 +1,32 @@
 #pragma once
 
-#define WQ_MAX_ENTRIES      256
-#define WQ_MAX_WAIT_TIME    SM_MAX_WAIT_TIME
+#include "thread.h"
 
-typedef void (*WqCallback)(const struct WorkQueue*, void*);
+#define WORK_QUEUE_MAX_ENTRIES      256
+#define WORK_QUEUE_MAX_WAIT_TIME    SEMAPHORE_MAX_WAIT_TIME
 
-struct WqEntry
+typedef void (*WorkqCallback)(const struct Workq*, void*);
+
+struct WorkqEntry
 {
-    WqCallback  Callback;
-    void*       Data;
+    WorkqCallback   callback;
+    void*           data;
 };
 
 // Circular FIFO work queue with synced entry addition and process.
 // Supports multiple producers multiple consumers thread model.
-struct WorkQueue
+struct Workq
 {
-    void*           Semaphore;
-    WqEntry         Entries[WQ_MAX_ENTRIES];
-    volatile u32    EntryToAdd;
-    volatile u32    EntryToProcess;
-    volatile u32    AddedEntryCount;
-    volatile u32    ProcessedEntryCount;
+    hsemaphore      semaphore;
+    WorkqEntry      entries[WORK_QUEUE_MAX_ENTRIES];
+    volatile u32    entry_to_add;
+    volatile u32    entry_to_process;
+    volatile u32    added_entry_count;
+    volatile u32    processed_entry_count;
 };
 
-WorkQueue   wqinit(void* semaphore);
-bool        wqactive(WorkQueue* wq);
-void        wqadd(WorkQueue* wq, void* data, WqCallback callback);
-bool        wqprocess(WorkQueue* wq);
-void        wqwait(WorkQueue* wq, u32 ms);
+Workq   workq_create(void* semaphore);
+bool    workq_active(Workq* wq);
+void    workq_add(Workq* wq, void* data, WorkqCallback callback);
+bool    workq_process(Workq* wq);
+void    workq_wait(Workq* wq, u32 ms);

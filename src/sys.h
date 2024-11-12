@@ -6,18 +6,18 @@
 
 struct SysMemStatus
 {
-    u64 TotalPhys;
-    u64 TotalVirt;
-    u64 AvailPhys;
-    u64 AvailVirt;
+    u64 phys_total;
+    u64 phys_avail;
+    u64 virt_total;
+    u64 virt_avail;
 };
 
 struct SysInfo
 {
-    u32 PageSize;
-    u32 AllocGran;
-    u32 LgCoreNum;
+    u32 page_size;
+    u32 alloc_gran;
+    u32 lg_core_num;
 };
 
-void sysmemstatus(SysMemStatus* status);
-void sysinfo(SysInfo* info);
+void sys_mem_status(SysMemStatus* status);
+void sys_info(SysInfo* info);

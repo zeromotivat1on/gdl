@@ -4,7 +4,7 @@
 
 #define INVALID_THREAD_RESULT ((DWORD)-1)
 
-static DWORD win32_thcreatetype(s32 type)
+static DWORD win32_thread_create_type(s32 type)
 {
     switch(type)
     {
@@ -14,41 +14,41 @@ static DWORD win32_thcreatetype(s32 type)
     }
 }
 
-u64 thcurrid()
+u64 thread_curr_id()
 {
     return GetCurrentThreadId();
 }
 
-void thsleep(u32 ms)
+void thread_sleep(u32 ms)
 {
     Sleep(ms);
 }
 
-bool thactive(thhandle handle)
+bool thread_active(hthread handle)
 {
     DWORD exitCode;
     GetExitCodeThread(handle, &exitCode);
     return exitCode == STILL_ACTIVE;
 }
 
-thhandle thcreate(s32 type, thentry entry, void* userdata)
+hthread thread_create(s32 type, ThreadEntry entry, void* userdata)
 {
-    return CreateThread(0, 0, (LPTHREAD_START_ROUTINE)entry, userdata, win32_thcreatetype(type), NULL);
+    return CreateThread(0, 0, (LPTHREAD_START_ROUTINE)entry, userdata, win32_thread_create_type(type), NULL);
 }
 
-void thresume(thhandle handle)
+void thread_resume(hthread handle)
 {
     const DWORD res = ResumeThread(handle);
     ASSERT(res != INVALID_THREAD_RESULT);
 }
 
-void thsuspend(thhandle handle)
+void thread_suspend(hthread handle)
 {
     const DWORD res = SuspendThread(handle);
     ASSERT(res != INVALID_THREAD_RESULT);
 }
 
-void thterminate(thhandle handle)
+void thread_terminate(hthread handle)
 {
     DWORD exitCode;
     GetExitCodeThread(handle, &exitCode);
@@ -56,78 +56,78 @@ void thterminate(thhandle handle)
     ASSERT(res);
 }
 
-smhandle smcreate(bool signaled)
+hsemaphore semaphore_create(bool signaled)
 {
     return CreateSemaphore(nullptr, (LONG)signaled, 1, nullptr);
 }
 
-void smrelease(smhandle handle)
+void semaphore_release(hsemaphore handle)
 {
     LONG prevCount;
     ReleaseSemaphore(handle, 1, &prevCount);
 }
 
-void smwait(smhandle handle, u32 ms)
+void semaphore_wait(hsemaphore handle, u32 ms)
 {
     WaitForSingleObjectEx(handle, ms, FALSE);
 }
 
-void rbarrier()
+void barrier_read()
 {
     _ReadBarrier();
 }
 
-void wbarrier()
+void barrier_write()
 {
     _WriteBarrier();
 }
 
-void mbarrier()
+void barrier_memory()
 {
     _ReadWriteBarrier();
 }
 
-void rfence()
+void fence_read()
 {
     _mm_lfence();
 }
 
-void wfence()
+void fence_write()
 {
     _mm_sfence();
 }
 
-void mfence()
+void fence_memory()
 {
     _mm_mfence();
 }
 
-s32 atmswap(volatile s32* dst, s32 val)
+s32 atomic_swap(volatile s32* dst, s32 val)
 {
     return InterlockedExchange((volatile LONG*)dst, val);
 }
 
-s32 atmcmpswap(volatile s32* dst, s32 val, s32 cmp)
+s32 atomic_cmp_swap(volatile s32* dst, s32 val, s32 cmp)
 {
     return InterlockedCompareExchange((volatile LONG*)dst, val, cmp);
 }
 
-void* atmcmpswap(volatile void** dst, void* val, void* cmp)
+void* atomic_cmp_swap(volatile void** dst, void* val, void* cmp)
 {
     return InterlockedCompareExchangePointer((volatile LPVOID*)dst, val, cmp);
 }
 
-s32 atmadd(volatile s32* dst, s32 val)
+s32 atomic_add(volatile s32* dst, s32 val)
 {
     return InterlockedAdd((volatile LONG*)dst, val);
 }
 
-s32 atminc(volatile s32* dst)
+s32 atomic_inc(volatile s32* dst)
 {
     return InterlockedIncrement((volatile LONG*)dst);
 }
 
-s32 atmdec(volatile s32* dst)
+s32 atomic_dec(volatile s32* dst)
 {
     return InterlockedDecrement((volatile LONG*)dst);
 }

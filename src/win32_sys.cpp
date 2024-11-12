@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "sys.h"
 
-void sysmemstatus(SysMemStatus* status)
+void sys_mem_status(SysMemStatus* status)
 {
     if (!status) return;
 
@@ -9,21 +9,21 @@ void sysmemstatus(SysMemStatus* status)
     ms.dwLength = sizeof(ms);
     if (GlobalMemoryStatusEx(&ms))
     {
-        status->TotalPhys = ms.ullTotalPhys;
-        status->TotalVirt = ms.ullTotalVirtual;
-        status->AvailPhys = ms.ullAvailPhys;
-        status->AvailVirt = ms.ullAvailVirtual;
+        status->phys_total = ms.ullTotalPhys;
+        status->virt_total = ms.ullTotalVirtual;
+        status->phys_avail = ms.ullAvailPhys;
+        status->virt_avail = ms.ullAvailVirtual;
     }
 }
 
-void sysinfo(SysInfo* info)
+void sys_info(SysInfo* info)
 {
     if (!info) return;
 
     SYSTEM_INFO si = STRUCT_ZERO(SYSTEM_INFO);
     GetSystemInfo(&si);
 
-    info->PageSize = si.dwPageSize;
-    info->AllocGran = si.dwAllocationGranularity;
-    info->LgCoreNum = si.dwNumberOfProcessors;
+    info->page_size = si.dwPageSize;
+    info->alloc_gran = si.dwAllocationGranularity;
+    info->lg_core_num = si.dwNumberOfProcessors;
 }

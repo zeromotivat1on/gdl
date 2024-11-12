@@ -18,17 +18,17 @@
 // Reserve virtual memory of a given size.
 // Returned memory and alloc size are aligned based on system granularity.
 // Initial address can be specified, leave null to let the os decide.
-void*   vmreserve(void* addr, u64 size);
+void*   mem_virt_reserve(void* addr, u64 size);
 
 // Commit virtual memory from given reserved range.
 // Physical memory is allocated when commited one is being written to.
-void*   vmcommit(void* vm, u64 size);
+void*   mem_virt_commit(void* vm, u64 size);
 
 // Release physical memory from given range of virtual addresses.
-bool    vmdecommit(void* vm, u64 size);
+bool    mem_virt_decommit(void* vm, u64 size);
 
 // Free both physical and virtual memory.
-bool    vmrelease(void* vm);
+bool    mem_virt_release(void* vm);
 
 // ------------
 // Memory arena
@@ -36,50 +36,45 @@ bool    vmrelease(void* vm);
 
 struct Arena
 {
-    u8* Base;
-    u64 Size;
-    u64 Used;
+    u8* base;
+    u64 size;
+    u64 used;
 };
 
-// Push size bytes.
-#define mpushsize(arena, size)          (u8*)mpushzero(arena, size)
+#define arena_push_size(arena, size)            (u8*)arena_push_zero(arena, size)
+#define arena_push_struct(arena, type)          (type*)arena_push_zero(arena, sizeof(type))
+#define arena_push_array(arena, type, count)    (type*)arena_push_zero(arena, sizeof(type) * count)
 
-// Push specific type.
-#define mpushtype(arena, type)          (type*)mpushzero(arena, sizeof(type))
-
-// Push array of types.
-#define mpusharray(arena, type, count)  (type*)mpushzero(arena, sizeof(type) * count)
-
-inline Arena minit(void* base, u64 size)
+inline Arena arena_create(void* base, u64 size)
 {
     Arena arena = STRUCT_ZERO(Arena);
-    arena.Base = (u8*)base;
-    arena.Size = size;
+    arena.base = (u8*)base;
+    arena.size = size;
     return arena;
 }
 
-inline void* mpush(Arena* arena, u64 size)
+inline void* arena_push(Arena* arena, u64 size)
 {
-    ASSERT(arena->Used + size <= arena->Size);
-    void* data = arena->Base + arena->Used;
-    arena->Used += size;
+    ASSERT(arena->used + size <= arena->size);
+    void* data = arena->base + arena->used;
+    arena->used += size;
     return data;
 }
 
-inline void* mpushzero(Arena* arena, u64 size)
+inline void* arena_push_zero(Arena* arena, u64 size)
 {
-    void* data = mpush(arena, size);
+    void* data = arena_push(arena, size);
     memset(data, 0, size);
     return data;
 }
 
-inline void mpop(Arena* arena, u64 size)
+inline void arena_pop(Arena* arena, u64 size)
 {
-    ASSERT(arena->Used >= size);
-    arena->Used -= size;
+    ASSERT(arena->used >= size);
+    arena->used -= size;
 }
 
-inline void mclear(Arena* arena)
+inline void arena_clear(Arena* arena)
 {
-    arena->Used = 0;
+    arena->used = 0;
 }

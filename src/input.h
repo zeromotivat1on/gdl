@@ -223,29 +223,23 @@ enum GamepadAxis : s16
 // Input
 // -----
 
-// Initialize input tables.
-void        wkeymaps(whandle win);
+void        window_key_tables_init(hwindow win);
 
-// Button states.
+bool        key_up(hwindow win, s16 key);
+bool        key_down(hwindow win, s16 key);
+bool        key_pressed(hwindow win, s16 key);
+bool        key_released(hwindow win, s16 key);
+const char* key_name(hwindow win, s16 key);
 
-bool        keyup(whandle win, s16 key);
-bool        keydown(whandle win, s16 key);
-bool        keypressed(whandle win, s16 key);
-bool        keyreleased(whandle win, s16 key);
-const char* keyname(whandle win, s16 key);
+bool        mouse_up(hwindow win, s16 button);
+bool        mouse_down(hwindow win, s16 button);
+bool        mouse_pressed(hwindow win, s16 button);
+bool        mouse_released(hwindow win, s16 button);
 
-bool        mouseup(whandle win, s16 button);
-bool        mousedown(whandle win, s16 button);
-bool        mousepressed(whandle win, s16 button);
-bool        mousereleased(whandle win, s16 button);
+bool        gamepad_up(hwindow win, u8 gamepad, s16 button);
+bool        gamepad_down(hwindow win, u8 gamepad, s16 button);
+bool        gamepad_pressed(hwindow win, u8 gamepad, s16 button);
+bool        gamepad_released(hwindow win, u8 gamepad, s16 button);
 
-bool        gamepadup(whandle win, u8 gamepad, s16 button);
-bool        gamepaddown(whandle win, u8 gamepad, s16 button);
-bool        gamepadpressed(whandle win, u8 gamepad, s16 button);
-bool        gamepadreleased(whandle win, u8 gamepad, s16 button);
-
-// Axis values.
-
-f32         mouseaxis(whandle win, s16 axis);
-f32         gamepadaxis(whandle win, u8 gamepad, s16 axis);
-
+f32         mouse_axis(hwindow win, s16 axis);
+f32         gamepad_axis(hwindow win, u8 gamepad, s16 axis);

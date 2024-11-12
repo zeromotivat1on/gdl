@@ -11,17 +11,17 @@ extern s32 FILE_ACCESS_EXEC;    // file can be executed
 extern s32 FILE_CREATE_NEW;     // create new file or fail
 extern s32 FILE_OPEN_EXISTING;  // open existing file or fail
 
-typedef void*   fhandle; // file handle
+typedef void*   hfile; // file handle
 
 // ----
 // Core
 // ----
 
-fhandle fopen(const char* fpath, s32 access, s32 start);
-bool    fclose(fhandle handle);
+hfile   file_open(const char* fpath, s32 open, s32 access);
+bool    file_close(hfile handle);
 
-bool    freadsync(fhandle handle, u8* buffer, u64 size, u64* nbytes);
-bool    fwritesync(fhandle handle, u8* buffer, u64 size, u64* nbytes);
+bool    file_read_sync(hfile handle, u8* buffer, u64 size, u64* nbytes);
+bool    file_write_sync(hfile handle, u8* buffer, u64 size, u64* nbytes);
 
 // -----
 // Extra
@@ -29,9 +29,9 @@ bool    fwritesync(fhandle handle, u8* buffer, u64 size, u64* nbytes);
 
 // Convenient wrappers to read/write from/to existing file.
 
-inline bool freadsync(const char* fpath, u8* buffer, u64 size, u64* nbytes)
+inline bool file_read_sync(const char* fpath, u8* buffer, u64 size, u64* nbytes)
 {
-    if (fhandle handle = fopen(fpath, FILE_ACCESS_READ, FILE_OPEN_EXISTING))
+    if (hfile handle = fopen(fpath, FILE_ACCESS_READ, FILE_OPEN_EXISTING))
     {
         const bool res = freadsync(handle, buffer, size, nbytes);
         fclose(handle);
@@ -41,9 +41,9 @@ inline bool freadsync(const char* fpath, u8* buffer, u64 size, u64* nbytes)
     return false;
 }
 
-inline bool fwritesync(const char* fpath, u8* buffer, u64 size, u64* nbytes)
+inline bool file_write_sync(const char* fpath, u8* buffer, u64 size, u64* nbytes)
 {
-    if (fhandle handle = fopen(fpath, FILE_ACCESS_WRITE, FILE_OPEN_EXISTING))
+    if (hfile handle = fopen(fpath, FILE_ACCESS_WRITE, FILE_OPEN_EXISTING))
     {
         const bool res = fwritesync(handle, buffer, size, nbytes);
         fclose(handle);

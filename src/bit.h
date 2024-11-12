@@ -6,54 +6,54 @@
 
 struct u128
 {
-    u64 Buckets[2];
+    u64 buckets[2];
 };
 
 struct u256
 {
-    u64 Buckets[4];
+    u64 buckets[4];
 };
 
 struct u512
 {
-    u64 Buckets[8];
+    u64 buckets[8];
 };
 
-// --------------
-// Bit operations
-// --------------
+// --------------------
+// Large bit operations
+// --------------------
 
-inline void bitset(u64* buckets, u64 idx)
+inline void bit_set(u64* buckets, u64 idx)
 {
     buckets[idx / 64] |= (1ull << (idx % 64));
 }
 
-inline void bitclear(u64* buckets, u64 idx)
+inline void bit_clear(u64* buckets, u64 idx)
 {
     buckets[idx / 64] &= ~(1ull << (idx % 64));
 }
 
-inline void bittoggle(u64* buckets, u64 idx)
+inline void bit_toggle(u64* buckets, u64 idx)
 {
     buckets[idx / 64] ^= (1ull << (idx % 64));
 }
 
-inline bool bitcheck(const u64* buckets, u64 idx)
+inline bool bit_check(const u64* buckets, u64 idx)
 {
     return (buckets[idx / 64] & (1ull << (idx % 64))) != 0;
 }
 
-inline void bitsetall(u64* buckets, u64 count)
+inline void bit_set_all(u64* buckets, u64 count)
 {
     memset(buckets, 0xFF, count * sizeof(u64));
 }
 
-inline void bitclearall(u64* buckets, u64 count)
+inline void bit_clear_all(u64* buckets, u64 count)
 {
     memset(buckets, 0, count * sizeof(u64));
 }
 
-inline void bitand(u64* resbuckets, const u64* lbuckets, const u64* rbuckets, u64 count)
+inline void bit_and(u64* resbuckets, const u64* lbuckets, const u64* rbuckets, u64 count)
 {
     for (u64 i = 0; i < count; ++i)
     {
@@ -61,26 +61,26 @@ inline void bitand(u64* resbuckets, const u64* lbuckets, const u64* rbuckets, u6
     }
 }
 
-inline void bitor(u64* resbuckets, const u64* lbuckets, const u64* rbuckets, u64 count)
+inline void bit_or(u64* res_buckets, const u64* lbuckets, const u64* rbuckets, u64 count)
 {
     for (u64 i = 0; i < count; ++i)
     {
-        resbuckets[i] = lbuckets[i] | rbuckets[i];
+        res_buckets[i] = lbuckets[i] | rbuckets[i];
     }
 }
 
-inline void bitxor(u64* resbuckets, const u64* lbuckets, const u64* rbuckets, u64 count)
+inline void bit_xor(u64* res_buckets, const u64* lbuckets, const u64* rbuckets, u64 count)
 {
     for (u64 i = 0; i < count; ++i)
     {
-        resbuckets[i] = lbuckets[i] ^ rbuckets[i];
+        res_buckets[i] = lbuckets[i] ^ rbuckets[i];
     }
 }
 
-inline void bitnot(u64* resbuckets, const u64* buckets, u64 count)
+inline void bit_not(u64* res_buckets, const u64* buckets, u64 count)
 {
     for (u64 i = 0; i < count; ++i)
     {
-        resbuckets[i] = ~buckets[i];
+        res_buckets[i] = ~buckets[i];
     }
 }

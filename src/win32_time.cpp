@@ -1,17 +1,17 @@
 #include "pch.h"
 #include "time.h"
 
-u64 tmcurr()
+u64 time_curr()
 {
-    return hpcounter() * 1000ull / hpfrequency();
+    return hp_counter() * 1000ull / hp_frequency();
 }
 
-u64 tmsysboot()
+u64 time_sys_boot()
 {
     return GetTickCount64();
 }
 
-u64 hpcounter()
+u64 hp_counter()
 {
     LARGE_INTEGER counter;
     const BOOL res = QueryPerformanceCounter(&counter);
@@ -19,7 +19,7 @@ u64 hpcounter()
     return counter.QuadPart;
 }
 
-u64 hpfrequency()
+u64 hp_frequency()
 {
     static u64 frequency64 = 0;
 

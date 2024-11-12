@@ -2,22 +2,23 @@
 #include "msg.h"
 #include <cstdio>
 
-void* stdouthandle()
+void* stdout_handle()
 {
     static void* handle = GetStdHandle(STD_OUTPUT_HANDLE);
     return handle;
 }
 
-void msgva(void* outstream, MsgCategory category, const char* msg, va_list args)
+void msg_va(void* stream, MsgCategory category, const char* msg, va_list args)
 {
     static char buffer[2][2048];
-    ASSERT(outstream);
+    
+    ASSERT(stream);
 
-    char* vamsg = buffer[0];
-    char* fmtmsg = buffer[1];
+    char* va_msg = buffer[0];
+    char* fmt_msg = buffer[1];
 
-    vsnprintf(vamsg, sizeof(buffer[0]), msg, args);
-    sprintf(fmtmsg, "[%s]: %s\n", msgnames[category], vamsg);
+    vsnprintf(va_msg, sizeof(buffer[0]), msg, args);
+    sprintf(fmt_msg, "[%s]: %s\n", MSG_NAMES[category], va_msg);
 
-    WriteFile(outstream, fmtmsg, (DWORD)strlen(fmtmsg), nullptr, nullptr);
+    WriteFile(stream, fmt_msg, (DWORD)strlen(fmt_msg), nullptr, nullptr);
 }

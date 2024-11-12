@@ -9,24 +9,24 @@ s32 FILE_ACCESS_EXEC    = GENERIC_EXECUTE;
 s32 FILE_CREATE_NEW     = CREATE_NEW;
 s32 FILE_OPEN_EXISTING  = OPEN_EXISTING;
 
-fhandle fopen(const char* fpath, s32 access, s32 start)
+hfile file_open(const char* fpath, s32 open, s32 access)
 {
     wchar_t wfpath[512];
-    utf8to16(fpath, wfpath);
-    return CreateFileW(wfpath, access, 0, NULL, start, FILE_ATTRIBUTE_NORMAL, NULL);
+    utf8_to_utf16(fpath, wfpath);
+    return CreateFileW(wfpath, access, 0, NULL, open, FILE_ATTRIBUTE_NORMAL, NULL);
 }
 
-bool fclose(fhandle handle)
+bool file_close(hfile handle)
 {
     return CloseHandle(handle);
 }
 
-bool freadsync(fhandle handle, u8* buffer, u64 size, u64* nbytes)
+bool file_read_sync(hfile handle, u8* buffer, u64 size, u64* nbytes)
 {
     return ReadFile(handle, buffer, (DWORD)size, (LPDWORD)nbytes, NULL);
 }
 
-bool fwritesync(fhandle handle, u8* buffer, u64 size, u64* nbytes)
+bool file_write_sync(hfile handle, u8* buffer, u64 size, u64* nbytes)
 {
     return WriteFile(handle, buffer, (DWORD)size, (LPDWORD)nbytes, NULL);
 }

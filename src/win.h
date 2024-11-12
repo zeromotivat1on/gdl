@@ -4,41 +4,43 @@
 // Types
 // -----
 
-typedef void*   whandle; // window handle
+typedef void*   hwindow; // window handle
 
 struct WindowInfo
 {
-    char*   Title;
-	u16     Width;
-    u16     Height;
-    u16     X;
-    u16     Y;
+    char*   title;
+	u16     width;
+    u16     height;
+    u16     x;
+    u16     y;
 };
 
 // Desired platform window allocation size.
+// Use this to preallocate a block of memory
+// that should be passed during window creation.
 extern const u16 WINDOW_ALLOC_SIZE;
 
 // ----
 // Core
 // ----
 
-bool    wcreate(WindowInfo* info, whandle win);     // create window in preallocated memory
-void    wdestroy(whandle win);                      // destroy the window
-void    wupdate(whandle win);                       // poll window events
-void    wclose(whandle win);                        // close the window
-bool    wactive(whandle win);                       // window not closed
-void    wsize(whandle win, u16* w, u16* h);         // window whole size
-void    wsizeinner(whandle win, u16* w, u16* h);    // window inner renderable size
-void*   wnative(whandle win);                       // window native platform handle
-bool    wcrlock(whandle win, bool lock);            // lock/unlock cursor from window
-s32     wcrshow(whandle win, bool show);            // show/hide cursor in window
+bool    window_create(hwindow win, WindowInfo* info);   // init window in preallocated memory
+void    window_destroy(hwindow win);                    // destroy the window
+void    window_update(hwindow win);                     // poll window events
+void    window_close(hwindow win);                      // close the window
+bool    window_active(hwindow win);                     // window not closed
+void    window_size(hwindow win, u16* w, u16* h);       // window whole size
+void    window_size_inner(hwindow win, u16* w, u16* h); // window inner renderable size
+void*   window_native(hwindow win);                     // window native platform handle
+bool    window_cursor_lock(hwindow win, bool lock);     // lock/unlock cursor within window
+s32     window_cursor_show(hwindow win, bool show);     // show/hide cursor in window
 
 // -----
 // Extra
 // -----
 
 // Fill orthographic data at center of a given dimensions in order [left, right, bottom, top]
-inline void orthocenter(f32 w, f32 h, f32* ortho)
+inline void ortho_center(f32 w, f32 h, f32* ortho)
 {
 	const f32 whalf = w * 0.5f;
 	const f32 hhalf = h * 0.5f;
@@ -54,16 +56,16 @@ inline f32 aspect(f32 w, f32 h)
     return w / h;
 }
 
-inline void worthocenter(whandle win, f32* ortho)
+inline void window_ortho_center(hwindow win, f32* ortho)
 {
     u16 w, h;
-    wsize(win, &w, &h);
-    orthocenter(w, h, ortho);
+    window_size_inner(win, &w, &h);
+    ortho_center(w, h, ortho);
 }
 
-inline f32 waspect(whandle win)
+inline f32 window_aspect(hwindow win)
 {
     u16 w, h;
-    wsize(win, &w, &h);
+    window_size_inner(win, &w, &h);
     return aspect(w, h);
 }

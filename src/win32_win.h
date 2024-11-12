@@ -9,30 +9,30 @@ struct Win32Window
     // Platform
     // --------
 
-    wchar_t*    ClassName;
-    ATOM        Class;
-    HINSTANCE   Instance;
-    HWND        Handle;
-    // DIC         Device;
+    wchar_t*    class_name;
+    ATOM        class_atom;
+    HINSTANCE   hinstance;
+    HWND        handle;
+    // DIC      device;
 
     // -----
     // Input
     // -----
 
-    u128        Keys;
-    u128        KeysLast;
-    u128        KeysPressed;
-    u128        KeysReleased;
+    u128        keys;
+    u128        keys_last;
+    u128        keys_pressed;
+    u128        keys_released;
 
-    u8          MouseButtons;
-    u8          MouseButtonsLast;
-    u8          MouseButtonsPressed;
-    u8          MouseButtonsReleased;
+    u8          mouse_buttons;
+    u8          mouse_buttons_last;
+    u8          mouse_buttons_pressed;
+    u8          mouse_buttons_released;
     
-    f32         MouseAxes[MOUSE_AXIS_COUNT];
+    f32         mouse_axes[MOUSE_AXIS_COUNT];
     
-    s16         VirtualKeys[KEY_COUNT]; // key to virtual keycode
-    s16         Scancodes[KEY_COUNT];   // key to keyboard scancode
-    s16         Keycodes[512];          // virtual keycode to key
-    char        Keynames[KEY_COUNT][4]; // key visual representation
+    s16         virtual_keys[KEY_COUNT];    // key to virtual keycode
+    s16         scancodes[KEY_COUNT];       // key to keyboard scancode
+    s16         keycodes[512];              // virtual keycode to key
+    char        keynames[KEY_COUNT][4];     // key visual representation
 };

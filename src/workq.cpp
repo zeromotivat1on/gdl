@@ -2,58 +2,58 @@
 #include "workq.h"
 #include "thread.h"
 
-WorkQueue wqinit(void* semaphore)
+Workq workq_create(void* semaphore)
 {
-    WorkQueue wq = STRUCT_ZERO(WorkQueue);
-    wq.Semaphore = semaphore;
+    Workq wq = STRUCT_ZERO(Workq);
+    wq.semaphore = semaphore;
     return wq;
 }
 
-bool wqactive(WorkQueue* wq)
+bool workq_active(Workq* wq)
 {
-    return wq->ProcessedEntryCount != wq->AddedEntryCount;
+    return wq->processed_entry_count != wq->added_entry_count;
 }
 
-void wqadd(WorkQueue* wq, void* data, WqCallback callback)
+void workq_add(Workq* wq, void* data, WorkqCallback callback)
 {
-    const u32 entryToAdd = wq->EntryToAdd;
-    const u32 nextEntryToAdd = (entryToAdd + 1) % ARRAY_COUNT(wq->Entries);
+    const u32 entry_to_add = wq->entry_to_add;
+    const u32 next_entry_to_add = (entry_to_add + 1) % ARRAY_COUNT(wq->entries);
 
-    ASSERT(nextEntryToAdd != wq->EntryToProcess);
+    ASSERT(next_entry_to_add != wq->entry_to_process);
 
-    const u32 idx = atmcmpswap((volatile s32*)&wq->EntryToAdd, nextEntryToAdd, entryToAdd);
-    if (idx == entryToAdd)
+    const u32 idx = atomic_cmp_swap((volatile s32*)&wq->entry_to_add, next_entry_to_add, entry_to_add);
+    if (idx == entry_to_add)
     {
-        WqEntry& entry = wq->Entries[entryToAdd];
-        entry.Callback = callback;
-        entry.Data = data;
+        WorkqEntry& entry = wq->entries[entry_to_add];
+        entry.callback = callback;
+        entry.data = data;
 
-        atminc((volatile s32*)&wq->ProcessedEntryCount);
-        smrelease(wq->Semaphore);
+        atomic_inc((volatile s32*)&wq->processed_entry_count);
+        semaphore_release(wq->semaphore);
     }
 }
 
-bool wqprocess(WorkQueue* wq)
+bool workq_process(Workq* wq)
 {
-    const u32 entryToProcess = wq->EntryToProcess;
-    if (entryToProcess == wq->EntryToAdd)
+    const u32 entry_to_trocess = wq->entry_to_process;
+    if (entry_to_trocess == wq->entry_to_add)
     {
         return false;
     }
 
-    const u32 nextEntryToProcess = (entryToProcess + 1) % ARRAY_COUNT(wq->Entries);
-    const u32 idx = atmcmpswap((volatile s32*)&wq->EntryToProcess, nextEntryToProcess, entryToProcess);
-    if (idx == entryToProcess)
+    const u32 next_entry_to_process = (entry_to_trocess + 1) % ARRAY_COUNT(wq->entries);
+    const u32 idx = atomic_cmp_swap((volatile s32*)&wq->entry_to_process, next_entry_to_process, entry_to_trocess);
+    if (idx == entry_to_trocess)
     {
-        WqEntry& entry = wq->Entries[entryToProcess];
-        entry.Callback(wq, entry.Data);
-        atminc((volatile s32*)&wq->AddedEntryCount);
+        WorkqEntry& entry = wq->entries[entry_to_trocess];
+        entry.callback(wq, entry.data);
+        atomic_inc((volatile s32*)&wq->added_entry_count);
     }
 
     return true;
 }
 
-void wqwait(WorkQueue* wq, u32 ms)
+void workq_wait(Workq* wq, u32 ms)
 {
-    smwait(wq->Semaphore, ms);
+    semaphore_wait(wq->semaphore, ms);
 }
