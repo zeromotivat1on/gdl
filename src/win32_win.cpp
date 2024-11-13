@@ -88,7 +88,7 @@ bool window_create(hwindow win, WindowInfo* info)
 
     static wchar_t wtitle[32];
     utf8_to_utf16(info->title, wtitle);
-    PANIC(win32->handle == NULL);
+    PANIC(win32->handle);
 
     win32->handle = CreateWindowExW(
         0,
