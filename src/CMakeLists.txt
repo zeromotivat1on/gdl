@@ -16,7 +16,7 @@ endif()
 
 target_compile_definitions(gdl PRIVATE
                                # Platform
-                               $<$<PLATFORM_ID:Windows>:PLATFORM_WIN32>
+                               $<$<PLATFORM_ID:Windows>:WIN32>
                                # Configuration
-                               $<$<CONFIG:Debug>:GDL_DEBUG>
-                               $<$<CONFIG:Release>:GDL_RELEASE>)
+                               $<$<CONFIG:Debug>:BUILD_DEBUG>
+                               $<$<CONFIG:Release>:BUILD_RELEASE>)

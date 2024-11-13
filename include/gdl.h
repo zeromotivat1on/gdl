@@ -1,12 +1,6 @@
 #pragma once
 
 // ------------
-// STD Includes
-// ------------
-
-#include <cstring>
-
-// ------------
 // GDL Includes
 // ------------
 

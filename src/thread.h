@@ -1,5 +1,7 @@
 #pragma once
 
+#define WAIT_INFINITE       0xFFFFFFFF
+
 // ------
 // Thread
 // ------
@@ -23,13 +25,21 @@ void        thread_terminate(hthread handle);
 // Semaphore
 // ---------
 
-#define SEMAPHORE_MAX_WAIT_TIME 0xFFFFFFFFu
-
 typedef void*	hsemaphore; // semaphore handle
 
-hsemaphore  semaphore_create(bool signaled);
-void        semaphore_release(hsemaphore handle);
-void        semaphore_wait(hsemaphore handle, u32 ms);
+hsemaphore  semaphore_create(s32 init_count, s32 max_count);
+bool        semaphore_release(hsemaphore handle, s32 count, s32* prev_count);
+bool        semaphore_wait(hsemaphore handle, u32 ms);
+
+// -----
+// Mutex
+// -----
+
+typedef void*   hmutex;
+
+hmutex      mutex_create(bool signaled);
+bool        mutex_release(hmutex handle);
+bool        mutex_wait(hmutex handle, u32 ms);
 
 // -------
 // Barrier

@@ -14,6 +14,31 @@ static DWORD win32_thread_create_type(s32 type)
     }
 }
 
+static BOOL win32_wait_res_check(void* hobj, DWORD res)
+{
+    switch(res)
+    {
+        case WAIT_OBJECT_0:
+            return true;
+
+        case WAIT_ABANDONED:
+            msg_error("[gdl]: Object (%p) was not released before owning thread termination", hobj);
+            return false;
+            
+        case WAIT_TIMEOUT:
+            msg_warning("[gdl]: Wait time for object (%p) elapsed", hobj);
+            return false;
+            
+        case WAIT_FAILED:
+            msg_error("[gdl]: Failed to wait for object (%p) with error code (%u)", hobj, GetLastError());
+            return false;
+                        
+        default:
+            msg_error("[gdl]: Unknown wait result (%u) for object (%p)", res, hobj);
+            return false;
+    }
+}
+
 u64 thread_curr_id()
 {
     return GetCurrentThreadId();
@@ -26,9 +51,9 @@ void thread_sleep(u32 ms)
 
 bool thread_active(hthread handle)
 {
-    DWORD exitCode;
-    GetExitCodeThread(handle, &exitCode);
-    return exitCode == STILL_ACTIVE;
+    DWORD exit_code;
+    GetExitCodeThread(handle, &exit_code);
+    return exit_code == STILL_ACTIVE;
 }
 
 hthread thread_create(s32 type, ThreadEntry entry, void* userdata)
@@ -50,26 +75,42 @@ void thread_suspend(hthread handle)
 
 void thread_terminate(hthread handle)
 {
-    DWORD exitCode;
-    GetExitCodeThread(handle, &exitCode);
-    const BOOL res = TerminateThread(handle, exitCode);
+    DWORD exit_code;
+    GetExitCodeThread(handle, &exit_code);
+    const BOOL res = TerminateThread(handle, exit_code);
     PANIC(!res);
 }
 
-hsemaphore semaphore_create(bool signaled)
+hsemaphore semaphore_create(s32 init_count, s32 max_count)
 {
-    return CreateSemaphore(nullptr, (LONG)signaled, 1, nullptr);
+    return CreateSemaphore(NULL, (LONG)init_count, (LONG)max_count, NULL);
 }
 
-void semaphore_release(hsemaphore handle)
+bool semaphore_release(hsemaphore handle, s32 count, s32* prev_count)
 {
-    LONG prevCount;
-    ReleaseSemaphore(handle, 1, &prevCount);
+    return ReleaseSemaphore(handle, count, (LPLONG)prev_count);
 }
 
-void semaphore_wait(hsemaphore handle, u32 ms)
+bool semaphore_wait(hsemaphore handle, u32 ms)
 {
-    WaitForSingleObjectEx(handle, ms, FALSE);
+    const DWORD res = WaitForSingleObjectEx(handle, ms, FALSE);
+    return win32_wait_res_check(handle, res);
+}
+
+hmutex mutex_create(bool signaled)
+{
+    return CreateMutex(NULL, (LONG)signaled, NULL);
+}
+
+bool mutex_release(hmutex handle)
+{
+    return ReleaseMutex(handle);
+}
+
+bool mutex_wait(hmutex handle, u32 ms)
+{
+    const DWORD res = WaitForSingleObjectEx(handle, ms, FALSE);
+    return win32_wait_res_check(handle, res);
 }
 
 void barrier_read()

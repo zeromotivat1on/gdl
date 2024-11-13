@@ -2,8 +2,8 @@
 
 #include "thread.h"
 
-#define WORK_QUEUE_MAX_ENTRIES      256
-#define WORK_QUEUE_MAX_WAIT_TIME    SEMAPHORE_MAX_WAIT_TIME
+#define WORKQ_MAX_ENTRIES      256
+#define WORKQ_MAX_WAIT_TIME    SEMAPHORE_MAX_WAIT_TIME
 
 typedef void (*WorkqCallback)(const struct Workq*, void*);
 
@@ -18,14 +18,14 @@ struct WorkqEntry
 struct Workq
 {
     hsemaphore      semaphore;
-    WorkqEntry      entries[WORK_QUEUE_MAX_ENTRIES];
+    WorkqEntry      entries[WORKQ_MAX_ENTRIES];
     volatile u32    entry_to_add;
     volatile u32    entry_to_process;
     volatile u32    added_entry_count;
     volatile u32    processed_entry_count;
 };
 
-Workq   workq_create(void* semaphore);
+Workq   workq_create(hsemaphore semaphore);
 bool    workq_active(Workq* wq);
 void    workq_add(Workq* wq, void* data, WorkqCallback callback);
 bool    workq_process(Workq* wq);
