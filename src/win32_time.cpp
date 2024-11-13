@@ -15,7 +15,7 @@ u64 hp_counter()
 {
     LARGE_INTEGER counter;
     const BOOL res = QueryPerformanceCounter(&counter);
-    ASSERT(res);
+    PANIC(!res);
     return counter.QuadPart;
 }
 
@@ -27,7 +27,7 @@ u64 hp_frequency()
     {
         LARGE_INTEGER frequency;
         const BOOL res = QueryPerformanceFrequency(&frequency);
-        ASSERT(res);
+        PANIC(!res);
         frequency64 = (u64)frequency.QuadPart;
     }
     

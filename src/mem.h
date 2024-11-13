@@ -55,7 +55,7 @@ inline Arena arena_create(void* base, u64 size)
 
 inline void* arena_push(Arena* arena, u64 size)
 {
-    ASSERT(arena->used + size <= arena->size);
+    PANIC(arena->used + size > arena->size);
     void* data = arena->base + arena->used;
     arena->used += size;
     return data;
@@ -70,7 +70,7 @@ inline void* arena_push_zero(Arena* arena, u64 size)
 
 inline void arena_pop(Arena* arena, u64 size)
 {
-    ASSERT(arena->used >= size);
+    PANIC(arena->used < size);
     arena->used -= size;
 }
 

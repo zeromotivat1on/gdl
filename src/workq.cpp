@@ -19,7 +19,7 @@ void workq_add(Workq* wq, void* data, WorkqCallback callback)
     const u32 entry_to_add = wq->entry_to_add;
     const u32 next_entry_to_add = (entry_to_add + 1) % ARRAY_COUNT(wq->entries);
 
-    ASSERT(next_entry_to_add != wq->entry_to_process);
+    PANIC(next_entry_to_add == wq->entry_to_process);
 
     const u32 idx = atomic_cmp_swap((volatile s32*)&wq->entry_to_add, next_entry_to_add, entry_to_add);
     if (idx == entry_to_add)

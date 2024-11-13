@@ -12,7 +12,7 @@ void msg_va(void* stream, MsgCategory category, const char* msg, va_list args)
 {
     static char buffer[2][2048];
     
-    ASSERT(stream);
+    PANIC(!stream);
 
     char* va_msg = buffer[0];
     char* fmt_msg = buffer[1];

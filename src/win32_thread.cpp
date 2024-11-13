@@ -39,13 +39,13 @@ hthread thread_create(s32 type, ThreadEntry entry, void* userdata)
 void thread_resume(hthread handle)
 {
     const DWORD res = ResumeThread(handle);
-    ASSERT(res != INVALID_THREAD_RESULT);
+    PANIC(res == INVALID_THREAD_RESULT);
 }
 
 void thread_suspend(hthread handle)
 {
     const DWORD res = SuspendThread(handle);
-    ASSERT(res != INVALID_THREAD_RESULT);
+    PANIC(res == INVALID_THREAD_RESULT);
 }
 
 void thread_terminate(hthread handle)
@@ -53,7 +53,7 @@ void thread_terminate(hthread handle)
     DWORD exitCode;
     GetExitCodeThread(handle, &exitCode);
     const BOOL res = TerminateThread(handle, exitCode);
-    ASSERT(res);
+    PANIC(!res);
 }
 
 hsemaphore semaphore_create(bool signaled)

@@ -13,13 +13,13 @@ struct quat;
 #define MATRIX_INV_EPSILON	1e-14f
 
 // Right-handed look at view matrix.
-mat4 mat4lookat(const vec3& eye, const vec3& at, const vec3& up);
+mat4 lookat(const vec3& eye, const vec3& at, const vec3& up);
 
 // Right-handed perspective matrix.
-mat4 mat4perspective(f32 rfovy, f32 aspect, f32 n, f32 f);
+mat4 perspective(f32 rfovy, f32 aspect, f32 n, f32 f);
 
 // Right-handed orthographic matrix.
-mat4 mat4orthographic(f32 l, f32 r, f32 b, f32 t, f32 n, f32 f);
+mat4 orthographic(f32 l, f32 r, f32 b, f32 t, f32 n, f32 f);
 
 // Row-major matrix 2x2.
 struct mat2
@@ -287,7 +287,7 @@ inline mat2 mat2::Inverse() const
 {
 	mat2 invMat = *this;
 	const bool res = invMat.InverseSelf();
-	ASSERT(res);
+	PANIC(!res);
 	return invMat;
 }
 
@@ -640,7 +640,7 @@ inline mat3 mat3::Inverse() const
 {
 	mat3 invMat = *this;
 	const bool res = invMat.InverseSelf();
-	ASSERT(res);
+	PANIC(!res);
 	return invMat;
 }
 
@@ -1080,7 +1080,7 @@ inline mat4 mat4::Inverse() const
 {
 	mat4 invMat = *this;
 	const bool res = invMat.InverseSelf();
-	ASSERT(res);
+	PANIC(!res);
 	return invMat;
 }
 

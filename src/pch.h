@@ -40,7 +40,7 @@ using f64 = double;
 #define MACRO_GLUE_(a, b)       a ## b
 #define MACRO_GLUE(a, b)        MACRO_GLUE_(a, b)
 
-#define ASSERT(x)               if (!(x)) { *(int*)0 = 0; }
+#define PANIC(x)                if ((x)) { *(int*)0 = 0; }
 #define STRUCT_ZERO(x)          x{0}
 
 #define FPS(n)                  (1.0f / (n))
