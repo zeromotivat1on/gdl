@@ -20,3 +20,5 @@ target_compile_definitions(gdl PRIVATE
                                # Configuration
                                $<$<CONFIG:Debug>:BUILD_DEBUG>
                                $<$<CONFIG:Release>:BUILD_RELEASE>)
+
+target_include_directories(gdl PUBLIC "${PROJECT_SOURCE_DIR}")

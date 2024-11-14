@@ -28,26 +28,26 @@ void workq_add(Workq* wq, void* data, WorkqCallback callback)
         entry.callback = callback;
         entry.data = data;
 
-        atomic_inc((volatile s32*)&wq->processed_entry_count);
+        atomic_inc((volatile s32*)&wq->added_entry_count);
         semaphore_release(wq->semaphore, 1, nullptr);
     }
 }
 
 bool workq_process(Workq* wq)
 {
-    const u32 entry_to_trocess = wq->entry_to_process;
-    if (entry_to_trocess == wq->entry_to_add)
+    const u32 entry_to_process = wq->entry_to_process;
+    if (entry_to_process == wq->entry_to_add)
     {
         return false;
     }
 
-    const u32 next_entry_to_process = (entry_to_trocess + 1) % ARRAY_COUNT(wq->entries);
-    const u32 idx = atomic_cmp_swap((volatile s32*)&wq->entry_to_process, next_entry_to_process, entry_to_trocess);
-    if (idx == entry_to_trocess)
+    const u32 next_entry_to_process = (entry_to_process + 1) % ARRAY_COUNT(wq->entries);
+    const u32 idx = atomic_cmp_swap((volatile s32*)&wq->entry_to_process, next_entry_to_process, entry_to_process);
+    if (idx == entry_to_process)
     {
-        WorkqEntry& entry = wq->entries[entry_to_trocess];
+        WorkqEntry& entry = wq->entries[entry_to_process];
         entry.callback(wq, entry.data);
-        atomic_inc((volatile s32*)&wq->added_entry_count);
+        atomic_inc((volatile s32*)&wq->processed_entry_count);
     }
 
     return true;

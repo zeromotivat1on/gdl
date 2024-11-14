@@ -16,7 +16,7 @@ u64         thread_curr_id();
 void        thread_sleep(u32 ms);
 bool        thread_active(hthread handle);
 
-hthread		thread_create(s32 type, ThreadEntry entry, void* userdata);
+hthread		thread_create(ThreadEntry entry, void* userdata, s32 type);
 void        thread_resume(hthread handle);
 void        thread_suspend(hthread handle);
 void        thread_terminate(hthread handle);

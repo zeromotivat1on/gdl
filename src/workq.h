@@ -2,8 +2,8 @@
 
 #include "thread.h"
 
-#define WORKQ_MAX_ENTRIES      256
-#define WORKQ_MAX_WAIT_TIME    SEMAPHORE_MAX_WAIT_TIME
+// Max simultaneous work queue entries to process.
+#define WORKQ_MAX_ENTRIES   256
 
 typedef void (*WorkqCallback)(const struct Workq*, void*);
 
