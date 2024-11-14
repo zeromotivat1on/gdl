@@ -4,6 +4,8 @@
 
 #define INVALID_THREAD_RESULT ((DWORD)-1)
 
+const u32 CRITICAL_SECTION_ALLOC_SIZE = sizeof(CRITICAL_SECTION);
+
 static DWORD win32_thread_create_type(s32 type)
 {
     switch(type)
@@ -113,6 +115,34 @@ bool mutex_wait(hmutex handle, u32 ms)
     return win32_wait_res_check(handle, res);
 }
 
+void critical_section_create(hcritsec handle, u32 spin_count)
+{
+    if (spin_count > 0)
+        InitializeCriticalSectionAndSpinCount((LPCRITICAL_SECTION)handle, spin_count);
+    else
+        InitializeCriticalSection((LPCRITICAL_SECTION)handle);
+}
+
+void critical_section_enter(hcritsec handle)
+{
+    EnterCriticalSection((LPCRITICAL_SECTION)handle);
+}
+
+bool critical_section_try_enter(hcritsec handle)
+{
+    return TryEnterCriticalSection((LPCRITICAL_SECTION)handle);
+}
+
+void critical_section_leave(hcritsec handle)
+{
+    LeaveCriticalSection((LPCRITICAL_SECTION)handle);
+}
+
+void critical_section_delete(hcritsec handle)
+{
+    DeleteCriticalSection((LPCRITICAL_SECTION)handle);
+}
+
 void barrier_read()
 {
     _ReadBarrier();
@@ -163,12 +193,12 @@ s32 atomic_add(volatile s32* dst, s32 val)
     return InterlockedAdd((volatile LONG*)dst, val);
 }
 
-s32 atomic_inc(volatile s32* dst)
+s32 atomic_increment(volatile s32* dst)
 {
     return InterlockedIncrement((volatile LONG*)dst);
 }
 
-s32 atomic_dec(volatile s32* dst)
+s32 atomic_decrement(volatile s32* dst)
 {
     return InterlockedDecrement((volatile LONG*)dst);
 }

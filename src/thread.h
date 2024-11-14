@@ -41,6 +41,25 @@ hmutex      mutex_create(bool signaled);
 bool        mutex_release(hmutex handle);
 bool        mutex_wait(hmutex handle, u32 ms);
 
+// ----------------
+// Critical Section
+// ----------------
+
+extern const u32 CRITICAL_SECTION_ALLOC_SIZE;
+
+typedef void*   hcritsec;  // critical section handle
+
+// Initialize critical section in preallocated memory with optional spin lock counter.
+// If spin_count <= 0, wait for critical section will always put calling thread to sleep.
+// If thread tries to acquire locked critical section with spin lock,
+// thread spins in a loop spin_count times checking if lock is released.
+// If lock is not released at the end of spin loop, thread is put to sleep.
+void        critical_section_init(hcritsec handle, u32 spin_count);
+void        critical_section_enter(hcritsec handle);
+bool        critical_section_try_enter(hcritsec handle);
+void        critical_section_leave(hcritsec handle);
+void        critical_section_delete(hcritsec handle);
+
 // -------
 // Barrier
 // -------
@@ -75,5 +94,5 @@ s32			atomic_cmp_swap(volatile s32* dst, s32 val, s32 cmp);
 void*		atomic_cmp_swap(volatile void** dst, void* val, void* cmp);
 
 s32			atomic_add(volatile s32* dst, s32 val); // add val to dst and return dst before op
-s32			atomic_inc(volatile s32* dst);  // atomic increment
-s32			atomic_dec(volatile s32* dst);  // atomic decrement
+s32			atomic_increment(volatile s32* dst);
+s32			atomic_decrement(volatile s32* dst);

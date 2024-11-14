@@ -61,7 +61,7 @@ static LRESULT CALLBACK win32_window_proc(HWND hwnd, UINT umsg, WPARAM wparam, L
     return DefWindowProcW(hwnd, umsg, wparam, lparam);
 }
 
-bool window_create(hwindow win, WindowInfo* info)
+bool window_init(hwindow win, WindowInfo* info)
 {
     Win32Window* win32 = (Win32Window*)win;
 
@@ -109,9 +109,14 @@ bool window_create(hwindow win, WindowInfo* info)
         return false;
 
     SetPropW(win32->handle, L"gdl", win32);
-    ShowWindow(win32->handle, SW_NORMAL);
     
     return true;
+}
+
+void window_show(hwindow win)
+{
+    Win32Window* win32 = (Win32Window*)win;
+    ShowWindow(win32->handle, SW_NORMAL);
 }
 
 void window_destroy(hwindow win)

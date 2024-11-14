@@ -28,7 +28,7 @@ void workq_add(Workq* wq, void* data, WorkqCallback callback)
         entry.callback = callback;
         entry.data = data;
 
-        atomic_inc((volatile s32*)&wq->added_entry_count);
+        atomic_increment((volatile s32*)&wq->added_entry_count);
         semaphore_release(wq->semaphore, 1, nullptr);
     }
 }
@@ -47,7 +47,7 @@ bool workq_process(Workq* wq)
     {
         WorkqEntry& entry = wq->entries[entry_to_process];
         entry.callback(wq, entry.data);
-        atomic_inc((volatile s32*)&wq->processed_entry_count);
+        atomic_increment((volatile s32*)&wq->processed_entry_count);
     }
 
     return true;

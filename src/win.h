@@ -24,7 +24,8 @@ extern const u16 WINDOW_ALLOC_SIZE;
 // Core
 // ----
 
-bool    window_create(hwindow win, WindowInfo* info);   // init window in preallocated memory
+bool    window_init(hwindow win, WindowInfo* info);     // init window in preallocated memory
+void    window_show(hwindow win);                       // display window
 void    window_destroy(hwindow win);                    // destroy the window
 void    window_update(hwindow win);                     // poll window events
 void    window_close(hwindow win);                      // close the window
