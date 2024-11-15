@@ -179,13 +179,13 @@ void window_update(hwindow win)
              u16 w, h;
              window_size_inner(win, &w, &h);
              
-             win32->mouse_axes[MOUSE_LAST_X] = w * 0.5f;
-             win32->mouse_axes[MOUSE_LAST_Y] = h * 0.5f;
-
              POINT point;
-             point.x = (LONG)win32->mouse_axes[MOUSE_LAST_X];
-             point.y = (LONG)win32->mouse_axes[MOUSE_LAST_Y];
-             
+             point.x = (LONG)w / 2;
+             point.y = (LONG)h / 2;
+
+             win32->mouse_axes[MOUSE_LAST_X] = (f32)point.x;
+             win32->mouse_axes[MOUSE_LAST_Y] = (f32)point.y;
+
              ClientToScreen(win32->handle, &point);
              SetCursorPos(point.x, point.y);
          }
