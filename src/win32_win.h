@@ -29,7 +29,7 @@ struct Win32Window
     u8          mouse_buttons_pressed;
     u8          mouse_buttons_released;
     
-    f32         mouse_axes[MOUSE_AXIS_COUNT];
+    u16         mouse_axes[MOUSE_AXIS_COUNT];
 
     bool        cursor_constrained;
     

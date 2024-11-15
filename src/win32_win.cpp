@@ -46,14 +46,14 @@ static LRESULT CALLBACK win32_window_proc(HWND hwnd, UINT umsg, WPARAM wparam, L
 
         case WM_MOUSEMOVE:
         {   
-            win32->mouse_axes[MOUSE_X] = (f32)GET_X_LPARAM(lparam);
-            win32->mouse_axes[MOUSE_Y] = (f32)GET_Y_LPARAM(lparam);
+            win32->mouse_axes[MOUSE_X] = GET_X_LPARAM(lparam);
+            win32->mouse_axes[MOUSE_Y] = GET_Y_LPARAM(lparam);
             break;
         }
 
         case WM_MOUSEWHEEL:
         {
-            win32->mouse_axes[MOUSE_SCROLL_X] = 0.0f;
+            win32->mouse_axes[MOUSE_SCROLL_X] = 0;
             win32->mouse_axes[MOUSE_SCROLL_Y] = GET_WHEEL_DELTA_WPARAM(wparam);
             break;
         }
@@ -131,8 +131,8 @@ void window_update(hwindow win)
 {
     Win32Window* win32 = (Win32Window*)win;
         
-    win32->mouse_axes[MOUSE_SCROLL_X] = 0.0f;
-    win32->mouse_axes[MOUSE_SCROLL_Y] = 0.0f;
+    win32->mouse_axes[MOUSE_SCROLL_X] = 0;
+    win32->mouse_axes[MOUSE_SCROLL_Y] = 0;
     
     MSG msg = STRUCT_ZERO(MSG);
     msg.hwnd = win32->handle;
@@ -180,11 +180,8 @@ void window_update(hwindow win)
              window_size_inner(win, &w, &h);
              
              POINT point;
-             point.x = (LONG)w / 2;
-             point.y = (LONG)h / 2;
-
-             win32->mouse_axes[MOUSE_LAST_X] = (f32)point.x;
-             win32->mouse_axes[MOUSE_LAST_Y] = (f32)point.y;
+             point.x = win32->mouse_axes[MOUSE_LAST_X] = w / 2;
+             point.y = win32->mouse_axes[MOUSE_LAST_Y] = h / 2;
 
              ClientToScreen(win32->handle, &point);
              SetCursorPos(point.x, point.y);
