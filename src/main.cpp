@@ -16,6 +16,8 @@ int main()
 
 void test_window()
 {
+    input_tables_init();
+    
     WindowInfo winfo = STRUCT_ZERO(WindowInfo);
     winfo.title = "GDL Window";
     winfo.width = 1280;
@@ -26,12 +28,10 @@ void test_window()
     void* win = ::operator new(WINDOW_ALLOC_SIZE);
     memset(win, 0, WINDOW_ALLOC_SIZE);
 
-    if (!window_create(win, &winfo))
+    if (!window_init(win, &winfo))
     {
         return;
     }
-
-    window_key_tables_init(win);
     
     while(window_active(win))
     {
@@ -41,7 +41,7 @@ void test_window()
         {
             if (key_pressed(win, key))
             {
-                printf("Key pressed: %s\n", key_name(win, key));
+                printf("Key pressed: %s\n", key_name(key));
             }
         }
 
@@ -59,17 +59,17 @@ void test_window()
 
 // Workq
 
-hmutex g_mutex_msg = mutex_create(false);
+hcritsec g_crit_section = nullptr;
 volatile s32 g_callback_call_count = 0;
 volatile s32 g_thread_add_count = 0;
 
 void test_workq_callback(const Workq* wq, void* data)
 {
-    mutex_wait(g_mutex_msg, WAIT_INFINITE);
+    critical_section_try_enter(g_crit_section);
     msg_log("Thread (%u) workq callback with data (%s)", thread_curr_id(), (const char*)data);
-    mutex_release(g_mutex_msg);
+    critical_section_leave(g_crit_section);
     
-    atomic_inc(&g_callback_call_count);
+    atomic_increment(&g_callback_call_count);
 }
 
 u32 test_workq_thread_process(void* data)
@@ -96,7 +96,7 @@ u32 test_workq_thread_add(void* data)
     while(workq_active(wq))
     {
         workq_add(wq, "String Producer", test_workq_callback);
-        atomic_inc(&g_thread_add_count);
+        atomic_increment(&g_thread_add_count);
         thread_sleep(1);
     }
 
@@ -107,7 +107,10 @@ void test_workq()
 {
     msg_log("Thread (%u) workq setup", thread_curr_id());
 
-    Workq wq = workq_create(semaphore_create(0, 3));
+    g_crit_section = ::operator new(CRITICAL_SECTION_ALLOC_SIZE);
+    critical_section_init(g_crit_section, 0);
+    
+    Workq wq = workq_create(semaphore_create(0, 5));
 
     workq_add(&wq, "String A1", test_workq_callback);
     workq_add(&wq, "String A2", test_workq_callback);
@@ -120,13 +123,17 @@ void test_workq()
     workq_add(&wq, "String A9", test_workq_callback);
 
     thread_create(test_workq_thread_add, &wq, THREAD_IMMEDIATE);
-    thread_sleep(5);
+    thread_sleep(100);
     
+    thread_create(test_workq_thread_process, &wq, THREAD_IMMEDIATE);
+    thread_create(test_workq_thread_process, &wq, THREAD_IMMEDIATE);
     thread_create(test_workq_thread_process, &wq, THREAD_IMMEDIATE);
     thread_create(test_workq_thread_process, &wq, THREAD_IMMEDIATE);
     thread_create(test_workq_thread_process, &wq, THREAD_IMMEDIATE);
 
     while(workq_active(&wq)) {}
 
+    critical_section_delete(g_crit_section);
+    
     msg_log("Workq entries done %d out of (%d + 9) = %d", g_callback_call_count, g_thread_add_count, g_thread_add_count + 9);
 }

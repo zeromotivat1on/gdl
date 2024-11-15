@@ -115,7 +115,7 @@ bool mutex_wait(hmutex handle, u32 ms)
     return win32_wait_res_check(handle, res);
 }
 
-void critical_section_create(hcritsec handle, u32 spin_count)
+void critical_section_init(hcritsec handle, u32 spin_count)
 {
     if (spin_count > 0)
         InitializeCriticalSectionAndSpinCount((LPCRITICAL_SECTION)handle, spin_count);
