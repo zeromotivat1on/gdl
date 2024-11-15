@@ -3,7 +3,7 @@
 #include "input.h"
 #include "win32_win.h"
 
-void key_tables_init()
+void input_tables_init()
 {
     memset(g_input_tables.virtual_keys, KEY_INVALID, sizeof(g_input_tables.virtual_keys));
     memset(g_input_tables.scancodes, KEY_INVALID, sizeof(g_input_tables.scancodes));
