@@ -4,17 +4,17 @@
 // Types
 // -----
 
-struct u128
+struct bit128
 {
     u64 buckets[2];
 };
 
-struct u256
+struct bit256
 {
     u64 buckets[4];
 };
 
-struct u512
+struct bit512
 {
     u64 buckets[8];
 };
@@ -53,11 +53,11 @@ inline void bit_clear_all(u64* buckets, u64 count)
     memset(buckets, 0, count * sizeof(u64));
 }
 
-inline void bit_and(u64* resbuckets, const u64* lbuckets, const u64* rbuckets, u64 count)
+inline void bit_and(u64* res_buckets, const u64* lbuckets, const u64* rbuckets, u64 count)
 {
     for (u64 i = 0; i < count; ++i)
     {
-        resbuckets[i] = lbuckets[i] & rbuckets[i];
+        res_buckets[i] = lbuckets[i] & rbuckets[i];
     }
 }
 

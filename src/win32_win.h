@@ -19,10 +19,10 @@ struct Win32Window
     // Input
     // -----
 
-    u128        keys;
-    u128        keys_last;
-    u128        keys_pressed;
-    u128        keys_released;
+    bit128      keys;
+    bit128      keys_last;
+    bit128      keys_pressed;
+    bit128      keys_released;
 
     u8          mouse_buttons;
     u8          mouse_buttons_last;
