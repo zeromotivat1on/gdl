@@ -244,7 +244,7 @@ bool gamepad_released(hwindow win, u8 gamepad, s16 button)
     return false;
 }
 
-f32 mouse_axis(hwindow win, s16 axis)
+s16 mouse_axis(hwindow win, s16 axis)
 {
     PANIC(axis >= MOUSE_AXIS_COUNT);
     Win32Window* win32 = (Win32Window*)win;

@@ -241,5 +241,5 @@ bool        gamepad_down(hwindow win, u8 gamepad, s16 button);
 bool        gamepad_pressed(hwindow win, u8 gamepad, s16 button);
 bool        gamepad_released(hwindow win, u8 gamepad, s16 button);
 
-f32         mouse_axis(hwindow win, s16 axis);
+s16         mouse_axis(hwindow win, s16 axis);
 f32         gamepad_axis(hwindow win, u8 gamepad, s16 axis);
