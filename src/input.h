@@ -219,17 +219,28 @@ enum GamepadAxis : s16
     GAMEPAD_AXIS_COUNT,
 };
 
-// -----
-// Input
-// -----
+struct InputTables
+{
+    s16     virtual_keys[KEY_COUNT];    // key to virtual keycode
+    s16     scancodes[KEY_COUNT];       // key to keyboard scancode
+    s16     keycodes[512];              // virtual keycode to key
+    char    keynames[KEY_COUNT][4];     // key visual representation
+};
 
-void        window_key_tables_init(hwindow win);
+// ----
+// Core
+// ----
+
+inline InputTables g_input_tables;
+
+void        input_tables_init();
 
 bool        key_up(hwindow win, s16 key);
 bool        key_down(hwindow win, s16 key);
 bool        key_pressed(hwindow win, s16 key);
 bool        key_released(hwindow win, s16 key);
-const char* key_name(hwindow win, s16 key);
+
+const char* key_name(s16 key);
 
 bool        mouse_up(hwindow win, s16 button);
 bool        mouse_down(hwindow win, s16 button);

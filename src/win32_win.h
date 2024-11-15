@@ -32,9 +32,4 @@ struct Win32Window
     s16         mouse_axes[MOUSE_AXIS_COUNT];
 
     bool        cursor_constrained;
-    
-    s16         virtual_keys[KEY_COUNT];    // key to virtual keycode
-    s16         scancodes[KEY_COUNT];       // key to keyboard scancode
-    s16         keycodes[512];              // virtual keycode to key
-    char        keynames[KEY_COUNT][4];     // key visual representation
 };

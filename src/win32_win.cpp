@@ -22,7 +22,7 @@ static LRESULT CALLBACK win32_window_proc(HWND hwnd, UINT umsg, WPARAM wparam, L
         case WM_KEYDOWN:
         case WM_SYSKEYDOWN:
         {
-            if (const s16 key = win32->keycodes[wparam]; key > 0)
+            if (const s16 key = g_input_tables.keycodes[wparam]; key > 0)
                 bit_set(win32->keys.buckets, key);
             break;
         }
@@ -30,7 +30,7 @@ static LRESULT CALLBACK win32_window_proc(HWND hwnd, UINT umsg, WPARAM wparam, L
         case WM_KEYUP:
         case WM_SYSKEYUP:
         {
-            if (const s16 key = win32->keycodes[wparam]; key > 0)
+            if (const s16 key = g_input_tables.keycodes[wparam]; key > 0)
                 bit_clear(win32->keys.buckets, key);
             break;
         }
