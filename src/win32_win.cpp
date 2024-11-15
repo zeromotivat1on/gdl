@@ -43,7 +43,8 @@ static LRESULT CALLBACK win32_window_proc(HWND hwnd, UINT umsg, WPARAM wparam, L
     	case WM_RBUTTONUP: BIT_CLEAR(win32->mouse_buttons, MOUSE_RIGHT); break; 
     	case WM_MBUTTONUP: BIT_CLEAR(win32->mouse_buttons, MOUSE_MIDDLE); break; 
     	case WM_XBUTTONUP: break;
-    	case WM_MOUSEMOVE:
+
+        case WM_MOUSEMOVE:
         {   
             win32->mouse_axes[MOUSE_X] = (f32)GET_X_LPARAM(lparam);
             win32->mouse_axes[MOUSE_Y] = (f32)GET_Y_LPARAM(lparam);
@@ -142,7 +143,7 @@ void window_update(hwindow win)
         DispatchMessage(&msg);
     }
 
-    // Update pressed/released keys.
+    // Update keys.
     {
         const u64 count = ARRAY_COUNT(win32->keys.buckets);
         
@@ -158,7 +159,7 @@ void window_update(hwindow win)
         memcpy(&win32->keys_last, &win32->keys, sizeof(win32->keys));
     }
 
-    // Update pressed/released mouse buttons.
+    // Update mouse buttons.
     {
         const u8 changes = win32->mouse_buttons ^ win32->mouse_buttons_last;
         win32->mouse_buttons_pressed = changes & win32->mouse_buttons;
@@ -167,14 +168,32 @@ void window_update(hwindow win)
         win32->mouse_buttons_last = win32->mouse_buttons;
     }
 
-    // Update mouse offset.
+    // Update mouse axes.
     {
          win32->mouse_axes[MOUSE_OFFSET_X] = win32->mouse_axes[MOUSE_X] - win32->mouse_axes[MOUSE_LAST_X];
          win32->mouse_axes[MOUSE_OFFSET_Y] = win32->mouse_axes[MOUSE_LAST_Y] - win32->mouse_axes[MOUSE_Y];
 
-         win32->mouse_axes[MOUSE_LAST_X] = win32->mouse_axes[MOUSE_X];
-         win32->mouse_axes[MOUSE_LAST_Y] = win32->mouse_axes[MOUSE_Y];   
+         
+         if (win32->cursor_constrained)
+         {
+             POINT point;
+             
+             u16 w, h;
+             window_size_inner(win, &w, &h);
+             
+             win32->mouse_axes[MOUSE_LAST_X] = point.x = w * 0.5f;
+             win32->mouse_axes[MOUSE_LAST_Y] = point.y = h * 0.5f;
+
+             ClientToScreen(win32->handle, &point);
+             SetCursorPos(point.x, point.y);
+         }
+         else
+         {
+             win32->mouse_axes[MOUSE_LAST_X] = win32->mouse_axes[MOUSE_X];
+             win32->mouse_axes[MOUSE_LAST_Y] = win32->mouse_axes[MOUSE_Y];
+         }
     }
+
     // TODO: gamepad.
 }
 
@@ -238,4 +257,10 @@ bool window_cursor_lock(hwindow win, bool lock)
 s32 window_cursor_show(hwindow win, bool show)
 {
     return ShowCursor(show);
+}
+
+void window_cursor_constrain(hwindow win, bool constrain)
+{
+    Win32Window* win32 = (Win32Window*)win;
+    win32->cursor_constrained = constrain;
 }

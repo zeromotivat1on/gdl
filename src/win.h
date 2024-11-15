@@ -33,8 +33,10 @@ bool    window_active(hwindow win);                     // window not closed
 void    window_size(hwindow win, u16* w, u16* h);       // window whole size
 void    window_size_inner(hwindow win, u16* w, u16* h); // window inner renderable size
 void*   window_native(hwindow win);                     // window native platform handle
+
 bool    window_cursor_lock(hwindow win, bool lock);     // lock/unlock cursor within window
 s32     window_cursor_show(hwindow win, bool show);     // show/hide cursor in window
+void    window_cursor_constrain(hwindow win, bool constrain); // keep cursor within window
 
 // -----
 // Extra

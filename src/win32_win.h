@@ -30,6 +30,8 @@ struct Win32Window
     u8          mouse_buttons_released;
     
     f32         mouse_axes[MOUSE_AXIS_COUNT];
+
+    bool        cursor_constrained;
     
     s16         virtual_keys[KEY_COUNT];    // key to virtual keycode
     s16         scancodes[KEY_COUNT];       // key to keyboard scancode
