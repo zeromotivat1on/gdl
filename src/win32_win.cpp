@@ -176,14 +176,16 @@ void window_update(hwindow win)
          
          if (win32->cursor_constrained)
          {
-             POINT point;
-             
              u16 w, h;
              window_size_inner(win, &w, &h);
              
-             win32->mouse_axes[MOUSE_LAST_X] = point.x = w * 0.5f;
-             win32->mouse_axes[MOUSE_LAST_Y] = point.y = h * 0.5f;
+             win32->mouse_axes[MOUSE_LAST_X] = w * 0.5f;
+             win32->mouse_axes[MOUSE_LAST_Y] = h * 0.5f;
 
+             POINT point;
+             point.x = (LONG)win32->mouse_axes[MOUSE_LAST_X];
+             point.y = (LONG)win32->mouse_axes[MOUSE_LAST_Y];
+             
              ClientToScreen(win32->handle, &point);
              SetCursorPos(point.x, point.y);
          }
@@ -263,4 +265,25 @@ void window_cursor_constrain(hwindow win, bool constrain)
 {
     Win32Window* win32 = (Win32Window*)win;
     win32->cursor_constrained = constrain;
+}
+
+void window_cursor_pos_absolute(hwindow win, u16* x, u16* y)
+{
+    POINT point;
+    GetCursorPos(&point);
+
+    if (x) *x = (u16)point.x;
+    if (y) *y = (u16)point.y;
+}
+
+void window_cursor_pos_relative(hwindow win, u16* x, u16* y)
+{
+    Win32Window* win32 = (Win32Window*)win;
+
+    POINT point;
+    GetCursorPos(&point);
+    ScreenToClient(win32->handle, &point);
+
+    if (x) *x = (u16)point.x;
+    if (y) *y = (u16)point.y;
 }

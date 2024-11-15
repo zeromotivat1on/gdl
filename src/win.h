@@ -37,6 +37,8 @@ void*   window_native(hwindow win);                     // window native platfor
 bool    window_cursor_lock(hwindow win, bool lock);     // lock/unlock cursor within window
 s32     window_cursor_show(hwindow win, bool show);     // show/hide cursor in window
 void    window_cursor_constrain(hwindow win, bool constrain); // keep cursor within window
+void    window_cursor_pos_absolute(hwindow win, u16* x, u16* y);
+void    window_cursor_pos_relative(hwindow win, u16* x, u16* y);
 
 // -----
 // Extra
