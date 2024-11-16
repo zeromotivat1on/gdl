@@ -6,7 +6,7 @@
 // Math
 // ----
 
-mat4 lookat(const vec3& eye, const vec3& at, const vec3& up)
+mat4 mat4_lookat(const vec3& eye, const vec3& at, const vec3& up)
 {
 	const vec3 f = (at - eye).normalize();
 	const vec3 r = f.cross(up).normalize();
@@ -37,7 +37,7 @@ mat4 lookat(const vec3& eye, const vec3& at, const vec3& up)
 	return result;
 }
 
-mat4 perspective(f32 rfovy, f32 aspect, f32 n, f32 f)
+mat4 mat4_perspective(f32 rfovy, f32 aspect, f32 n, f32 f)
 {
 	const f32 tan_half_fovy = gdl::tan(rfovy * 0.5f);
 
@@ -51,7 +51,7 @@ mat4 perspective(f32 rfovy, f32 aspect, f32 n, f32 f)
 	return result;
 }
 
-mat4 orthographic(f32 l, f32 r, f32 b, f32 t, f32 n, f32 f)
+mat4 mat4_orthographic(f32 l, f32 r, f32 b, f32 t, f32 n, f32 f)
 {
 	mat4 result;
 	result[0][0] =  2.0f / (r - l);
