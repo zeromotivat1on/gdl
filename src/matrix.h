@@ -13,13 +13,13 @@ struct quat;
 #define MATRIX_INV_EPSILON	1e-14f
 
 // Right-handed look at view matrix.
-mat4 lookat(const vec3& eye, const vec3& at, const vec3& up);
+mat4 mat4_lookat(const vec3& eye, const vec3& at, const vec3& up);
 
 // Right-handed perspective matrix.
-mat4 perspective(f32 rfovy, f32 aspect, f32 n, f32 f);
+mat4 mat4_perspective(f32 rfovy, f32 aspect, f32 n, f32 f);
 
 // Right-handed orthographic matrix.
-mat4 orthographic(f32 l, f32 r, f32 b, f32 t, f32 n, f32 f);
+mat4 mat4_orthographic(f32 l, f32 r, f32 b, f32 t, f32 n, f32 f);
 
 // Row-major matrix 2x2.
 struct mat2

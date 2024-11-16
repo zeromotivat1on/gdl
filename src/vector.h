@@ -329,7 +329,7 @@ struct vec3
     const f32*	    ptr() const;
 
     vec3&			clamp(const vec3& min, const vec3& max);
-    vec3&			snap();                 // snap to closest integer value
+    vec3&			snap(); // snap to closest integer value
     vec3&			lerp(const vec3& v1, const vec3& v2, f32 alpha);
 };
 
@@ -867,4 +867,28 @@ inline vec4& vec4::lerp(const vec4& v1, const vec4& v2, f32 alpha)
     }
 
     return *this;
+}
+
+// -----
+// Extra
+// -----
+
+inline vec3 vec3_forward(const vec3& start, const vec3& end)
+{
+    return (start - end).normalize();
+}
+
+inline vec3 vec3_right(const vec3& start, const vec3& end, const vec3& up)
+{
+    return (start - end).cross(up).normalize();
+}
+
+// Convert spherical coordinates (yaw, pitch) to cartesian coordinates (forward vector).
+inline vec3 vec3_forward(f32 yaw, f32 pitch)
+{
+    const f32 ycos = gdl::cos(gdl::rad(yaw));
+    const f32 ysin = gdl::sin(gdl::rad(yaw));
+    const f32 pcos = gdl::cos(gdl::rad(pitch));
+    const f32 psin = gdl::sin(gdl::rad(pitch));
+    return vec3(ycos * pcos, psin, ysin * pcos).normalize();
 }
