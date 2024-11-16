@@ -875,12 +875,12 @@ inline vec4& vec4::lerp(const vec4& v1, const vec4& v2, f32 alpha)
 
 inline vec3 vec3_forward(const vec3& start, const vec3& end)
 {
-    return (start - end).normalize();
+    return (end - start).normalize();
 }
 
 inline vec3 vec3_right(const vec3& start, const vec3& end, const vec3& up)
 {
-    return (start - end).cross(up).normalize();
+    return (end - start).cross(up).normalize();
 }
 
 // Convert spherical coordinates (yaw, pitch) to cartesian coordinates (forward vector).
