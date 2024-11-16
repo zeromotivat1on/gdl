@@ -35,25 +35,24 @@ struct quat
 	friend quat		operator*(const f32 a, const quat& b);
 	friend vec3		operator*(const vec3& a, const quat& b);
 
-	quat& 			Set(f32 a, f32 b, f32 c, f32 d);
+	quat& 			set(f32 a, f32 b, f32 c, f32 d);
 
-	bool			Equal(const quat& a) const;
-	bool			Equal(const quat& a, const f32 epsilon) const;
+	bool			equal(const quat& a) const;
+	bool			equal(const quat& a, const f32 epsilon) const;
 
-	quat			Inverse() const;
-	f32				Length() const;
-	quat& 			Normalize();
+	quat			inverse() const;
+	f32				length() const;
+	quat& 			normalize();
 
-	f32				W() const;	// calculate quaternion w-component
+	f32				calc_w() const;	// calculate quaternion w-component
 
-	mat3			Mat3() const;
-	mat4			Mat4() const;
+	mat3			to_mat3() const;
+	mat4			to_mat4() const;
 
-	s32				Dimension() const;
+	s32				dimension() const;
 
-	const f32*		Ptr() const;
-	f32*			Ptr();
-	const char*		String(s32 precision = 2) const;
+	const f32*		ptr() const;
+	f32*			ptr();
 };
 
 inline quat::quat()
@@ -166,7 +165,7 @@ inline quat& quat::operator*=(f32 a) {
 
 inline bool quat::operator==(const quat& a) const
 {
-	return Equal(a);
+	return equal(a);
 }
 
 inline bool quat::operator!=(const quat& a) const
@@ -184,7 +183,7 @@ inline vec3 operator*(const vec3& a, const quat& b)
 	return b * a;
 }
 
-inline quat& quat::Set(f32 a, f32 b, f32 c, f32 d)
+inline quat& quat::set(f32 a, f32 b, f32 c, f32 d)
 {
 	x = a;
 	y = b;
@@ -193,63 +192,59 @@ inline quat& quat::Set(f32 a, f32 b, f32 c, f32 d)
 	return *this;
 }
 
-inline bool quat::Equal(const quat& a) const
+inline bool quat::equal(const quat& a) const
 {
 	return (x == a.x) && (y == a.y) && (z == a.z) && (w == a.w);
 }
 
-inline bool quat::Equal(const quat& a, const f32 epsilon) const
+inline bool quat::equal(const quat& a, const f32 epsilon) const
 {
-	return Absf(x - a.x) <= epsilon &&
-		   Absf(y - a.y) <= epsilon &&
-		   Absf(z - a.z) <= epsilon &&
-		   Absf(w - a.w) <= epsilon;
+	return gdl::absf(x - a.x) <= epsilon &&
+		   gdl::absf(y - a.y) <= epsilon &&
+		   gdl::absf(z - a.z) <= epsilon &&
+		   gdl::absf(w - a.w) <= epsilon;
 }
 
-inline quat quat::Inverse() const
+inline quat quat::inverse() const
 {
 	return quat(-x, -y, -z, w);
 }
 
-inline f32 quat::Length() const
+inline f32 quat::length() const
 {
-	return Sqrt(x * x + y * y + z * z + w * w);
+	return gdl::sqrt(x * x + y * y + z * z + w * w);
 }
 
-inline quat& quat::Normalize()
+inline quat& quat::normalize()
 {
-	const f32 length = Length();
-	if (length != 0.0f)
+	const f32 len = length();
+	if (len != 0.0f)
 	{
-		const f32 lengthInv = 1 / length;
-		x *= lengthInv;
-		y *= lengthInv;
-		z *= lengthInv;
-		w *= lengthInv;
+		const f32 length_inv = 1 / len;
+		x *= length_inv;
+		y *= length_inv;
+		z *= length_inv;
+		w *= length_inv;
 	}
 	return *this;
 }
 
-inline f32 quat::W() const
+inline f32 quat::calc_w() const
 {
-	return Sqrt(Absf(1.0f - (x * x + y * y + z * z)));
+	return gdl::sqrt(gdl::absf(1.0f - (x * x + y * y + z * z)));
 }
 
-inline s32 quat::Dimension() const
+inline s32 quat::dimension() const
 {
 	return 4;
 }
 
-inline const f32 *quat::Ptr() const
+inline const f32 *quat::ptr() const
 {
 	return &x;
 }
 
-inline f32 *quat::Ptr()
+inline f32 *quat::ptr()
 {
 	return &x;
-}
-
-inline const char* quat::String(s32 precision) const
-{
 }

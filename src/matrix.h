@@ -51,29 +51,29 @@ struct mat2
    	friend mat2		operator*(f32 a, const mat2& mat);
 	friend vec2&	operator*=(vec2& vec, const mat2& mat);
 
-	bool			Equal(const mat2& a) const;
-	bool			Equal(const mat2& a, f32 epsilon) const;
+	bool			equal(const mat2& a) const;
+	bool			equal(const mat2& a, f32 epsilon) const;
 
-	mat2&			Zero();
-	mat2&			Identity();
-	bool			Identity(f32 epsilon = MATRIX_EPSILON) const;
-	bool			Symmetric(f32 epsilon = MATRIX_EPSILON) const;
-	bool			Diagonal(f32 epsilon = MATRIX_EPSILON) const;
+	mat2&			zero();
+	mat2&			identity();
+	bool			identity(f32 epsilon = MATRIX_EPSILON) const;
+	bool			symmetric(f32 epsilon = MATRIX_EPSILON) const;
+	bool			diagonal(f32 epsilon = MATRIX_EPSILON) const;
 
-	f32				Trace() const;
-	f32				Determinant() const;
-	mat2			Transpose() const;
-	mat2&			TransposeSelf();
-	mat2			Inverse() const;
-	bool			InverseSelf();
+	f32				trace() const;
+	f32				determinant() const;
+	mat2			transpose() const;
+	mat2&			transpose_self();
+	mat2			inverse() const;
+	bool			inverse_self();
 
-	s32				Dimension() const;
+	s32				dimension() const;
 
-	const f32*		Ptr() const;
-	f32*			Ptr();
+	const f32*		ptr() const;
+	f32*			ptr();
 };
 
-inline mat2 IdentityMat2()
+inline mat2 mat2_identity()
 {
 	return mat2(vec2(1.0f, 0.0f), vec2(0.0f, 1.0f));
 }
@@ -196,7 +196,7 @@ inline mat2& mat2::operator*=(f32 a)
 
 inline bool mat2::operator==(const mat2& a) const
 {
-	return Equal(a);
+	return equal(a);
 }
 
 inline bool mat2::operator!=(const mat2& a) const
@@ -220,55 +220,55 @@ inline vec2& operator*=(vec2& vec, const mat2& mat)
 	return vec;
 }
 
-inline bool mat2::Equal(const mat2& a) const
+inline bool mat2::equal(const mat2& a) const
 {
-	return mat[0].Equal(a[0]) && mat[1].Equal(a[1]);
+	return mat[0].equal(a[0]) && mat[1].equal(a[1]);
 }
 
-inline bool mat2::Equal(const mat2& a, f32 epsilon) const
+inline bool mat2::equal(const mat2& a, f32 epsilon) const
 {
-	return mat[0].Equal(a[0], epsilon) && mat[1].Equal(a[1], epsilon);
+	return mat[0].equal(a[0], epsilon) && mat[1].equal(a[1], epsilon);
 }
 
-inline mat2& mat2::Zero()
+inline mat2& mat2::zero()
 {
 	memset(mat, 0, sizeof(mat2));
 	return *this;
 }
 
-inline mat2& mat2::Identity()
+inline mat2& mat2::identity()
 {
-	*this = IdentityMat2();
+	*this = mat2_identity();
 	return *this;
 }
 
-inline bool mat2::Identity(f32 epsilon) const
+inline bool mat2::identity(f32 epsilon) const
 {
-	return Equal(IdentityMat2(), epsilon);
+	return equal(mat2_identity(), epsilon);
 }
 
-inline bool mat2::Symmetric(f32 epsilon) const
+inline bool mat2::symmetric(f32 epsilon) const
 {
-	return Absf(mat[0][1] - mat[1][0]) < epsilon;
+	return gdl::absf(mat[0][1] - mat[1][0]) < epsilon;
 }
 
-inline bool mat2::Diagonal(f32 epsilon) const
+inline bool mat2::diagonal(f32 epsilon) const
 {
-	return Absf(mat[0][1]) <= epsilon &&
-		   Absf(mat[1][0]) <= epsilon;
+	return gdl::absf(mat[0][1]) <= epsilon &&
+		   gdl::absf(mat[1][0]) <= epsilon;
 }
 
-inline f32 mat2::Trace() const
+inline f32 mat2::trace() const
 {
 	return mat[0][0] + mat[1][1];
 }
 
-inline f32 mat2::Determinant() const
+inline f32 mat2::determinant() const
 {
 	return mat[0][0] * mat[1][1] - mat[0][1] * mat[1][0];
 }
 
-inline mat2 mat2::Transpose() const
+inline mat2 mat2::transpose() const
 {
 	return mat2
 	(
@@ -277,25 +277,25 @@ inline mat2 mat2::Transpose() const
 	);
 }
 
-inline mat2& mat2::TransposeSelf()
+inline mat2& mat2::transpose_self()
 {
-	Swap(mat[0][1], mat[1][0]);
+	gdl::swap(mat[0][1], mat[1][0]);
 	return *this;
 }
 
-inline mat2 mat2::Inverse() const
+inline mat2 mat2::inverse() const
 {
 	mat2 invMat = *this;
-	const bool res = invMat.InverseSelf();
+	const bool res = invMat.inverse_self();
 	PANIC(!res);
 	return invMat;
 }
 
-inline bool mat2::InverseSelf()
+inline bool mat2::inverse_self()
 {
 	f32 det = mat[0][0] * mat[1][1] - mat[0][1] * mat[1][0];
 
-	if (Absf(det) < MATRIX_INV_EPSILON)
+	if (gdl::absf(det) < MATRIX_INV_EPSILON)
 	{
 		return false;
 	}
@@ -311,19 +311,19 @@ inline bool mat2::InverseSelf()
 	return true;
 }
 
-inline s32 mat2::Dimension() const
+inline s32 mat2::dimension() const
 {
 	return 4;
 }
 
-inline const f32* mat2::Ptr() const
+inline const f32* mat2::ptr() const
 {
-	return mat[0].Ptr();
+	return mat[0].ptr();
 }
 
-inline f32* mat2::Ptr()
+inline f32* mat2::ptr()
 {
-	return mat[0].Ptr();
+	return mat[0].ptr();
 }
 
 // Row-major matrix 3x3.
@@ -356,32 +356,32 @@ struct mat3
 	friend vec3		operator*(const vec3& vec, const mat3& mat);
 	friend vec3& 	operator*=(vec3& vec, const mat3& mat);
 
-	bool			Equal(const mat3& a) const;
-	bool			Equal(const mat3& a, f32 epsilon) const;
+	bool			equal(const mat3& a) const;
+	bool			equal(const mat3& a, f32 epsilon) const;
 
-	mat3&			Zero();
-	mat3&			Identity();
-	bool			Identity(f32 epsilon = MATRIX_EPSILON) const;
-	bool			Symmetric(f32 epsilon = MATRIX_EPSILON) const;
-	bool			Diagonal(f32 epsilon = MATRIX_EPSILON) const;
-	bool			Rotated() const;
+	mat3&			zero();
+	mat3&			identity();
+	bool			identity(f32 epsilon = MATRIX_EPSILON) const;
+	bool			symmetric(f32 epsilon = MATRIX_EPSILON) const;
+	bool			diagonal(f32 epsilon = MATRIX_EPSILON) const;
+	bool			rotated() const;
 
-	f32				Trace() const;
-	f32				Determinant() const;
-	mat3			Transpose() const;
-	mat3& 			TransposeSelf();
-	mat3			Inverse() const;
-	bool			InverseSelf();
+	f32				trace() const;
+	f32				determinant() const;
+	mat3			transpose() const;
+	mat3& 			transpose_self();
+	mat3			inverse() const;
+	bool			inverse_self();
 
-	s32				Dimension() const;
+	s32				dimension() const;
 
-	mat4			Mat4() const;
+	mat4			to_mat4() const;
 
-	const f32*		Ptr() const;
-	f32*			Ptr();
+	const f32*		ptr() const;
+	f32*			ptr();
 };
 
-inline mat3 IdentityMat3()
+inline mat3 mat3_identity()
 {
 	return mat3(vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1));
 }
@@ -523,7 +523,7 @@ inline mat3& mat3::operator*=(f32 a)
 
 inline bool mat3::operator==(const mat3& a) const
 {
-	return Equal(a);
+	return equal(a);
 }
 
 inline bool mat3::operator!=(const mat3& a) const
@@ -547,67 +547,67 @@ inline vec3& operator*=(vec3& vec, const mat3& mat)
 	return vec;
 }
 
-inline bool mat3::Equal(const mat3& a) const
+inline bool mat3::equal(const mat3& a) const
 {
-	return mat[0].Equal(a[0]) &&
-		   mat[1].Equal(a[1]) &&
-		   mat[2].Equal(a[2]);
+	return mat[0].equal(a[0]) &&
+		   mat[1].equal(a[1]) &&
+		   mat[2].equal(a[2]);
 }
 
-inline bool mat3::Equal(const mat3& a, f32 epsilon) const
+inline bool mat3::equal(const mat3& a, f32 epsilon) const
 {
-	return mat[0].Equal(a[0], epsilon) &&
-		   mat[1].Equal(a[1], epsilon) &&
-		   mat[2].Equal(a[2], epsilon);
+	return mat[0].equal(a[0], epsilon) &&
+		   mat[1].equal(a[1], epsilon) &&
+		   mat[2].equal(a[2], epsilon);
 }
 
-inline mat3& mat3::Zero()
+inline mat3& mat3::zero()
 {
 	memset(mat, 0, sizeof(mat3));
 	return *this;
 }
 
-inline mat3& mat3::Identity()
+inline mat3& mat3::identity()
 {
-	*this = IdentityMat3();
+	*this = mat3_identity();
 	return *this;
 }
 
-inline bool mat3::Identity(f32 epsilon) const
+inline bool mat3::identity(f32 epsilon) const
 {
-	return Equal(IdentityMat3(), epsilon);
+	return equal(mat3_identity(), epsilon);
 }
 
-inline bool mat3::Symmetric(f32 epsilon) const
+inline bool mat3::symmetric(f32 epsilon) const
 {
-	return Absf(mat[0][1] - mat[1][0]) <= epsilon &&
-	   	   Absf(mat[0][2] - mat[2][0]) <= epsilon &&
-	   	   Absf(mat[1][2] - mat[2][1]) <= epsilon;
+	return gdl::absf(mat[0][1] - mat[1][0]) <= epsilon &&
+	   	   gdl::absf(mat[0][2] - mat[2][0]) <= epsilon &&
+	   	   gdl::absf(mat[1][2] - mat[2][1]) <= epsilon;
 }
 
-inline bool mat3::Diagonal(f32 epsilon) const
+inline bool mat3::diagonal(f32 epsilon) const
 {
-	return Absf(mat[0][1]) <= epsilon &&
-		   Absf(mat[0][2]) <= epsilon &&
-		   Absf(mat[1][0]) <= epsilon &&
-		   Absf(mat[1][2]) <= epsilon &&
-		   Absf(mat[2][0]) <= epsilon &&
-		   Absf(mat[2][1]) <= epsilon;
+	return gdl::absf(mat[0][1]) <= epsilon &&
+		   gdl::absf(mat[0][2]) <= epsilon &&
+		   gdl::absf(mat[1][0]) <= epsilon &&
+		   gdl::absf(mat[1][2]) <= epsilon &&
+		   gdl::absf(mat[2][0]) <= epsilon &&
+		   gdl::absf(mat[2][1]) <= epsilon;
 }
 
-inline bool mat3::Rotated() const
+inline bool mat3::rotated() const
 {
 	return mat[0][1] != 0.0f || mat[0][2] != 0.0f ||
 	   	   mat[1][0] != 0.0f || mat[1][2] != 0.0f ||
 	   	   mat[2][0] != 0.0f || mat[2][1] != 0.0f;
 }
 
-inline f32 mat3::Trace() const
+inline f32 mat3::trace() const
 {
 	return mat[0][0] + mat[1][1] + mat[2][2];
 }
 
-inline f32 mat3::Determinant() const
+inline f32 mat3::determinant() const
 {
 	// determinant_size_rows_cols
 
@@ -618,7 +618,7 @@ inline f32 mat3::Determinant() const
 	return mat[0][0] * det2_12_12 - mat[0][1] * det2_12_02 + mat[0][2] * det2_12_01;
 }
 
-inline mat3 mat3::Transpose() const
+inline mat3 mat3::transpose() const
 {
 	return mat3
 	(
@@ -628,35 +628,35 @@ inline mat3 mat3::Transpose() const
 	);
 }
 
-inline mat3& mat3::TransposeSelf()
+inline mat3& mat3::transpose_self()
 {
-	Swap(mat[0][1], mat[1][0]);
-	Swap(mat[0][2], mat[2][0]);
-	Swap(mat[1][2], mat[2][1]);
+	gdl::swap(mat[0][1], mat[1][0]);
+	gdl::swap(mat[0][2], mat[2][0]);
+	gdl::swap(mat[1][2], mat[2][1]);
 	return *this;
 }
 
-inline mat3 mat3::Inverse() const
+inline mat3 mat3::inverse() const
 {
 	mat3 invMat = *this;
-	const bool res = invMat.InverseSelf();
+	const bool res = invMat.inverse_self();
 	PANIC(!res);
 	return invMat;
 }
 
-inline s32 mat3::Dimension() const
+inline s32 mat3::dimension() const
 {
 	return 9;
 }
 
-inline const f32* mat3::Ptr() const
+inline const f32* mat3::ptr() const
 {
-	return mat[0].Ptr();
+	return mat[0].ptr();
 }
 
-inline f32* mat3::Ptr()
+inline f32* mat3::ptr()
 {
-	return mat[0].Ptr();
+	return mat[0].ptr();
 }
 
 // Row-major matrix 4x4.
@@ -696,35 +696,35 @@ struct mat4
 	friend vec4& 	operator*=(vec4& vec, const mat4& mat);
 	friend vec3& 	operator*=(vec3& vec, const mat4& mat);
 
-	bool			Equal(const mat4& a) const;
-	bool			Equal(const mat4& a, f32 epsilon) const;
+	bool			equal(const mat4& a) const;
+	bool			equal(const mat4& a, f32 epsilon) const;
 
-	mat4&			Zero();
-	mat4&			Identity();
-	bool			Identity(f32 epsilon = MATRIX_EPSILON) const;
-	bool			Symmetric(f32 epsilon = MATRIX_EPSILON) const;
-	bool			Diagonal(f32 epsilon = MATRIX_EPSILON) const;
-	bool			Rotated() const;
+	mat4&			zero();
+	mat4&			identity();
+	bool			identity(f32 epsilon = MATRIX_EPSILON) const;
+	bool			symmetric(f32 epsilon = MATRIX_EPSILON) const;
+	bool			diagonal(f32 epsilon = MATRIX_EPSILON) const;
+	bool			rotated() const;
 
-	f32				Trace() const;
-	f32				Determinant() const;
-	mat4			Transpose() const;
-	mat4& 			TransposeSelf();
-	mat4			Inverse() const;
-	bool			InverseSelf();
+	f32				trace() const;
+	f32				determinant() const;
+	mat4			transpose() const;
+	mat4& 			transpose_self();
+	mat4			inverse() const;
+	bool			inverse_self();
 
-	mat4&			Translate(const vec3& translation);
-	mat4&			Rotate(const mat4& rotation);
-	mat4&			Rotate(const quat& rotation);
-	mat4&			Scale(const vec3& scale);
+	mat4&			translate(const vec3& translation);
+	mat4&			rotate(const mat4& rotation);
+	mat4&			rotate(const quat& rotation);
+	mat4&			scale(const vec3& scale);
 
-	s32				Dimension() const;
+	s32				dimension() const;
 
-	const f32*		Ptr() const;
-	f32*			Ptr();
+	const f32*		ptr() const;
+	f32*			ptr();
 };
 
-inline mat4 mat3::Mat4() const
+inline mat4 mat3::to_mat4() const
 {
 	return mat4
 	(
@@ -735,7 +735,7 @@ inline mat4 mat3::Mat4() const
 	);
 }
 
-inline mat4 IdentityMat4()
+inline mat4 mat4_identity()
 {
 	return mat4(vec4(1, 0, 0, 0), vec4(0, 1, 0, 0), vec4(0, 0, 1, 0), vec4(0, 0, 0, 1));
 }
@@ -936,7 +936,7 @@ inline mat4& mat4::operator*=(f32 a)
 
 inline bool mat4::operator==(const mat4& a) const
 {
-	return Equal(a);
+	return equal(a);
 }
 
 inline bool mat4::operator!=(const mat4& a) const
@@ -971,46 +971,46 @@ inline vec3& operator*=(vec3& vec, const mat4& mat)
 	return vec;
 }
 
-inline bool mat4::Equal(const mat4& a) const
+inline bool mat4::equal(const mat4& a) const
 {
-	return mat[0].Equal(a[0]) &&
-		   mat[1].Equal(a[1]) &&
-		   mat[2].Equal(a[2]) &&
-		   mat[3].Equal(a[3]);
+	return mat[0].equal(a[0]) &&
+		   mat[1].equal(a[1]) &&
+		   mat[2].equal(a[2]) &&
+		   mat[3].equal(a[3]);
 }
 
-inline bool mat4::Equal(const mat4& a, f32 epsilon) const
+inline bool mat4::equal(const mat4& a, f32 epsilon) const
 {
-	return mat[0].Equal(a[0], epsilon) &&
-	       mat[1].Equal(a[1], epsilon) &&
-	       mat[2].Equal(a[2], epsilon) &&
-	       mat[3].Equal(a[3], epsilon);
+	return mat[0].equal(a[0], epsilon) &&
+	       mat[1].equal(a[1], epsilon) &&
+	       mat[2].equal(a[2], epsilon) &&
+	       mat[3].equal(a[3], epsilon);
 }
 
-inline mat4& mat4::Zero()
+inline mat4& mat4::zero()
 {
 	memset(mat, 0, sizeof(mat4));
 	return *this;
 }
 
-inline mat4& mat4::Identity()
+inline mat4& mat4::identity()
 {
-	*this = IdentityMat4();
+	*this = mat4_identity();
 	return *this;
 }
 
-inline bool mat4::Identity(f32 epsilon) const
+inline bool mat4::identity(f32 epsilon) const
 {
-	return Equal(IdentityMat4(), epsilon);
+	return equal(mat4_identity(), epsilon);
 }
 
-inline bool mat4::Symmetric(f32 epsilon) const
+inline bool mat4::symmetric(f32 epsilon) const
 {
 	for (s32 i = 1; i < 4; ++i)
 	{
 		for (s32 j = 0; j < i; ++j)
 		{
-			if (Absf(mat[i][j] - mat[j][i]) > epsilon)
+			if (gdl::absf(mat[i][j] - mat[j][i]) > epsilon)
 			{
 				return false;
 			}
@@ -1020,13 +1020,13 @@ inline bool mat4::Symmetric(f32 epsilon) const
 	return true;
 }
 
-inline bool mat4::Diagonal(f32 epsilon) const
+inline bool mat4::diagonal(f32 epsilon) const
 {
 	for (s32 i = 0; i < 4; ++i)
 	{
 		for (s32 j = 0; j < 4; ++j)
 		{
-			if (i != j && Absf(mat[i][j]) > epsilon)
+			if (i != j && gdl::absf(mat[i][j]) > epsilon)
 			{
 				return false;
 			}
@@ -1036,19 +1036,19 @@ inline bool mat4::Diagonal(f32 epsilon) const
 	return true;
 }
 
-inline bool mat4::Rotated() const
+inline bool mat4::rotated() const
 {
 	return mat[0][1] != 0.0f || mat[0][2] != 0.0f ||
 		   mat[1][0] != 0.0f || mat[1][2] != 0.0f ||
 		   mat[2][0] != 0.0f || mat[2][1] != 0.0f;
 }
 
-inline f32 mat4::Trace() const
+inline f32 mat4::trace() const
 {
 	return mat[0][0] + mat[1][1] + mat[2][2] + mat[3][3];
 }
 
-inline mat4 mat4::Transpose() const
+inline mat4 mat4::transpose() const
 {
 	mat4 transpose;
 
@@ -1063,28 +1063,28 @@ inline mat4 mat4::Transpose() const
 	return transpose;
 }
 
-inline mat4& mat4::TransposeSelf()
+inline mat4& mat4::transpose_self()
 {
 	for(s32 i = 0; i < 4; ++i)
 	{
 		for(s32 j = i + 1; j < 4; ++j)
 		{
-			Swap(mat[i][j], mat[j][i]);
+			gdl::swap(mat[i][j], mat[j][i]);
 		}
 	}
 
 	return *this;
 }
 
-inline mat4 mat4::Inverse() const
+inline mat4 mat4::inverse() const
 {
 	mat4 invMat = *this;
-	const bool res = invMat.InverseSelf();
+	const bool res = invMat.inverse_self();
 	PANIC(!res);
 	return invMat;
 }
 
-inline mat4& mat4::Translate(const vec3& translation)
+inline mat4& mat4::translate(const vec3& translation)
 {
 	mat[3][0] = translation.x;
 	mat[3][1] = translation.y;
@@ -1092,7 +1092,7 @@ inline mat4& mat4::Translate(const vec3& translation)
 	return *this;
 }
 
-inline mat4& mat4::Scale(const vec3& scale)
+inline mat4& mat4::scale(const vec3& scale)
 {
 	mat[0][0] = scale.x;
 	mat[1][1] = scale.y;
@@ -1100,17 +1100,17 @@ inline mat4& mat4::Scale(const vec3& scale)
 	return *this;
 }
 
-inline s32 mat4::Dimension() const
+inline s32 mat4::dimension() const
 {
 	return 16;
 }
 
-inline const f32 *mat4::Ptr() const
+inline const f32 *mat4::ptr() const
 {
-	return mat[0].Ptr();
+	return mat[0].ptr();
 }
 
-inline f32 *mat4::Ptr()
+inline f32 *mat4::ptr()
 {
-	return mat[0].Ptr();
+	return mat[0].ptr();
 }

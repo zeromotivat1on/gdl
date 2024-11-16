@@ -2,7 +2,7 @@
 #include "quat.h"
 #include "matrix.h"
 
-mat3 quat::Mat3() const
+mat3 quat::to_mat3() const
 {
     mat3 mat;
 
@@ -37,7 +37,7 @@ mat3 quat::Mat3() const
     return mat;
 }
 
-mat4 quat::Mat4() const
+mat4 quat::to_mat4() const
 {
-    return Mat3().Mat4();
+    return to_mat3().to_mat4();
 }

@@ -32,26 +32,26 @@ struct vec2
 
     friend vec2	    operator*(f32 a, vec2 b);
 
-    vec2& 			Set(f32 a, f32 b);
-    vec2&			Zero();
+    vec2& 			set(f32 a, f32 b);
+    vec2&			zero();
 
-    bool			Equal(const vec2& a) const;
-    bool			Equal(const vec2& a, f32 epsilon) const;
+    bool			equal(const vec2& a) const;
+    bool			equal(const vec2& a, f32 epsilon) const;
 
-    f32			    Length() const;
-    f32			    LengthSqr() const;
-    f32             Dot(const vec2& a) const;
-    vec2&           Normalize();            // normalize vector
-    vec2&		    Truncate(f32 length);   // cap vector length
+    f32			    length() const;
+    f32			    length_sqr() const;
+    f32             dot(const vec2& a) const;
+    vec2&           normalize();            // normalize vector
+    vec2&		    truncate(f32 length);   // cap vector length
 
-    s32				Dimension() const;
+    s32				dimension() const;
 
-    f32*			Ptr();
-    const f32*	    Ptr() const;
+    f32*			ptr();
+    const f32*	    ptr() const;
 
-    vec2&			Clamp(const vec2& min, const vec2& max);
-    vec2&			Snap(); // snap to closest integer value
-    vec2&			Lerp(const vec2& v1, const vec2& v2, f32 alpha);
+    vec2&			clamp(const vec2& min, const vec2& max);
+    vec2&			snap(); // snap to closest integer value
+    vec2&			lerp(const vec2& v1, const vec2& v2, f32 alpha);
 };
 
 inline vec2::vec2()
@@ -96,7 +96,7 @@ inline vec2 vec2::operator-(const vec2& a) const
 
 inline f32 vec2::operator*(const vec2& a) const
 {
-    return Dot(a);
+    return dot(a);
 }
 
 inline vec2 vec2::operator*(f32 a) const
@@ -148,7 +148,7 @@ inline vec2& vec2::operator*=(f32 a)
 
 inline bool vec2::operator==(const vec2& a) const
 {
-    return Equal(a);
+    return equal(a);
 }
 
 inline bool vec2::operator!=(const vec2& a) const
@@ -161,104 +161,104 @@ inline vec2 operator*(f32 a, vec2 b)
     return vec2(b.x * a, b.y * a);
 }
 
-inline vec2& vec2::Set(f32 a, f32 b)
+inline vec2& vec2::set(f32 a, f32 b)
 {
     x = a;
     y = b;
     return *this;
 }
 
-inline vec2& vec2::Zero()
+inline vec2& vec2::zero()
 {
     x = y = 0.0f;
     return *this;
 }
 
-inline bool vec2::Equal(const vec2& a) const
+inline bool vec2::equal(const vec2& a) const
 {
     return x == a.x && y == a.y;
 }
 
-inline bool vec2::Equal(const vec2& a, f32 epsilon) const
+inline bool vec2::equal(const vec2& a, f32 epsilon) const
 {
-    return Absf(x - a.x) <= epsilon &&
-           Absf(y - a.y) <= epsilon;
+    return gdl::absf(x - a.x) <= epsilon &&
+           gdl::absf(y - a.y) <= epsilon;
 }
 
-inline f32 vec2::Length() const
+inline f32 vec2::length() const
 {
-    return Sqrt(x * x + y * y);
+    return gdl::sqrt(x * x + y * y);
 }
 
-inline f32 vec2::LengthSqr() const
+inline f32 vec2::length_sqr() const
 {
     return x * x + y * y;
 }
 
-inline f32 vec2::Dot(const vec2& a) const
+inline f32 vec2::dot(const vec2& a) const
 {
     return x * a.x + y * a.y;
 }
 
-inline vec2& vec2::Normalize()
+inline vec2& vec2::normalize()
 {
-    const f32 lengthInv = InvSqrt(x * x + y * y);
+    const f32 length_inv = gdl::sqrt_inv(x * x + y * y);
 
-    x *= lengthInv;
-    y *= lengthInv;
+    x *= length_inv;
+    y *= length_inv;
 
     return *this;
 }
 
-inline vec2& vec2::Truncate(f32 length)
+inline vec2& vec2::truncate(f32 length)
 {
     if (length == 0.0f)
     {
-        Zero();
+        zero();
         return *this;
     }
 
-    const f32 lengthSquare = x * x + y * y;
-    if (lengthSquare > length * length)
+    const f32 length_square = x * x + y * y;
+    if (length_square > length * length)
     {
-        const f32 scaleFactor = length * InvSqrt(lengthSquare);
-        x *= scaleFactor;
-        y *= scaleFactor;
+        const f32 scale_factor = length * gdl::sqrt_inv(length_square);
+        x *= scale_factor;
+        y *= scale_factor;
     }
 
     return *this;
 }
 
-inline s32 vec2::Dimension() const
+inline s32 vec2::dimension() const
 {
     return 2;
 }
 
-inline f32* vec2::Ptr()
+inline f32* vec2::ptr()
 {
     return &x;
 }
 
-inline const f32* vec2::Ptr() const
+inline const f32* vec2::ptr() const
 {
     return &x;
 }
 
-inline vec2& vec2::Clamp(const vec2& min, const vec2& max)
+inline vec2& vec2::clamp(const vec2& min, const vec2& max)
 {
-    x = ::Clamp(x, min.x, max.x);
-    y = ::Clamp(y, min.y, max.y);
+    x = gdl::clamp(x, min.x, max.x);
+    y = gdl::clamp(y, min.y, max.y);
     return *this;
 }
 
-inline vec2& vec2::Snap()
+inline vec2& vec2::snap()
 {
     x = (f32)((s32)x);
     y = (f32)((s32)y);
     return *this;
 }
 
-inline vec2& vec2::Lerp(const vec2& v1, const vec2& v2, f32 alpha)
+inline vec2& vec2::lerp(const vec2& v1, const vec2& v2, f32 alpha)
 {
     if (alpha <= 0.0f)
     {
@@ -305,32 +305,32 @@ struct vec3
 
     friend vec3	    operator*(f32 a, vec3 b);
 
-    vec3& 			Set(f32 a, f32 b, f32 c);
-    vec3&			Zero();
+    vec3& 			set(f32 a, f32 b, f32 c);
+    vec3&			zero();
 
-    bool			Equal(const vec3& a) const;
-    bool			Equal(const vec3& a, f32 epsilon) const;
+    bool			equal(const vec3& a) const;
+    bool			equal(const vec3& a, f32 epsilon) const;
 
-    f32			    Length() const;
-    f32			    LengthSqr() const;
-    f32             Dot(const vec3& a) const;
-    vec3            Cross(const vec3& a) const;
-    vec3&           Normalize();            // normalize vector
-    vec3&		    Truncate(f32 length);   // cap vector length
+    f32			    length() const;
+    f32			    length_sqr() const;
+    f32             dot(const vec3& a) const;
+    vec3            cross(const vec3& a) const;
+    vec3&           normalize();            // normalize vector
+    vec3&		    truncate(f32 length);   // cap vector length
 
-    s32				Dimension() const;
+    s32				dimension() const;
 
-    f32			    Yaw() const;
-    f32			    Pitch() const;
-    const vec2&	    Vec2() const;
-    vec2&		    Vec2();
+    f32			    yaw() const;
+    f32			    pitch() const;
+    const vec2&	    to_vec2() const;
+    vec2&		    to_vec2();
 
-    f32*			Ptr();
-    const f32*	    Ptr() const;
+    f32*			ptr();
+    const f32*	    ptr() const;
 
-    vec3&			Clamp(const vec3& min, const vec3& max);
-    vec3&			Snap();                 // snap to closest integer value
-    vec3&			Lerp(const vec3& v1, const vec3& v2, f32 alpha);
+    vec3&			clamp(const vec3& min, const vec3& max);
+    vec3&			snap();                 // snap to closest integer value
+    vec3&			lerp(const vec3& v1, const vec3& v2, f32 alpha);
 };
 
 inline vec3::vec3()
@@ -375,7 +375,7 @@ inline vec3 vec3::operator-(const vec3& a) const
 
 inline f32 vec3::operator*(const vec3& a) const
 {
-    return Dot(a);
+    return dot(a);
 }
 
 inline vec3 vec3::operator*(f32 a) const
@@ -432,7 +432,7 @@ inline vec3& vec3::operator*=(f32 a)
 
 inline bool vec3::operator==(const vec3& a) const
 {
-    return Equal(a);
+    return equal(a);
 }
 
 inline bool vec3::operator!=(const vec3& a) const
@@ -445,7 +445,7 @@ inline vec3 operator*(f32 a, vec3 b)
     return vec3(b.x * a, b.y * a, b.z * a);
 }
 
-inline vec3& vec3::Set(f32 a, f32 b, f32 c)
+inline vec3& vec3::set(f32 a, f32 b, f32 c)
 {
     x = a;
     y = b;
@@ -453,117 +453,117 @@ inline vec3& vec3::Set(f32 a, f32 b, f32 c)
     return *this;
 }
 
-inline vec3& vec3::Zero()
+inline vec3& vec3::zero()
 {
     x = y = z = 0.0f;
     return *this;
 }
 
-inline bool vec3::Equal(const vec3& a) const
+inline bool vec3::equal(const vec3& a) const
 {
     return (x == a.x) && (y == a.y) && (z == a.z);
 }
 
-inline bool vec3::Equal(const vec3& a, f32 epsilon) const
+inline bool vec3::equal(const vec3& a, f32 epsilon) const
 {
-    return Absf(x - a.x) <= epsilon &&
-           Absf(y - a.y) <= epsilon &&
-           Absf(z - a.z) <= epsilon;
+    return gdl::absf(x - a.x) <= epsilon &&
+           gdl::absf(y - a.y) <= epsilon &&
+           gdl::absf(z - a.z) <= epsilon;
 }
 
-inline f32 vec3::Length() const
+inline f32 vec3::length() const
 {
-    return Sqrt(x * x + y * y + z * z);
+    return gdl::sqrt(x * x + y * y + z * z);
 }
 
-inline f32 vec3::LengthSqr() const
+inline f32 vec3::length_sqr() const
 {
     return x * x + y * y + z * z;
 }
 
-inline f32 vec3::Dot(const vec3& a) const
+inline f32 vec3::dot(const vec3& a) const
 {
     return x * a.x + y * a.y + z * a.z;
 }
 
-inline vec3 vec3::Cross(const vec3& a) const
+inline vec3 vec3::cross(const vec3& a) const
 {
     return vec3(y * a.z - z * a.y, z * a.x - x * a.z, x * a.y - y * a.x);
 }
 
-inline vec3& vec3::Normalize()
+inline vec3& vec3::normalize()
 {
-    const f32 lengthInv = InvSqrt(x * x + y * y + z * z);
+    const f32 length_inv = gdl::sqrt_inv(x * x + y * y + z * z);
 
-    x *= lengthInv;
-    y *= lengthInv;
-    z *= lengthInv;
+    x *= length_inv;
+    y *= length_inv;
+    z *= length_inv;
 
     return *this;
 }
 
-inline vec3& vec3::Truncate(f32 length)
+inline vec3& vec3::truncate(f32 length)
 {
     if (length == 0.0f)
     {
-        Zero();
+        zero();
         return *this;
     }
 
-    const f32 lengthSquare = x * x + y * y + z * z;
-    if (lengthSquare > length * length)
+    const f32 length_square = x * x + y * y + z * z;
+    if (length_square > length * length)
     {
-        const f32 scaleFactor = length * InvSqrt(lengthSquare);
-        x *= scaleFactor;
-        y *= scaleFactor;
-        z *= scaleFactor;
+        const f32 scale_factor = length * gdl::sqrt_inv(length_square);
+        x *= scale_factor;
+        y *= scale_factor;
+        z *= scale_factor;
     }
 
     return *this;
 }
 
-inline s32 vec3::Dimension() const
+inline s32 vec3::dimension() const
 {
     return 3;
 }
 
-inline f32 vec3::Yaw() const
+inline f32 vec3::yaw() const
 {
 }
 
-inline f32 vec3::Pitch() const
+inline f32 vec3::pitch() const
 {
 }
 
-inline const vec2& vec3::Vec2() const
+inline const vec2& vec3::to_vec2() const
 {
     return *(const vec2*)this;
 }
 
-inline vec2& vec3::Vec2()
+inline vec2& vec3::to_vec2()
 {
     return *(vec2*)this;
 }
 
-inline f32* vec3::Ptr()
+inline f32* vec3::ptr()
 {
     return &x;
 }
 
-inline const f32* vec3::Ptr() const
+inline const f32* vec3::ptr() const
 {
     return &x;
 }
 
-inline vec3& vec3::Clamp(const vec3& min, const vec3& max)
+inline vec3& vec3::clamp(const vec3& min, const vec3& max)
 {
-    x = ::Clamp(x, min.x, max.x);
-    y = ::Clamp(y, min.y, max.y);
-    z = ::Clamp(z, min.z, max.z);
+    x = gdl::clamp(x, min.x, max.x);
+    y = gdl::clamp(y, min.y, max.y);
+    z = gdl::clamp(z, min.z, max.z);
     return *this;
 }
 
-inline vec3& vec3::Snap()
+inline vec3& vec3::snap()
 {
     x = (f32)((s32)x);
     y = (f32)((s32)y);
@@ -571,7 +571,7 @@ inline vec3& vec3::Snap()
     return *this;
 }
 
-inline vec3& vec3::Lerp(const vec3& v1, const vec3& v2, f32 alpha)
+inline vec3& vec3::lerp(const vec3& v1, const vec3& v2, f32 alpha)
 {
     if (alpha <= 0.0f)
     {
@@ -619,28 +619,28 @@ struct vec4
 
     friend vec4	    operator*(f32 a, vec4 b);
 
-    vec4& 			Set(f32 a, f32 b, f32 c, f32 d);
-    vec4&			Zero();
+    vec4& 			set(f32 a, f32 b, f32 c, f32 d);
+    vec4&			zero();
 
-    bool			Equal(const vec4& a) const;
-    bool			Equal(const vec4& a, f32 epsilon) const;
+    bool			equal(const vec4& a) const;
+    bool			equal(const vec4& a, f32 epsilon) const;
 
-    f32			    Length() const;
-    f32			    LengthSqr() const;
-    f32             Dot(const vec4& a) const;
-    vec4&           Normalize();            // normalize vector
+    f32			    length() const;
+    f32			    length_sqr() const;
+    f32             dot(const vec4& a) const;
+    vec4&           normalize();            // normalize vector
 
-    s32				Dimension() const;
+    s32				dimension() const;
 
-    const vec2&	    Vec2() const;
-    vec2&		    Vec2();
-    const vec3&	    Vec3() const;
-    vec3&		    Vec3();
+    const vec2&	    to_vec2() const;
+    vec2&		    to_vec2();
+    const vec3&	    to_vec3() const;
+    vec3&		    to_vec3();
 
-    f32*			Ptr();
-    const f32*	    Ptr() const;
+    f32*			ptr();
+    const f32*	    ptr() const;
 
-    vec4&			Lerp(const vec4& v1, const vec4& v2, f32 alpha);
+    vec4&			lerp(const vec4& v1, const vec4& v2, f32 alpha);
 };
 
 inline vec4::vec4()
@@ -686,7 +686,7 @@ inline vec4 vec4::operator-(const vec4& a) const
 
 inline f32 vec4::operator*(const vec4& a) const
 {
-    return Dot(a);
+    return dot(a);
 }
 
 inline vec4 vec4::operator*(f32 a) const
@@ -748,7 +748,7 @@ inline vec4& vec4::operator*=(f32 a)
 
 inline bool vec4::operator==(const vec4& a) const
 {
-    return Equal(a);
+    return equal(a);
 }
 
 inline bool vec4::operator!=(const vec4& a) const
@@ -761,7 +761,7 @@ inline vec4 operator*(f32 a, vec4 b)
     return vec4(b.x * a, b.y * a, b.z * a, b.w * a);
 }
 
-inline vec4& vec4::Set(f32 a, f32 b, f32 c, f32 d)
+inline vec4& vec4::set(f32 a, f32 b, f32 c, f32 d)
 {
     x = a;
     y = b;
@@ -770,43 +770,43 @@ inline vec4& vec4::Set(f32 a, f32 b, f32 c, f32 d)
     return *this;
 }
 
-inline vec4& vec4::Zero()
+inline vec4& vec4::zero()
 {
     x = y = z = w = 0.0f;
     return *this;
 }
 
-inline bool vec4::Equal(const vec4& a) const
+inline bool vec4::equal(const vec4& a) const
 {
     return (x == a.x) && (y == a.y) && (z == a.z) && (w == a.w);
 }
 
-inline bool vec4::Equal(const vec4& a, f32 epsilon) const
+inline bool vec4::equal(const vec4& a, f32 epsilon) const
 {
-    return Absf(x - a.x) <= epsilon &&
-           Absf(y - a.y) <= epsilon &&
-           Absf(z - a.z) <= epsilon &&
-           Absf(w - a.w) <= epsilon;
+    return gdl::absf(x - a.x) <= epsilon &&
+           gdl::absf(y - a.y) <= epsilon &&
+           gdl::absf(z - a.z) <= epsilon &&
+           gdl::absf(w - a.w) <= epsilon;
 }
 
-inline f32 vec4::Length() const
+inline f32 vec4::length() const
 {
-    return Sqrt(x * x + y * y + z * z + w * w);
+    return gdl::sqrt(x * x + y * y + z * z + w * w);
 }
 
-inline f32 vec4::LengthSqr() const
+inline f32 vec4::length_sqr() const
 {
     return x * x + y * y + z * z + w * w;
 }
 
-inline f32 vec4::Dot(const vec4& a) const
+inline f32 vec4::dot(const vec4& a) const
 {
     return x * a.x + y * a.y + z * a.z + w * a.w;
 }
 
-inline vec4& vec4::Normalize()
+inline vec4& vec4::normalize()
 {
-    const f32 lengthInv = InvSqrt(x * x + y * y + z * z + w * w);
+    const f32 lengthInv = gdl::sqrt_inv(x * x + y * y + z * z + w * w);
 
     x *= lengthInv;
     y *= lengthInv;
@@ -816,42 +816,42 @@ inline vec4& vec4::Normalize()
     return *this;
 }
 
-inline s32 vec4::Dimension() const
+inline s32 vec4::dimension() const
 {
     return 4;
 }
 
-inline const vec2& vec4::Vec2() const
+inline const vec2& vec4::to_vec2() const
 {
     return *(const vec2*)this;
 }
 
-inline vec2& vec4::Vec2()
+inline vec2& vec4::to_vec2()
 {
     return *(vec2*)this;
 }
 
-inline const vec3& vec4::Vec3() const
+inline const vec3& vec4::to_vec3() const
 {
     return *(const vec3*)this;
 }
 
-inline vec3& vec4::Vec3()
+inline vec3& vec4::to_vec3()
 {
     return *(vec3*)this;
 }
 
-inline f32* vec4::Ptr()
+inline f32* vec4::ptr()
 {
     return &x;
 }
 
-inline const f32* vec4::Ptr() const
+inline const f32* vec4::ptr() const
 {
     return &x;
 }
 
-inline vec4& vec4::Lerp(const vec4& v1, const vec4& v2, f32 alpha)
+inline vec4& vec4::lerp(const vec4& v1, const vec4& v2, f32 alpha)
 {
     if (alpha <= 0.0f)
     {

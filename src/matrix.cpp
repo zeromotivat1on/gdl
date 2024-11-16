@@ -8,26 +8,26 @@
 
 mat4 lookat(const vec3& eye, const vec3& at, const vec3& up)
 {
-	const vec3 f = (at - eye).Normalize();
-	const vec3 r = f.Cross(up).Normalize();
-	const vec3 u = r.Cross(f);
+	const vec3 f = (at - eye).normalize();
+	const vec3 r = f.cross(up).normalize();
+	const vec3 u = r.cross(f);
 
 	mat4 result;
 
 	result[0][0] = r.x;
 	result[1][0] = r.y;
 	result[2][0] = r.z;
-	result[3][0] = -r.Dot(eye);
+	result[3][0] = -r.dot(eye);
 
 	result[0][1] = u.x;
 	result[1][1] = u.y;
 	result[2][1] = u.z;
-	result[3][1] = -u.Dot(eye);
+	result[3][1] = -u.dot(eye);
 
 	result[0][2] = -f.x;
 	result[1][2] = -f.y;
 	result[2][2] = -f.z;
-	result[3][2] = f.Dot(eye);
+	result[3][2] = f.dot(eye);
 
 	result[0][3] = 0.0f;
 	result[1][3] = 0.0f;
@@ -39,11 +39,11 @@ mat4 lookat(const vec3& eye, const vec3& at, const vec3& up)
 
 mat4 perspective(f32 rfovy, f32 aspect, f32 n, f32 f)
 {
-	const f32 tan_half_fovy = Tan(rfovy * 0.5f);
+	const f32 tan_half_fovy = gdl::tan(rfovy * 0.5f);
 
 	mat4 result;
 	result[0][0] = 1.0f / (aspect * tan_half_fovy);	// x-axis scaling
-	result[1][1] = 1.0f / tan_half_fovy;				// y-axis scaling
+	result[1][1] = 1.0f / tan_half_fovy;			// y-axis scaling
 	result[2][2] = -(f + n) / (f - n);				// z-axis scaling
 	result[2][3] = -1.0f;							// rh perspective divide
 	result[3][2] = -(2.0f * f * n) / (f - n);		// z-axis translation
@@ -68,7 +68,7 @@ mat4 orthographic(f32 l, f32 r, f32 b, f32 t, f32 n, f32 f)
 // mat4
 // ----
 
-f32 mat4::Determinant() const
+f32 mat4::determinant() const
 {
 	// determinant_size_rows_cols
 
@@ -89,7 +89,7 @@ f32 mat4::Determinant() const
 	return -det3_201_123 * mat[3][0] + det3_201_023 * mat[3][1] - det3_201_013 * mat[3][2] + det3_201_012 * mat[3][3];
 }
 
-bool mat4::InverseSelf()
+bool mat4::inverse_self()
 {
 	// determinant_size_rows_cols
 
@@ -109,7 +109,7 @@ bool mat4::InverseSelf()
 
 	const f32 det = -det3_201_123 * mat[3][0] + det3_201_023 * mat[3][1] - det3_201_013 * mat[3][2] + det3_201_012 * mat[3][3];
 
-	if (Absf(det) < MATRIX_INV_EPSILON)
+	if (gdl::absf(det) < MATRIX_INV_EPSILON)
 	{
 		return false;
 	}
@@ -170,14 +170,14 @@ bool mat4::InverseSelf()
 	return true;
 }
 
-mat4& mat4::Rotate(const mat4& rotation)
+mat4& mat4::rotate(const mat4& rotation)
 {
 	*this = *this * rotation;
 	return *this;
 }
 
-mat4& mat4::Rotate(const quat& rotation)
+mat4& mat4::rotate(const quat& rotation)
 {
-    *this = *this * rotation.Mat4();
+    *this = *this * rotation.to_mat4();
     return *this;
 }
