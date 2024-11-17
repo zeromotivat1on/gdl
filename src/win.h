@@ -11,7 +11,7 @@
 // Callbacks
 // ---------
 
-typedef void(*window_char_callback)(u32 character);
+typedef void(*window_char_callback)(Window* win, u32 character);
 
 // -----
 // Types
