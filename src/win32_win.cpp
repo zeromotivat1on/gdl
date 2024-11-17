@@ -5,14 +5,12 @@
 #include <malloc.h>
 #include <windowsx.h>
 
-const u16 WINDOW_ALLOC_SIZE = sizeof(Win32Window);
-
 EXTERN_C IMAGE_DOS_HEADER __ImageBase;
 
 static LRESULT CALLBACK win32_window_proc(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
 {
-    Win32Window* win32 = (Win32Window*)GetPropW(hwnd, L"gdl");
-    if (!win32)
+    Window* win = (Window*)GetPropW(hwnd, L"gdl");
+    if (!win)
     {
         return DefWindowProcW(hwnd, umsg, wparam, lparam);
     }
@@ -23,7 +21,7 @@ static LRESULT CALLBACK win32_window_proc(HWND hwnd, UINT umsg, WPARAM wparam, L
         case WM_SYSKEYDOWN:
         {
             if (const s16 key = g_input_tables.keycodes[wparam]; key > 0)
-                bit_set(win32->keys.buckets, key);
+                bit_set(win->keys.buckets, key);
             break;
         }
 
@@ -31,30 +29,30 @@ static LRESULT CALLBACK win32_window_proc(HWND hwnd, UINT umsg, WPARAM wparam, L
         case WM_SYSKEYUP:
         {
             if (const s16 key = g_input_tables.keycodes[wparam]; key > 0)
-                bit_clear(win32->keys.buckets, key);
+                bit_clear(win->keys.buckets, key);
             break;
         }
 
-    	case WM_LBUTTONDOWN: BIT_SET(win32->mouse_buttons, MOUSE_LEFT); break;
-    	case WM_RBUTTONDOWN: BIT_SET(win32->mouse_buttons, MOUSE_RIGHT); break;
-    	case WM_MBUTTONDOWN: BIT_SET(win32->mouse_buttons, MOUSE_MIDDLE); break;
+    	case WM_LBUTTONDOWN: BIT_SET(win->mouse_buttons, MOUSE_LEFT); break;
+    	case WM_RBUTTONDOWN: BIT_SET(win->mouse_buttons, MOUSE_RIGHT); break;
+    	case WM_MBUTTONDOWN: BIT_SET(win->mouse_buttons, MOUSE_MIDDLE); break;
     	case WM_XBUTTONDOWN: break;
-    	case WM_LBUTTONUP: BIT_CLEAR(win32->mouse_buttons, MOUSE_LEFT); break; 
-    	case WM_RBUTTONUP: BIT_CLEAR(win32->mouse_buttons, MOUSE_RIGHT); break; 
-    	case WM_MBUTTONUP: BIT_CLEAR(win32->mouse_buttons, MOUSE_MIDDLE); break; 
+    	case WM_LBUTTONUP: BIT_CLEAR(win->mouse_buttons, MOUSE_LEFT); break; 
+    	case WM_RBUTTONUP: BIT_CLEAR(win->mouse_buttons, MOUSE_RIGHT); break; 
+    	case WM_MBUTTONUP: BIT_CLEAR(win->mouse_buttons, MOUSE_MIDDLE); break; 
     	case WM_XBUTTONUP: break;
 
         case WM_MOUSEMOVE:
         {   
-            win32->mouse_axes[MOUSE_X] = GET_X_LPARAM(lparam);
-            win32->mouse_axes[MOUSE_Y] = GET_Y_LPARAM(lparam);
+            win->mouse_axes[MOUSE_X] = GET_X_LPARAM(lparam);
+            win->mouse_axes[MOUSE_Y] = GET_Y_LPARAM(lparam);
             break;
         }
 
         case WM_MOUSEWHEEL:
         {
-            win32->mouse_axes[MOUSE_SCROLL_X] = 0;
-            win32->mouse_axes[MOUSE_SCROLL_Y] = GET_WHEEL_DELTA_WPARAM(wparam);
+            win->mouse_axes[MOUSE_SCROLL_X] = 0;
+            win->mouse_axes[MOUSE_SCROLL_Y] = GET_WHEEL_DELTA_WPARAM(wparam);
             break;
         }
     }
@@ -62,38 +60,37 @@ static LRESULT CALLBACK win32_window_proc(HWND hwnd, UINT umsg, WPARAM wparam, L
     return DefWindowProcW(hwnd, umsg, wparam, lparam);
 }
 
-bool window_init(hwindow win, WindowInfo* info)
+bool window_init(Window* win, WindowInfo* info)
 {
-    Win32Window* win32 = (Win32Window*)win;
-
-    if (!win32->class_atom)
+    memset(win, 0, WINDOW_ALLOC_SIZE);
+    
+    if (!win->win32.class_atom)
     {
-        win32->class_name = L"gdl";
+        win->win32.class_name = L"gdl";
 
         WNDCLASSEXW wclass = STRUCT_ZERO(WNDCLASSEXW);
         wclass.cbSize = sizeof(wclass);
         wclass.style = CS_HREDRAW | CS_VREDRAW;
         wclass.lpfnWndProc = win32_window_proc;
-        wclass.hInstance = win32->hinstance;
+        wclass.hInstance = win->win32.hinstance;
         wclass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
         wclass.hCursor = LoadCursor(NULL, IDC_ARROW);
-        wclass.lpszClassName = win32->class_name;
+        wclass.lpszClassName = win->win32.class_name;
 
-        win32->class_atom = RegisterClassExW(&wclass);
+        win->win32.class_atom = RegisterClassExW(&wclass);
     }
 
-    if (!win32->hinstance)
+    if (!win->win32.hinstance)
     {
-        win32->hinstance = (HINSTANCE)&__ImageBase;
+        win->win32.hinstance = (HINSTANCE)&__ImageBase;
     }
 
     static wchar_t wtitle[32];
     utf8_to_utf16(info->title, wtitle);
-    PANIC(win32->handle);
-
-    win32->handle = CreateWindowExW(
+    
+    win->win32.hwnd = CreateWindowExW(
         0,
-        win32->class_name,
+        win->win32.class_name,
         wtitle,
         WS_OVERLAPPEDWINDOW,
         info->x,
@@ -102,40 +99,36 @@ bool window_init(hwindow win, WindowInfo* info)
         info->height,
         NULL,
         NULL,
-        win32->hinstance,
+        win->win32.hinstance,
         NULL
     );
 
-    if (win32->handle == NULL)
+    if (win->win32.hwnd == NULL)
         return false;
 
-    SetPropW(win32->handle, L"gdl", win32);
+    SetPropW(win->win32.hwnd, L"gdl", win);
     
     return true;
 }
 
-void window_show(hwindow win)
+void window_show(Window* win)
 {
-    Win32Window* win32 = (Win32Window*)win;
-    ShowWindow(win32->handle, SW_NORMAL);
+    ShowWindow(win->win32.hwnd, SW_NORMAL);
 }
 
-void window_destroy(hwindow win)
+void window_destroy(Window* win)
 {
-    Win32Window* win32 = (Win32Window*)win;
-    DestroyWindow(win32->handle);
-    UnregisterClassW(win32->class_name, win32->hinstance);
+    DestroyWindow(win->win32.hwnd);
+    UnregisterClassW(win->win32.class_name, win->win32.hinstance);
 }
 
-void window_update(hwindow win)
-{
-    Win32Window* win32 = (Win32Window*)win;
-        
-    win32->mouse_axes[MOUSE_SCROLL_X] = 0;
-    win32->mouse_axes[MOUSE_SCROLL_Y] = 0;
+void window_update(Window* win)
+{        
+    win->mouse_axes[MOUSE_SCROLL_X] = 0;
+    win->mouse_axes[MOUSE_SCROLL_Y] = 0;
     
     MSG msg = STRUCT_ZERO(MSG);
-    msg.hwnd = win32->handle;
+    msg.hwnd = win->win32.hwnd;
 
     while(PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
     {
@@ -145,104 +138,103 @@ void window_update(hwindow win)
 
     // Update keys.
     {
-        const u64 count = ARRAY_COUNT(win32->keys.buckets);
+        const u64 count = ARRAY_COUNT(win->keys.buckets);
         
         u64* changes = (u64*)alloca(count * sizeof(u64));
-        bit_xor(changes, win32->keys.buckets, win32->keys_last.buckets, count);
+        bit_xor(changes, win->keys.buckets, win->keys_last.buckets, count);
 
         u64* notbuckets = (u64*)alloca(count * sizeof(u64));
-        bit_not(notbuckets, win32->keys.buckets, count);
+        bit_not(notbuckets, win->keys.buckets, count);
 
-        bit_and(win32->keys_pressed.buckets, changes, win32->keys.buckets, count);
-        bit_and(win32->keys_released.buckets, changes, notbuckets, count);
+        bit_and(win->keys_pressed.buckets, changes, win->keys.buckets, count);
+        bit_and(win->keys_released.buckets, changes, notbuckets, count);
 
-        memcpy(&win32->keys_last, &win32->keys, sizeof(win32->keys));
+        memcpy(&win->keys_last, &win->keys, sizeof(win->keys));
     }
 
     // Update mouse buttons.
     {
-        const u8 changes = win32->mouse_buttons ^ win32->mouse_buttons_last;
-        win32->mouse_buttons_pressed = changes & win32->mouse_buttons;
-        win32->mouse_buttons_released = changes & (~win32->mouse_buttons);
+        const u8 changes = win->mouse_buttons ^ win->mouse_buttons_last;
+        win->mouse_buttons_pressed = changes & win->mouse_buttons;
+        win->mouse_buttons_released = changes & (~win->mouse_buttons);
 
-        win32->mouse_buttons_last = win32->mouse_buttons;
+        win->mouse_buttons_last = win->mouse_buttons;
     }
 
     // Update mouse axes.
     {
-         win32->mouse_axes[MOUSE_OFFSET_X] = win32->mouse_axes[MOUSE_X] - win32->mouse_axes[MOUSE_LAST_X];
-         win32->mouse_axes[MOUSE_OFFSET_Y] = win32->mouse_axes[MOUSE_LAST_Y] - win32->mouse_axes[MOUSE_Y];
+         win->mouse_axes[MOUSE_OFFSET_X] = win->mouse_axes[MOUSE_X] - win->mouse_axes[MOUSE_LAST_X];
+         win->mouse_axes[MOUSE_OFFSET_Y] = win->mouse_axes[MOUSE_LAST_Y] - win->mouse_axes[MOUSE_Y];
 
          
-         if (win32->cursor_constrained)
+         if (win->cursor_constrained)
          {
              u16 w, h;
              window_size_inner(win, &w, &h);
              
              POINT point;
-             point.x = win32->mouse_axes[MOUSE_LAST_X] = w / 2;
-             point.y = win32->mouse_axes[MOUSE_LAST_Y] = h / 2;
+             point.x = win->mouse_axes[MOUSE_LAST_X] = w / 2;
+             point.y = win->mouse_axes[MOUSE_LAST_Y] = h / 2;
 
-             ClientToScreen(win32->handle, &point);
+             ClientToScreen(win->win32.hwnd, &point);
              SetCursorPos(point.x, point.y);
          }
          else
          {
-             win32->mouse_axes[MOUSE_LAST_X] = win32->mouse_axes[MOUSE_X];
-             win32->mouse_axes[MOUSE_LAST_Y] = win32->mouse_axes[MOUSE_Y];
+             win->mouse_axes[MOUSE_LAST_X] = win->mouse_axes[MOUSE_X];
+             win->mouse_axes[MOUSE_LAST_Y] = win->mouse_axes[MOUSE_Y];
          }
     }
 
     // TODO: gamepad.
 }
 
-void window_close(hwindow win)
+void window_close(Window* win)
 {
-    Win32Window* win32 = (Win32Window*)win;
-    PostMessage(win32->handle, WM_CLOSE, 0, 0);
+    PostMessage(win->win32.hwnd, WM_CLOSE, 0, 0);
 }
 
-bool window_active(hwindow win)
+bool window_active(Window* win)
 {
-    Win32Window* win32 = (Win32Window*)win;
-    return IsWindow(win32->handle);
+    return IsWindow(win->win32.hwnd);
 }
 
-void window_size(hwindow win, u16* w, u16* h)
+void window_size(Window* win, u16* w, u16* h)
 {
-    Win32Window* win32 = (Win32Window*)win;
     RECT rect;
-    if (GetWindowRect(win32->handle, &rect))
+    if (GetWindowRect(win->win32.hwnd, &rect))
     {
         if (w) *w = (u16)(rect.right - rect.left);
         if (h) *h = (u16)(rect.bottom - rect.top);
     }
 }
 
-void window_size_inner(hwindow win, u16* w, u16* h)
+void window_size_inner(Window* win, u16* w, u16* h)
 {
-    Win32Window* win32 = (Win32Window*)win;
     RECT rect;
-    if (GetClientRect(win32->handle, &rect))
+    if (GetClientRect(win->win32.hwnd, &rect))
     {
         if (w) *w = (u16)(rect.right - rect.left);
         if (h) *h = (u16)(rect.bottom - rect.top);
     }
 }
 
-void* window_native(hwindow win)
+void* window_native(Window* win)
 {
-    Win32Window* win32 = (Win32Window*)win;
-    return win32->handle;
+    return win->win32.hwnd;
 }
 
-bool window_cursor_lock(hwindow win, bool lock)
+void window_set_char_callback(Window* win, window_char_callback callback)
+{
+    win->callbacks.character = callback;
+}
+
+bool window_cursor_lock(Window* win, bool lock)
 {
     if (lock)
     {
-        Win32Window* win32 = (Win32Window*)win;
         RECT rect;
-        if (GetWindowRect(win32->handle, &rect))
+        if (GetWindowRect(win->win32.hwnd, &rect))
         {
             return ClipCursor(&rect);
         }
@@ -253,18 +245,17 @@ bool window_cursor_lock(hwindow win, bool lock)
     return ClipCursor(NULL);
 }
 
-s32 window_cursor_show(hwindow win, bool show)
+s32 window_cursor_show(Window* win, bool show)
 {
     return ShowCursor(show);
 }
 
-void window_cursor_constrain(hwindow win, bool constrain)
+void window_cursor_constrain(Window* win, bool constrain)
 {
-    Win32Window* win32 = (Win32Window*)win;
-    win32->cursor_constrained = constrain;
+    win->cursor_constrained = constrain;
 }
 
-void window_cursor_pos_absolute(hwindow win, u16* x, u16* y)
+void window_cursor_pos_absolute(Window* win, u16* x, u16* y)
 {
     POINT point;
     GetCursorPos(&point);
@@ -273,13 +264,11 @@ void window_cursor_pos_absolute(hwindow win, u16* x, u16* y)
     if (y) *y = (u16)point.y;
 }
 
-void window_cursor_pos_relative(hwindow win, u16* x, u16* y)
+void window_cursor_pos_relative(Window* win, u16* x, u16* y)
 {
-    Win32Window* win32 = (Win32Window*)win;
-
     POINT point;
     GetCursorPos(&point);
-    ScreenToClient(win32->handle, &point);
+    ScreenToClient(win->win32.hwnd, &point);
 
     if (x) *x = (u16)point.x;
     if (y) *y = (u16)point.y;

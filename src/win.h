@@ -1,10 +1,21 @@
 #pragma once
 
+#include "input.h"
+
+#ifdef WIN32
+#include "win32_win.h"
+#define PLATFORM_WINDOW Win32Window win32
+#endif
+
+// ---------
+// Callbacks
+// ---------
+
+typedef void(*window_char_callback)(u32 character);
+
 // -----
 // Types
 // -----
-
-typedef void*   hwindow; // window handle
 
 struct WindowInfo
 {
@@ -15,30 +26,55 @@ struct WindowInfo
     u16     y;
 };
 
-// Desired platform window allocation size.
-// Use this to preallocate a block of memory
-// that should be passed during window creation.
-extern const u16 WINDOW_ALLOC_SIZE;
+struct Window
+{
+    bool cursor_constrained;
+
+    struct
+    {
+        window_char_callback character;
+    } callbacks;
+    
+    bit128      keys;
+    bit128      keys_last;
+    bit128      keys_pressed;
+    bit128      keys_released;
+
+    u8          mouse_buttons;
+    u8          mouse_buttons_last;
+    u8          mouse_buttons_pressed;
+    u8          mouse_buttons_released;
+    
+    s16         mouse_axes[MOUSE_AXIS_COUNT];
+    
+    PLATFORM_WINDOW;
+};
+
+// Desired window allocation size.
+// Use this to preallocate a block of memory that should be passed during window init.
+inline constexpr u16 WINDOW_ALLOC_SIZE = sizeof(Window);
 
 // ----
 // Core
 // ----
 
-bool    window_init(hwindow win, WindowInfo* info);     // init window in preallocated memory
-void    window_show(hwindow win);                       // display window
-void    window_destroy(hwindow win);                    // destroy the window
-void    window_update(hwindow win);                     // poll window events
-void    window_close(hwindow win);                      // close the window
-bool    window_active(hwindow win);                     // window not closed
-void    window_size(hwindow win, u16* w, u16* h);       // window whole size
-void    window_size_inner(hwindow win, u16* w, u16* h); // window inner renderable size
-void*   window_native(hwindow win);                     // window native platform handle
+bool    window_init(Window* win, WindowInfo* info);     // init window in preallocated memory
+void    window_show(Window* win);                       // display window
+void    window_destroy(Window* win);                    // destroy the window
+void    window_update(Window* win);                     // poll window events
+void    window_close(Window* win);                      // close the window
+bool    window_active(Window* win);                     // window not closed
+void    window_size(Window* win, u16* w, u16* h);       // window whole size
+void    window_size_inner(Window* win, u16* w, u16* h); // window inner renderable size
+void*   window_native(Window* win);                     // window native platform handle
 
-bool    window_cursor_lock(hwindow win, bool lock);     // lock/unlock cursor within window
-s32     window_cursor_show(hwindow win, bool show);     // show/hide cursor in window
-void    window_cursor_constrain(hwindow win, bool constrain); // keep cursor within window
-void    window_cursor_pos_absolute(hwindow win, u16* x, u16* y);
-void    window_cursor_pos_relative(hwindow win, u16* x, u16* y);
+void    window_set_char_callback(Window* win, window_char_callback callback);
+
+bool    window_cursor_lock(Window* win, bool lock);     // lock/unlock cursor within window
+s32     window_cursor_show(Window* win, bool show);     // show/hide cursor in window
+void    window_cursor_constrain(Window* win, bool constrain); // keep cursor within window
+void    window_cursor_pos_absolute(Window* win, u16* x, u16* y);
+void    window_cursor_pos_relative(Window* win, u16* x, u16* y);
 
 // -----
 // Extra
@@ -61,14 +97,14 @@ inline f32 aspect(f32 w, f32 h)
     return w / h;
 }
 
-inline void window_ortho_center(hwindow win, f32* ortho)
+inline void window_ortho_center(Window* win, f32* ortho)
 {
     u16 w, h;
     window_size_inner(win, &w, &h);
     ortho_center(w, h, ortho);
 }
 
-inline f32 window_aspect(hwindow win)
+inline f32 window_aspect(Window* win)
 {
     u16 w, h;
     window_size_inner(win, &w, &h);

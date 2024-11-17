@@ -1,7 +1,5 @@
 #pragma once
 
-#include "win.h"
-
 //
 // TODO: add gamepad support.
 //
@@ -231,26 +229,28 @@ struct InputTables
 // Core
 // ----
 
+struct Window;
+
 inline InputTables g_input_tables;
 
 void        input_tables_init();
 
-bool        key_up(hwindow win, s16 key);
-bool        key_down(hwindow win, s16 key);
-bool        key_pressed(hwindow win, s16 key);
-bool        key_released(hwindow win, s16 key);
+bool        key_up(Window* win, s16 key);
+bool        key_down(Window* win, s16 key);
+bool        key_pressed(Window* win, s16 key);
+bool        key_released(Window* win, s16 key);
 
 const char* key_name(s16 key);
 
-bool        mouse_up(hwindow win, s16 button);
-bool        mouse_down(hwindow win, s16 button);
-bool        mouse_pressed(hwindow win, s16 button);
-bool        mouse_released(hwindow win, s16 button);
+bool        mouse_up(Window* win, s16 button);
+bool        mouse_down(Window* win, s16 button);
+bool        mouse_pressed(Window* win, s16 button);
+bool        mouse_released(Window* win, s16 button);
 
-bool        gamepad_up(hwindow win, u8 gamepad, s16 button);
-bool        gamepad_down(hwindow win, u8 gamepad, s16 button);
-bool        gamepad_pressed(hwindow win, u8 gamepad, s16 button);
-bool        gamepad_released(hwindow win, u8 gamepad, s16 button);
+bool        gamepad_up(Window* win, u8 gamepad, s16 button);
+bool        gamepad_down(Window* win, u8 gamepad, s16 button);
+bool        gamepad_pressed(Window* win, u8 gamepad, s16 button);
+bool        gamepad_released(Window* win, u8 gamepad, s16 button);
 
-s16         mouse_axis(hwindow win, s16 axis);
-f32         gamepad_axis(hwindow win, u8 gamepad, s16 axis);
+s16         mouse_axis(Window* win, s16 axis);
+f32         gamepad_axis(Window* win, u8 gamepad, s16 axis);
