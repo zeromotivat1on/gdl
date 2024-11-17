@@ -33,6 +33,14 @@ static LRESULT CALLBACK win32_window_proc(HWND hwnd, UINT umsg, WPARAM wparam, L
             break;
         }
 
+        case WM_CHAR:
+        case WM_SYSCHAR:
+        {
+            if (win->callbacks.character)
+                win->callbacks.character(win, (u32)wparam);
+            return 0;
+        }
+        
     	case WM_LBUTTONDOWN: BIT_SET(win->mouse_buttons, MOUSE_LEFT); break;
     	case WM_RBUTTONDOWN: BIT_SET(win->mouse_buttons, MOUSE_RIGHT); break;
     	case WM_MBUTTONDOWN: BIT_SET(win->mouse_buttons, MOUSE_MIDDLE); break;
