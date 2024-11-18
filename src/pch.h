@@ -54,11 +54,13 @@ using f64 = double;
 #define FPS(n)                  (1.0f / (n))
 #define ARRAY_COUNT(arr)        (sizeof(arr) / sizeof(arr[0]))
 
-#define BIT(x)                  (1ull << (x))
-#define BIT_SET(val, pos)       ((val) |= (1ull << (pos)))
-#define BIT_CLEAR(val, pos)     ((val) &= ~(1ull << (pos)))
-#define BIT_TOGGLE(val, pos)    ((val) ^= (1ull << (pos)))
-#define BIT_CHECK(val, pos)     (((val) & (1ull << (pos))) != 0)
+#define BIT(x)                      (1ull << (x))
+#define BIT_SET(val, pos)           ((val) |= (1ull << (pos)))
+#define BIT_CLEAR(val, pos)         ((val) &= ~(1ull << (pos)))
+// Set or clear bit based on test.
+#define BIT_SORC(val, pos, test) ((val) = ((test) ? ((val) | (1ull << (pos))) : ((val) & ~(1ull << (pos)))))
+#define BIT_TOGGLE(val, pos)        ((val) ^= (1ull << (pos)))
+#define BIT_CHECK(val, pos)         (((val) & (1ull << (pos))) != 0)
 
 #define INDEX_NONE              -1
 

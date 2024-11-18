@@ -17,6 +17,13 @@ typedef void(*window_char_callback)(Window* win, u32 character);
 // Types
 // -----
 
+enum CursorFlags : u8
+{
+    CURSOR_VISIBLE = BIT(0),
+    CURSOR_LOCKED = BIT(1),
+    CURSOR_CONSTRAINED = BIT(2),
+};
+
 struct WindowInfo
 {
     char*   title;
@@ -26,26 +33,27 @@ struct WindowInfo
     u16     y;
 };
 
+// TODO: hide the details from client to encourage usage of functions?
 struct Window
 {
-    bool cursor_constrained;
+    u8 cursor_flags;
 
     struct
     {
         window_char_callback character;
     } callbacks;
     
-    bit128      keys;
-    bit128      keys_last;
-    bit128      keys_pressed;
-    bit128      keys_released;
+    bit128  keys;
+    bit128  keys_last;
+    bit128  keys_pressed;
+    bit128  keys_released;
 
-    u8          mouse_buttons;
-    u8          mouse_buttons_last;
-    u8          mouse_buttons_pressed;
-    u8          mouse_buttons_released;
+    u8      mouse_buttons;
+    u8      mouse_buttons_last;
+    u8      mouse_buttons_pressed;
+    u8      mouse_buttons_released;
     
-    s16         mouse_axes[MOUSE_AXIS_COUNT];
+    s16     mouse_axes[MOUSE_AXIS_COUNT];
     
     PLATFORM_WINDOW;
 };
@@ -73,6 +81,7 @@ void    window_set_char_callback(Window* win, window_char_callback callback);
 bool    window_cursor_lock(Window* win, bool lock);     // lock/unlock cursor within window
 s32     window_cursor_show(Window* win, bool show);     // show/hide cursor in window
 void    window_cursor_constrain(Window* win, bool constrain); // keep cursor within window
+u8      window_cursor_flags(Window* win);
 void    window_cursor_pos_absolute(Window* win, u16* x, u16* y);
 void    window_cursor_pos_relative(Window* win, u16* x, u16* y);
 

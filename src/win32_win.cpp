@@ -17,6 +17,17 @@ static LRESULT CALLBACK win32_window_proc(HWND hwnd, UINT umsg, WPARAM wparam, L
     
     switch(umsg)
     {
+        case WM_SETFOCUS:
+        {
+            break;
+        }
+
+        case WM_KILLFOCUS:
+        {
+            BIT_CLEAR(win->cursor_flags, CURSOR_CONSTRAINED);
+            break;
+        }
+        
         case WM_KEYDOWN:
         case WM_SYSKEYDOWN:
         {
@@ -173,9 +184,8 @@ void window_update(Window* win)
     {
          win->mouse_axes[MOUSE_OFFSET_X] = win->mouse_axes[MOUSE_X] - win->mouse_axes[MOUSE_LAST_X];
          win->mouse_axes[MOUSE_OFFSET_Y] = win->mouse_axes[MOUSE_LAST_Y] - win->mouse_axes[MOUSE_Y];
-
          
-         if (win->cursor_constrained)
+         if (BIT_CHECK(win->cursor_flags, CURSOR_CONSTRAINED))
          {
              u16 w, h;
              window_size_inner(win, &w, &h);
@@ -239,6 +249,8 @@ void window_set_char_callback(Window* win, window_char_callback callback)
 
 bool window_cursor_lock(Window* win, bool lock)
 {
+    BIT_SORC(win->cursor_flags, CURSOR_LOCKED, lock);
+    
     if (lock)
     {
         RECT rect;
@@ -255,12 +267,18 @@ bool window_cursor_lock(Window* win, bool lock)
 
 s32 window_cursor_show(Window* win, bool show)
 {
+    BIT_SORC(win->cursor_flags, CURSOR_VISIBLE, show);
     return ShowCursor(show);
 }
 
 void window_cursor_constrain(Window* win, bool constrain)
 {
-    win->cursor_constrained = constrain;
+    BIT_SORC(win->cursor_flags, CURSOR_CONSTRAINED, constrain);
+}
+
+u8 window_cursor_flags(Window* win)
+{
+    return win->cursor_flags;
 }
 
 void window_cursor_pos_absolute(Window* win, u16* x, u16* y)

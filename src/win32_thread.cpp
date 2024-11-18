@@ -6,15 +6,8 @@
 
 const u32 CRITICAL_SECTION_ALLOC_SIZE = sizeof(CRITICAL_SECTION);
 
-static DWORD win32_thread_create_type(s32 type)
-{
-    switch(type)
-    {
-        case THREAD_SUSPENDED: return CREATE_SUSPENDED;
-        case THREAD_IMMEDIATE:
-        default: return 0;
-    }
-}
+const s32 THREAD_CREATE_IMMEDIATE = 0;
+const s32 THREAD_CREATE_SUSPENDED = CREATE_SUSPENDED;
 
 static BOOL win32_wait_res_check(void* hobj, DWORD res)
 {
@@ -24,7 +17,7 @@ static BOOL win32_wait_res_check(void* hobj, DWORD res)
             return true;
 
         case WAIT_ABANDONED:
-            msg_error("[gdl]: Object (%p) was not released before owning thread termination", hobj);
+            msg_error("[gdl]: Mutex (%p) was not released before owning thread termination", hobj);
             return false;
             
         case WAIT_TIMEOUT:
@@ -58,9 +51,9 @@ bool thread_active(hthread handle)
     return exit_code == STILL_ACTIVE;
 }
 
-hthread thread_create(ThreadEntry entry, void* userdata, s32 type)
+hthread thread_create(ThreadEntry entry, void* userdata, s32 create_type)
 {
-    return CreateThread(0, 0, (LPTHREAD_START_ROUTINE)entry, userdata, win32_thread_create_type(type), NULL);
+    return CreateThread(0, 0, (LPTHREAD_START_ROUTINE)entry, userdata, create_type, NULL);
 }
 
 void thread_resume(hthread handle)
