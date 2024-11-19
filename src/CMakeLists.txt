@@ -1,7 +1,7 @@
 add_library(gdl STATIC
                 "${PROJECT_SOURCE_DIR}/include/gdl.h"
-                bit.h file.h gdlmath.h hash.h input.h matrix.h mem.h msg.h quat.h sid.h str.h sys.h thread.h time.h uid.h vector.h win.h workq.h
-                gdlmath.cpp matrix.cpp quat.cpp workq.cpp)
+                bit.h file.h gdlmath.h hash.h input.h matrix.h mem.h msg.h quat.h sid.h sparse_set.h str.h sys.h thread.h time.h uid.h vector.h win.h workq.h
+                gdlmath.cpp matrix.cpp quat.cpp sparse_set.cpp workq.cpp)
 target_precompile_headers(gdl PUBLIC pch.h)
 
 if (WIN32)

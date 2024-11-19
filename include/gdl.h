@@ -15,6 +15,7 @@
 #include "src/msg.h"
 #include "src/quat.h"
 #include "src/sid.h"
+#include "src/sparse_set.h"
 #include "src/str.h"
 #include "src/sys.h"
 #include "src/thread.h"

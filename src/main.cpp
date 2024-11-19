@@ -3,12 +3,14 @@
 
 void test_window();
 void test_workq();
+void test_sparse_set();
 
 int main()
 {
     //test_window();
-    test_workq();
-
+    // test_workq();
+    test_sparse_set();
+    
     return 0;
 }
 
@@ -25,7 +27,7 @@ void test_window()
     winfo.x = 400;
     winfo.y = 100;
 
-    void* win = ::operator new(WINDOW_ALLOC_SIZE);
+    Window* win = (Window*)alloca(WINDOW_ALLOC_SIZE);
     memset(win, 0, WINDOW_ALLOC_SIZE);
 
     if (!window_init(win, &winfo))
@@ -122,18 +124,71 @@ void test_workq()
     workq_add(&wq, "String A8", test_workq_callback);
     workq_add(&wq, "String A9", test_workq_callback);
 
-    thread_create(test_workq_thread_add, &wq, THREAD_IMMEDIATE);
+    thread_create(test_workq_thread_add, &wq, THREAD_CREATE_IMMEDIATE);
     thread_sleep(100);
     
-    thread_create(test_workq_thread_process, &wq, THREAD_IMMEDIATE);
-    thread_create(test_workq_thread_process, &wq, THREAD_IMMEDIATE);
-    thread_create(test_workq_thread_process, &wq, THREAD_IMMEDIATE);
-    thread_create(test_workq_thread_process, &wq, THREAD_IMMEDIATE);
-    thread_create(test_workq_thread_process, &wq, THREAD_IMMEDIATE);
+    thread_create(test_workq_thread_process, &wq, THREAD_CREATE_IMMEDIATE);
+    thread_create(test_workq_thread_process, &wq, THREAD_CREATE_IMMEDIATE);
+    thread_create(test_workq_thread_process, &wq, THREAD_CREATE_IMMEDIATE);
+    thread_create(test_workq_thread_process, &wq, THREAD_CREATE_IMMEDIATE);
+    thread_create(test_workq_thread_process, &wq, THREAD_CREATE_IMMEDIATE);
 
     while(workq_active(&wq)) {}
 
     critical_section_delete(g_crit_section);
     
     msg_log("Workq entries done %d out of (%d + 9) = %d", g_callback_call_count, g_thread_add_count, g_thread_add_count + 9);
+}
+
+// SparseSet
+
+void test_sparse_set()
+{
+    const u64 size = 20 * sizeof(u64);
+    void* mem = alloca(size);
+    Arena arena = arena_create(mem, size);
+    
+    SparseSet ss;
+    sparse_set_init(&ss, &arena, 10, 10, sizeof(u64));
+
+    for (s32 i = 0; i < 10; ++i)
+    {
+        const u64 val = i + 10;
+        sparse_set_insert(&ss, i, &val);
+    }
+
+    for (s32 i = 0; i < 10; ++i)
+    {
+        if (u64* item = (u64*)sparse_set_get(&ss, i))
+        {
+            printf("Sparse set item (%u) at index (%u)\n", *item, i);
+        }
+    }
+
+    printf("Removing some items from sparse set\n");
+    sparse_set_remove(&ss, 0);
+    sparse_set_remove(&ss, 1);
+    sparse_set_remove(&ss, 2);
+
+    for (s32 i = 0; i < 10; ++i)
+    {
+        if (u64* item = (u64*)sparse_set_get(&ss, i))
+        {
+            printf("Sparse set item (%u) at index (%u)\n", *item, i);
+        }
+    }
+
+    printf("Adding some items to sparse set\n");
+    const u64 val_to_add = 12345;
+    sparse_set_insert(&ss, 0, &val_to_add);
+    sparse_set_insert_zero(&ss, 1);
+    sparse_set_insert_zero(&ss, 2);
+    
+    for (s32 i = 0; i < 10; ++i)
+    {
+        if (u64* item = (u64*)sparse_set_get(&ss, i))
+        {
+            printf("Sparse set item (%u) at index (%u)\n", *item, i);
+        }
+    }
 }

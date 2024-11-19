@@ -45,11 +45,17 @@ struct Arena
 #define arena_push_struct(arena, type)          (type*)arena_push_zero(arena, sizeof(type))
 #define arena_push_array(arena, count, type)    (type*)arena_push_zero(arena, sizeof(type) * count)
 
+inline void arena_init(Arena* arena, void* base, u64 size)
+{
+    arena->base = (u8*)base;
+    arena->size = size;
+    arena->used = 0;
+}
+
 inline Arena arena_create(void* base, u64 size)
 {
     Arena arena = STRUCT_ZERO(Arena);
-    arena.base = (u8*)base;
-    arena.size = size;
+    arena_init(&arena, base, size);
     return arena;
 }
 
