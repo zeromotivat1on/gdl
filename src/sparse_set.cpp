@@ -28,7 +28,7 @@ void sparse_set_init(SparseSet* ss, Arena* arena, u32 max_dense_count, u32 max_s
     memset(ss->sparse_indices, 0xFF, max_sparse_count * sizeof(u32));
 }
 
-bool sparse_set_has(SparseSet* ss, u32 idx)
+bool sparse_set_has(const SparseSet* ss, u32 idx)
 {
     ASSERT(idx < ss->max_sparse_count);
     
@@ -86,7 +86,7 @@ bool sparse_set_remove(SparseSet* ss, u32 idx)
     return true;
 }
 
-void* sparse_set_get(SparseSet* ss, u32 idx)
+void* sparse_set_get(const SparseSet* ss, u32 idx)
 {
     ASSERT(idx < ss->max_sparse_count);
 
