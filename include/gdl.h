@@ -6,6 +6,7 @@
 
 #include "src/pch.h"
 #include "src/bit.h"
+#include "src/ecs.h"
 #include "src/file.h"
 #include "src/gdlmath.h"
 #include "src/hash.h"

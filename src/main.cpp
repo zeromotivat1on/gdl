@@ -1,19 +1,23 @@
 #include "pch.h"
 #include "include/gdl.h"
+#include <stdio.h>
+#include <malloc.h>
 
 void test_window();
 void test_workq();
 void test_sparse_set();
 void test_hash_table();
 void test_sid();
+void test_ecs();
 
 int main()
 {
     //test_window();
     //test_workq();
     //test_sparse_set();
-    test_hash_table();
-    test_sid();
+    //test_hash_table();
+    //test_sid();
+    test_ecs();
     
     return 0;
 }
@@ -249,4 +253,42 @@ void test_sid()
     msg_log("Sid hash = %u, value = %s", test_sid_same_2, sid_str(test_sid_same_2));
     msg_log("Sid hash = %u, value = %s", test_sid_same_3, sid_str(test_sid_same_3));
     msg_log("Sid table load factor = %.3f", hash_table_load_factor(&g_sid_table));
+}
+
+// ecs
+
+void test_ecs()
+{
+    const u64 size = KB(512);
+    
+    void* mem = alloca(size);
+    Arena arena = arena_create(mem, size);
+
+    sid_init(&arena, 32, 64);
+    
+    ECS ecs;
+    ecs_init(&ecs, &arena, 100, 8);
+
+    ecs_component_reg(&ecs, &arena, SID("vec2"), sizeof(vec2));
+    // ^^^ function version ^^^ // vvv macro version vvv
+    ecs_component_reg_struct(&ecs, &arena, vec2);
+    
+    const Entity e0 = ecs_entity_new(&ecs);
+    ecs_component_add(&ecs, e0, SID("vec2"));
+
+    vec2* e0vec2 = (vec2*)ecs_component_get(&ecs, e0, SID("vec2"));
+    // ^^^ function version ^^^ // vvv macro version vvv
+    e0vec2 = ecs_component_get_struct(&ecs, e0, vec2);
+    
+    e0vec2->x = 10.12f;
+    e0vec2->y = 20.96f;
+
+    msg_log("Ecs entity (%u) component (%s) = (%.2f, %.2f)", e0, "vec2", e0vec2->x, e0vec2->y);
+
+    // NOTE: now if item in sparse set is removed, dense item data is zeroed, maybe come up with a better solution?
+    ecs_entity_del(&ecs, e0);
+    msg_log("Deleted entity (%u)", e0);
+    // return nullptr
+    //e0vec2 = (vec2*)ecs_component_get(&ecs, e0, SID("vec2"));
+    msg_log("Ecs entity (%u) component (%s) = (%.2f, %.2f)", e0, "vec2", e0vec2->x, e0vec2->y);
 }
