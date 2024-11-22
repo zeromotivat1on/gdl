@@ -30,7 +30,7 @@ struct ECS
 void    ecs_init(ECS* ecs, Arena* arena, u32 max_entities, u16 max_component_type_count);
 Entity  ecs_entity_new(ECS* ecs);
 void    ecs_entity_del(ECS* ecs, Entity e);
-void    ecs_entity_iterate(ECS* ecs, sid* cts, u8 cts_count, ecs_entity_iterate_callback callback);
+void    ecs_entity_iterate(ECS* ecs, const sid* cts, u8 cts_count, ecs_entity_iterate_callback callback);
 void    ecs_component_reg(ECS* ecs, Arena* arena, sid ct, u16 ct_size);
 bool    ecs_component_add(ECS* ecs, Entity e, sid ct);
 void*   ecs_component_get(ECS* ecs, Entity e, sid ct);

@@ -67,7 +67,7 @@ void ecs_entity_del(ECS* ecs, Entity e)
     }
 }
 
-void ecs_entity_iterate(ECS* ecs, sid* cts, u8 cts_count, ecs_entity_iterate_callback callback)
+void ecs_entity_iterate(ECS* ecs, const sid* cts, u8 cts_count, ecs_entity_iterate_callback callback)
 {
     ASSERT(cts_count > 0);
 
