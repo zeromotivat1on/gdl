@@ -2,22 +2,9 @@
 #include "sparse_set.h"
 #include "mem.h"
 
-void sparse_set_init(SparseSet* ss, void* dense_items, u32* dense_indices, u32* sparse_indices, u32 max_dense_count, u32 max_sparse_count, u32 dense_item_size)
-{
-    ss->dense_items = (u8*)dense_items;
-    ss->dense_indices = dense_indices;
-    ss->sparse_indices = sparse_indices;
-    ss->dense_count = 0;
-    ss->dense_item_size = dense_item_size;
-    ss->max_dense_count = max_dense_count;
-    ss->max_sparse_count = max_sparse_count;
-
-    memset(ss->sparse_indices, 0xFF, max_sparse_count * sizeof(u32));
-}
-
 void sparse_set_init(SparseSet* ss, Arena* arena, u32 max_dense_count, u32 max_sparse_count, u32 dense_item_size)
 {
-    ss->dense_items = (u8*)arena_push_size(arena, max_dense_count * dense_item_size);
+    ss->dense_items = arena_push_size(arena, max_dense_count * dense_item_size);
     ss->dense_indices = arena_push_array(arena, max_dense_count, u32);
     ss->sparse_indices = arena_push_array(arena, max_sparse_count, u32);
     ss->dense_count = 0;
