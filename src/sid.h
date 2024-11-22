@@ -1,5 +1,6 @@
 #pragma once
 
+#include "hash.h"
 #include "hash_table.h"
 
 #define SID(str) sid_gen(str)
