@@ -39,6 +39,3 @@ bool    ecs_component_del(ECS* ecs, Entity e, sid ct);
 #define ecs_component_reg_struct(ecs, arena, ct) ecs_component_reg(ecs, arena, SID(MACRO_STRING(ct)), sizeof(ct))
 #define ecs_component_add_struct(ecs, e, ct)    ecs_component_add(ecs, e, SID(MACRO_STRING(ct)))
 #define ecs_component_get_struct(ecs, e, ct)    (ct*)ecs_component_get(ecs, e, SID(MACRO_STRING(ct)))
-
-// Create debug cube entity with default transform.
-Entity ecs_entity_new_debug_cube(ECS* ecs);
