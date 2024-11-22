@@ -69,6 +69,7 @@ bool sparse_set_remove(SparseSet* ss, u32 idx)
     ss->sparse_indices[idx] = INVALID_DENSE_INDEX;
     
     memcpy(ss->dense_items + dense_idx * ss->dense_item_size, ss->dense_items + last_dense_idx * ss->dense_item_size, ss->dense_item_size);
+    memset(ss->dense_items + last_dense_idx * ss->dense_item_size, 0, ss->dense_item_size);
     
     return true;
 }
