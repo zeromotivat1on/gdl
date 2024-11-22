@@ -4,12 +4,16 @@
 void test_window();
 void test_workq();
 void test_sparse_set();
+void test_hash_table();
+void test_sid();
 
 int main()
 {
     //test_window();
-    // test_workq();
-    test_sparse_set();
+    //test_workq();
+    //test_sparse_set();
+    test_hash_table();
+    test_sid();
     
     return 0;
 }
@@ -161,11 +165,11 @@ void test_sparse_set()
     {
         if (u64* item = (u64*)sparse_set_get(&ss, i))
         {
-            printf("Sparse set item (%u) at index (%u)\n", *item, i);
+            msg_log("Sparse set item (%u) at index (%u)\n", *item, i);
         }
     }
 
-    printf("Removing some items from sparse set\n");
+    msg_log("Removing some items from sparse set\n");
     sparse_set_remove(&ss, 0);
     sparse_set_remove(&ss, 1);
     sparse_set_remove(&ss, 2);
@@ -174,11 +178,11 @@ void test_sparse_set()
     {
         if (u64* item = (u64*)sparse_set_get(&ss, i))
         {
-            printf("Sparse set item (%u) at index (%u)\n", *item, i);
+            msg_log("Sparse set item (%u) at index (%u)\n", *item, i);
         }
     }
 
-    printf("Adding some items to sparse set\n");
+    msg_log("Adding some items to sparse set\n");
     const u64 val_to_add = 12345;
     sparse_set_insert(&ss, 0, &val_to_add);
     sparse_set_insert_zero(&ss, 1);
@@ -188,7 +192,61 @@ void test_sparse_set()
     {
         if (u64* item = (u64*)sparse_set_get(&ss, i))
         {
-            printf("Sparse set item (%u) at index (%u)\n", *item, i);
+            msg_log("Sparse set item (%u) at index (%u)\n", *item, i);
         }
     }
+}
+
+// HashTable
+
+void test_hash_table()
+{
+    const u32 item_count = 1000;
+    const u32 key_size = 4;
+    const u32 val_size = sizeof(u64);
+    const u64 size = (item_count * key_size) + (item_count * val_size) + (item_count * sizeof(u64));
+    void* mem = alloca(size);
+    Arena arena = arena_create(mem, size);
+
+    HashTable ht;
+    hash_table_init(&ht, &arena, item_count, key_size, val_size, (hash_table_hash_func)hash_pcg32);
+    msg_log("Hash table load factor = %.3f", hash_table_load_factor(&ht));
+    
+    const u64 val = 1;
+    const u32 key = 12345;
+    
+    hash_table_insert(&ht, &key, &val);
+    msg_log("Hash table key-value (%u, %u)", key, *(u64*)hash_table_get(&ht, &key));
+    msg_log("Hash table load factor = %.3f", hash_table_load_factor(&ht));
+    
+    hash_table_remove(&ht, &key);
+    msg_log("Hash table remove at (%u)", key);
+    msg_log("Hash table has value at (%u) = %d", key, hash_table_get(&ht, &key) != nullptr);
+    msg_log("Hash table load factor = %.3f", hash_table_load_factor(&ht));
+}
+
+// sid
+
+void test_sid()
+{
+    const u32 sid_count = 1024;
+    const u32 sid_size = 64;
+    const u64 size = sid_count * (sid_size + sizeof(u64) + sizeof(sid));
+    
+    void* mem = alloca(size);
+    Arena arena = arena_create(mem, size);
+    
+    sid_init(&arena, sid_count, sid_size);
+
+    const sid test_sid = SID("TransformComponent");
+    msg_log("Sid hash = %u, value = %s", test_sid, sid_str(test_sid));
+    msg_log("Sid table load factor = %.3f", hash_table_load_factor(&g_sid_table));
+
+    const sid test_sid_same_1 = SID("TransformComponent1");
+    const sid test_sid_same_2 = SID("TransformComponent2");
+    const sid test_sid_same_3 = SID("TransformComponent3");
+    msg_log("Sid hash = %u, value = %s", test_sid_same_1, sid_str(test_sid_same_1));
+    msg_log("Sid hash = %u, value = %s", test_sid_same_2, sid_str(test_sid_same_2));
+    msg_log("Sid hash = %u, value = %s", test_sid_same_3, sid_str(test_sid_same_3));
+    msg_log("Sid table load factor = %.3f", hash_table_load_factor(&g_sid_table));
 }

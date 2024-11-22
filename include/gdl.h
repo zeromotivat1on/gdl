@@ -9,6 +9,7 @@
 #include "src/file.h"
 #include "src/gdlmath.h"
 #include "src/hash.h"
+#include "src/hash_table.h"
 #include "src/input.h"
 #include "src/matrix.h"
 #include "src/mem.h"

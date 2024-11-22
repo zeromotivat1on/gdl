@@ -6,8 +6,17 @@
 
 typedef u64 sid;
 
-// TODO: implement own hash table.
-inline std::unordered_map<sid, const char*> SID_TABLE;
+inline HashTable g_sid_table;
+
+inline u64 sid_hash_table_hash(void* value)
+{
+    return *(sid*)value;
+}
+
+inline void sid_init(Arena* arena, u32 max_sid_count, u32 max_sid_size)
+{
+    hash_table_init(&g_sid_table, arena, max_sid_count, sizeof(u64), max_sid_size, (hash_table_hash_func)sid_hash_table_hash);
+}
 
 inline sid sid_hash(const char* str)
 {
@@ -16,22 +25,22 @@ inline sid sid_hash(const char* str)
     
 inline sid sid_gen(const char* str)
 {
-    sid hash = sid_hash(str);
-    SID_TABLE.try_emplace(hash, str);
+    const sid hash = sid_hash(str);
+    hash_table_insert(&g_sid_table, &hash, str);
     return hash;
 }
 
 inline const char* sid_str(sid n)
 {
-    return SID_TABLE.at(n);
+    return (const char*)hash_table_get(&g_sid_table, &n);
 }
 
 inline bool sid_unique(sid n)
 {
-    return SID_TABLE.find(n) == SID_TABLE.end();
+    return hash_table_get(&g_sid_table, &n) == nullptr;
 }
 
 inline bool sid_unique(const char* str)
 {
-    return SID_TABLE.find(sid_hash(str)) == SID_TABLE.end();
+    return sid_unique(sid_hash(str));
 }

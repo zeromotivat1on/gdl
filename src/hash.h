@@ -20,10 +20,17 @@ inline u64 hash_pcg64(u64 input)
 // FNV-1a
 // ------
 
-#define FNV_BASIS 14695981039346656037ull
-#define FNV_PRIME 1099511628211ull
+inline constexpr u64 FNV_BASIS = 14695981039346656037ull;
+inline constexpr u64 FNV_PRIME = 1099511628211ull;
 
-inline u64 hash_fnv(const char* str, u64 hash = FNV_BASIS)
+inline u64 hash_fnv(const char* str)
 {
-    return *str ? hash_fnv(str + 1, (hash ^ *str) * FNV_PRIME) : hash;
+    u64 hash = FNV_BASIS;
+    for (const char* p = str; *p; ++p)
+    {
+        hash ^= (u64)(u8)(*p);
+        hash *= FNV_PRIME;
+    }
+
+    return hash;
 }
