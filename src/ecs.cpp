@@ -52,6 +52,7 @@ void ecs_entity_del(ECS* ecs, Entity e)
         return;
     }
 
+    ecs->entity_count--;
     ecs->entities[e] = INVALID_ENTITY;
     const u32 idx = ecs->free_entity_count++;
     ASSERT(idx < ecs->max_entity_count);
