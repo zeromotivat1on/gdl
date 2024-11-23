@@ -18,17 +18,17 @@
 // Reserve virtual memory of a given size.
 // Returned memory and alloc size are aligned based on system granularity.
 // Initial address can be specified, leave null to let the os decide.
-void*   mem_virt_reserve(void* addr, u64 size);
+void*   vm_reserve(void* addr, u64 size);
 
 // Commit virtual memory from given reserved range.
 // Physical memory is allocated when commited one is being written to.
-void*   mem_virt_commit(void* vm, u64 size);
+void*   vm_commit(void* vm, u64 size);
 
 // Release physical memory from given range of virtual addresses.
-bool    mem_virt_decommit(void* vm, u64 size);
+bool    vm_decommit(void* vm, u64 size);
 
 // Free both physical and virtual memory.
-bool    mem_virt_release(void* vm);
+bool    vm_release(void* vm);
 
 // ------------
 // Memory arena
