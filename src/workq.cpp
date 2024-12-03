@@ -2,7 +2,7 @@
 #include "workq.h"
 #include "thread.h"
 
-Workq workq_create(hsemaphore semaphore)
+Workq workq_create(semaphore_handle semaphore)
 {
     Workq wq = STRUCT_ZERO(Workq);
     wq.semaphore = semaphore;
@@ -29,7 +29,7 @@ void workq_add(Workq* wq, void* data, workq_callback callback)
         entry.data = data;
 
         atomic_increment((volatile s32*)&wq->added_entry_count);
-        semaphore_release(wq->semaphore, 1, nullptr);
+        release_semaphore(wq->semaphore, 1, nullptr);
     }
 }
 
@@ -55,5 +55,5 @@ bool workq_process(Workq* wq)
 
 void workq_wait(Workq* wq, u32 ms)
 {
-    semaphore_wait(wq->semaphore, ms);
+    wait_semaphore(wq->semaphore, ms);
 }

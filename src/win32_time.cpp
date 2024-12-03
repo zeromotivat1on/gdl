@@ -3,7 +3,7 @@
 
 u64 time_curr()
 {
-    return hp_counter() * 1000ull / hp_frequency();
+    return performance_counter() * 1000ull / performance_frequency();
 }
 
 u64 time_sys_boot()
@@ -11,7 +11,7 @@ u64 time_sys_boot()
     return GetTickCount64();
 }
 
-u64 hp_counter()
+u64 performance_counter()
 {
     LARGE_INTEGER counter;
     const BOOL res = QueryPerformanceCounter(&counter);
@@ -19,7 +19,7 @@ u64 hp_counter()
     return counter.QuadPart;
 }
 
-u64 hp_frequency()
+u64 performance_frequency()
 {
     static u64 frequency64 = 0;
 

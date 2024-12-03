@@ -3,7 +3,7 @@
 #include "input.h"
 
 #ifdef WIN32
-#include "win32_win.h"
+#include "win32_window.h"
 #define PLATFORM_WINDOW Win32Window win32
 #endif
 
@@ -66,21 +66,21 @@ inline constexpr u16 WINDOW_ALLOC_SIZE = sizeof(Window);
 // Core
 // ----
 
-bool    window_init(Window* win, Window_Info* info);    // init window in preallocated memory
-void    window_show(Window* win);                       // display window
-void    window_destroy(Window* win);                    // destroy the window
-void    window_update(Window* win);                     // poll window events
-void    window_close(Window* win);                      // close the window
-bool    window_active(Window* win);                     // window not closed
+bool    init_window(Window* win, Window_Info* info);    // init window in preallocated memory
+void    show_window(Window* win);                       // display window
+void    destroy_window(Window* win);                    // destroy the window
+void    update_window(Window* win);                     // poll window events
+void    close_window(Window* win);                      // close the window
+bool    is_window_active(Window* win);                     // window not closed
 void    window_size(Window* win, u16* w, u16* h);       // window whole size
 void    window_size_inner(Window* win, u16* w, u16* h); // window inner renderable size
 void*   window_native(Window* win);                     // window native platform handle
 
-void    window_set_char_callback(Window* win, window_char_callback callback);
+void    set_window_char_callback(Window* win, window_char_callback callback);
 
-bool    window_cursor_lock(Window* win, bool lock);     // lock/unlock cursor within window
-s32     window_cursor_show(Window* win, bool show);     // show/hide cursor in window
-void    window_cursor_constrain(Window* win, bool constrain); // keep cursor within window
+bool    lock_window_cursor(Window* win, bool lock);     // lock/unlock cursor within window
+s32     show_window_cursor(Window* win, bool show);     // show/hide cursor in window
+void    constrain_window_cursor(Window* win, bool constrain); // keep cursor within window
 u8      window_cursor_flags(Window* win);
 void    window_cursor_pos_absolute(Window* win, u16* x, u16* y);
 void    window_cursor_pos_relative(Window* win, u16* x, u16* y);

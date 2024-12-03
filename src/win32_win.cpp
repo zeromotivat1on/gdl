@@ -1,7 +1,7 @@
 #include "pch.h"
-#include "win.h"
+#include "window.h"
 #include "str.h"
-#include "win32_win.h"
+#include "win32_window.h"
 #include <malloc.h>
 #include <windowsx.h>
 
@@ -79,7 +79,7 @@ static LRESULT CALLBACK win32_window_proc(HWND hwnd, UINT umsg, WPARAM wparam, L
     return DefWindowProcW(hwnd, umsg, wparam, lparam);
 }
 
-bool window_init(Window* win, Window_Info* info)
+bool init_window(Window* win, Window_Info* info)
 {
     memset(win, 0, WINDOW_ALLOC_SIZE);
     
@@ -130,18 +130,18 @@ bool window_init(Window* win, Window_Info* info)
     return true;
 }
 
-void window_show(Window* win)
+void show_window(Window* win)
 {
     ShowWindow(win->win32.hwnd, SW_NORMAL);
 }
 
-void window_destroy(Window* win)
+void destroy_window(Window* win)
 {
     DestroyWindow(win->win32.hwnd);
     UnregisterClassW(win->win32.class_name, win->win32.hinstance);
 }
 
-void window_update(Window* win)
+void update_window(Window* win)
 {        
     win->mouse_axes[MOUSE_SCROLL_X] = 0;
     win->mouse_axes[MOUSE_SCROLL_Y] = 0;
@@ -207,12 +207,12 @@ void window_update(Window* win)
     // TODO: gamepad.
 }
 
-void window_close(Window* win)
+void close_window(Window* win)
 {
     PostMessage(win->win32.hwnd, WM_CLOSE, 0, 0);
 }
 
-bool window_active(Window* win)
+bool is_window_active(Window* win)
 {
     return IsWindow(win->win32.hwnd);
 }
@@ -242,12 +242,12 @@ void* window_native(Window* win)
     return win->win32.hwnd;
 }
 
-void window_set_char_callback(Window* win, window_char_callback callback)
+void set_window_char_callback(Window* win, window_char_callback callback)
 {
     win->callbacks.character = callback;
 }
 
-bool window_cursor_lock(Window* win, bool lock)
+bool lock_window_cursor(Window* win, bool lock)
 {
     BIT_SORC(win->cursor_flags, CURSOR_LOCKED, lock);
     
@@ -265,13 +265,13 @@ bool window_cursor_lock(Window* win, bool lock)
     return ClipCursor(NULL);
 }
 
-s32 window_cursor_show(Window* win, bool show)
+s32 show_window_cursor(Window* win, bool show)
 {
     BIT_SORC(win->cursor_flags, CURSOR_VISIBLE, show);
     return ShowCursor(show);
 }
 
-void window_cursor_constrain(Window* win, bool constrain)
+void constrain_window_cursor(Window* win, bool constrain)
 {
     BIT_SORC(win->cursor_flags, CURSOR_CONSTRAINED, constrain);
 }

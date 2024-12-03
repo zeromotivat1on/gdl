@@ -22,15 +22,15 @@ struct Ecs
     u32         free_entity_count;
 };
 
-void    ecs_init(Ecs* ecs, Arena* arena, u32 max_entities, u16 max_component_type_count);
-Entity  ecs_entity_new(Ecs* ecs);
-void    ecs_entity_del(Ecs* ecs, Entity e);
-void    ecs_entity_iterate(Ecs* ecs, const sid* cts, u8 cts_count, entity_iterate_callback callback);
-void    ecs_component_reg(Ecs* ecs, Arena* arena, sid ct, u16 ct_size);
-bool    ecs_component_add(Ecs* ecs, Entity e, sid ct);
-void*   ecs_component_get(Ecs* ecs, Entity e, sid ct);
-bool    ecs_component_del(Ecs* ecs, Entity e, sid ct);
+void    init_ecs(Ecs* ecs, Arena* arena, u32 max_entities, u16 max_component_type_count);
+Entity  new_entity(Ecs* ecs);
+void    delete_entity(Ecs* ecs, Entity e);
+void    iterate_entities(Ecs* ecs, const sid* cs, u8 count, entity_iterate_callback callback);
+void    regtister_component(Ecs* ecs, Arena* arena, sid c, u16 size);
+bool    add_component(Ecs* ecs, Entity e, sid c);
+void*   get_component(Ecs* ecs, Entity e, sid c);
+bool    delete_component(Ecs* ecs, Entity e, sid c);
 
-#define ecs_component_reg_struct(ecs, arena, ct)    ecs_component_reg(ecs, arena, SID(MACRO_STRING(ct)), sizeof(ct))
-#define ecs_component_add_struct(ecs, e, ct)        ecs_component_add(ecs, e, SID(MACRO_STRING(ct)))
-#define ecs_component_get_struct(ecs, e, ct)        (ct*)ecs_component_get(ecs, e, SID(MACRO_STRING(ct)))
+#define register_component_struct(ecs, arena, c)    regtister_component(ecs, arena, SID(#c), sizeof(c))
+#define add_component_struct(ecs, e, c)             add_component(ecs, e, SID(#c))
+#define get_component_struct(ecs, e, c)             (c*)get_component(ecs, e, SID(#c))

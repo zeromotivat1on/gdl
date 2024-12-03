@@ -9,37 +9,37 @@
 extern const s32 THREAD_CREATE_IMMEDIATE;
 extern const s32 THREAD_CREATE_SUSPENDED;
 
-typedef void*	hthread; // thread handle
+typedef void*	thread_handle;
 typedef u32     (*thread_entry)(void*);
 
-u64         thread_curr_id();
-void        thread_sleep(u32 ms);
-bool        thread_active(hthread handle);
+u64				current_thread_id();
+void			sleep_thread(u32 ms);
+bool			is_thread_active(thread_handle handle);
 
-hthread		thread_create(thread_entry entry, void* userdata, s32 create_type);
-void        thread_resume(hthread handle);
-void        thread_suspend(hthread handle);
-void        thread_terminate(hthread handle);
+thread_handle	create_thread(thread_entry entry, void* userdata, s32 create_type);
+void			resume_thread(thread_handle handle);
+void			suspend_thread(thread_handle handle);
+void			terminate_thread(thread_handle handle);
 
 // ---------
 // Semaphore
 // ---------
 
-typedef void*	hsemaphore; // semaphore handle
+typedef void*	semaphore_handle;
 
-hsemaphore  semaphore_create(s32 init_count, s32 max_count);
-bool        semaphore_release(hsemaphore handle, s32 count, s32* prev_count);
-bool        semaphore_wait(hsemaphore handle, u32 ms);
+semaphore_handle	create_semaphore(s32 init_count, s32 max_count);
+bool				release_semaphore(semaphore_handle handle, s32 count, s32* prev_count);
+bool				wait_semaphore(semaphore_handle handle, u32 ms);
 
 // -----
 // Mutex
 // -----
 
-typedef void*   hmutex;
+typedef void*   mutex_handle;
 
-hmutex      mutex_create(bool signaled);
-bool        mutex_release(hmutex handle);
-bool        mutex_wait(hmutex handle, u32 ms);
+mutex_handle	create_mutex(bool signaled);
+bool			release_mutex(mutex_handle handle);
+bool			wait_mutex(mutex_handle handle, u32 ms);
 
 // ----------------
 // Critical Section
@@ -47,18 +47,18 @@ bool        mutex_wait(hmutex handle, u32 ms);
 
 extern const u32 CRITICAL_SECTION_ALLOC_SIZE;
 
-typedef void*   hcritsec;  // critical section handle
+typedef void*   critical_section_handle;
 
 // Initialize critical section in preallocated memory with optional spin lock counter.
 // If spin_count <= 0, wait for critical section will always put calling thread to sleep.
 // If thread tries to acquire locked critical section with spin lock,
 // thread spins in a loop spin_count times checking if lock is released.
 // If lock is not released at the end of spin loop, thread is put to sleep.
-void        critical_section_init(hcritsec handle, u32 spin_count);
-void        critical_section_enter(hcritsec handle);
-bool        critical_section_try_enter(hcritsec handle);
-void        critical_section_leave(hcritsec handle);
-void        critical_section_delete(hcritsec handle);
+void        init_critical_section(critical_section_handle handle, u32 spin_count);
+void        enter_critical_section(critical_section_handle handle);
+bool        try_enter_critical_section(critical_section_handle handle);
+void        leave_critical_section(critical_section_handle handle);
+void        delete_critical_section(critical_section_handle handle);
 
 // -------
 // Barrier
@@ -67,9 +67,9 @@ void        critical_section_delete(hcritsec handle);
 // Hint compiler to not reorder memory operations, happened before barrier.
 // Basically disable memory read/write concerned optimizations.
 
-void		barrier_read();
-void		barrier_write();
-void		barrier_memory();
+void		read_barrier();
+void		write_barrier();
+void		memory_barrier();
 
 // -----
 // Fence
@@ -77,9 +77,9 @@ void		barrier_memory();
 
 // Ensure the order of read/write CPU instructions.
 
-void		fence_read();
-void		fence_write();
-void		fence_memory();
+void		read_fence();
+void		write_fence();
+void		memory_fence();
 
 // ------
 // Atomic

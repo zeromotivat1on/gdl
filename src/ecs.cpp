@@ -9,7 +9,7 @@ static u64 ecs_hash_component_type(const void* item)
     return (u64)*(sid*)item;
 }
 
-void ecs_init(Ecs* ecs, Arena* arena, u32 max_entities, u16 max_component_type_count)
+void init_ecs(Ecs* ecs, Arena* arena, u32 max_entities, u16 max_component_type_count)
 {
     ecs->max_entity_count = max_entities;
     
@@ -24,7 +24,7 @@ void ecs_init(Ecs* ecs, Arena* arena, u32 max_entities, u16 max_component_type_c
     hash_table_init(&ecs->components_table, arena, max_component_type_count, sizeof(sid), sizeof(Sparse_Set), ecs_hash_component_type);
 }
 
-Entity ecs_entity_new(Ecs* ecs)
+Entity new_entity(Ecs* ecs)
 {
     if (ecs->free_entity_count > 0)
     {
@@ -41,7 +41,7 @@ Entity ecs_entity_new(Ecs* ecs)
     return ecs->entities[idx];
 }
 
-void ecs_entity_del(Ecs* ecs, Entity e)
+void delete_entity(Ecs* ecs, Entity e)
 {
     ASSERT(e != INVALID_ENTITY);
     ASSERT(e < ecs->max_entity_count);
@@ -64,11 +64,11 @@ void ecs_entity_del(Ecs* ecs, Entity e)
             continue;
 
         const sid key = *(sid*)(ecs->components_table.keys + i * ecs->components_table.key_size);
-        ecs_component_del(ecs, e, key);
+        delete_component(ecs, e, key);
     }
 }
 
-void ecs_entity_iterate(Ecs* ecs, const sid* cts, u8 cts_count, entity_iterate_callback callback)
+void iterate_entities(Ecs* ecs, const sid* cts, u8 cts_count, entity_iterate_callback callback)
 {
     ASSERT(cts_count > 0);
 
@@ -127,14 +127,14 @@ void ecs_entity_iterate(Ecs* ecs, const sid* cts, u8 cts_count, entity_iterate_c
     }
 }
 
-void ecs_component_reg(Ecs* ecs, Arena* arena, sid ct, u16 ct_size)
+void regtister_component(Ecs* ecs, Arena* arena, sid ct, u16 ct_size)
 {
     Sparse_Set component_set;
     sparse_set_init(&component_set, arena, ecs->max_entity_count, ecs->max_entity_count, ct_size);
     hash_table_insert(&ecs->components_table, &ct, &component_set);
 }
 
-bool ecs_component_add(Ecs* ecs, Entity e, sid ct)
+bool add_component(Ecs* ecs, Entity e, sid ct)
 {
     ASSERT(e != INVALID_ENTITY);
     ASSERT(e < ecs->max_entity_count);
@@ -147,7 +147,7 @@ bool ecs_component_add(Ecs* ecs, Entity e, sid ct)
     return false;
 }
 
-void* ecs_component_get(Ecs* ecs, Entity e, sid ct)
+void* get_component(Ecs* ecs, Entity e, sid ct)
 {
     ASSERT(e != INVALID_ENTITY);
     ASSERT(e < ecs->max_entity_count);
@@ -160,7 +160,7 @@ void* ecs_component_get(Ecs* ecs, Entity e, sid ct)
     return nullptr;
 }
 
-bool ecs_component_del(Ecs* ecs, Entity e, sid ct)
+bool delete_component(Ecs* ecs, Entity e, sid ct)
 {
     ASSERT(e != INVALID_ENTITY);
     ASSERT(e < ecs->max_entity_count);

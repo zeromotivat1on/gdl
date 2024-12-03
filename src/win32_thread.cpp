@@ -34,81 +34,81 @@ static BOOL win32_wait_res_check(void* hobj, DWORD res)
     }
 }
 
-u64 thread_curr_id()
+u64 current_thread_id()
 {
     return GetCurrentThreadId();
 }
 
-void thread_sleep(u32 ms)
+void sleep_thread(u32 ms)
 {
     Sleep(ms);
 }
 
-bool thread_active(hthread handle)
+bool is_thread_active(thread_handle handle)
 {
     DWORD exit_code;
     GetExitCodeThread(handle, &exit_code);
     return exit_code == STILL_ACTIVE;
 }
 
-hthread thread_create(thread_entry entry, void* userdata, s32 create_type)
+thread_handle create_thread(thread_entry entry, void* userdata, s32 create_type)
 {
     return CreateThread(0, 0, (LPTHREAD_START_ROUTINE)entry, userdata, create_type, NULL);
 }
 
-void thread_resume(hthread handle)
+void resume_thread(thread_handle handle)
 {
     const DWORD res = ResumeThread(handle);
     PANIC(res == INVALID_THREAD_RESULT);
 }
 
-void thread_suspend(hthread handle)
+void suspend_thread(thread_handle handle)
 {
     const DWORD res = SuspendThread(handle);
     PANIC(res == INVALID_THREAD_RESULT);
 }
 
-void thread_terminate(hthread handle)
+void terminate_thread(thread_handle handle)
 {
     DWORD exit_code;
     GetExitCodeThread(handle, &exit_code);
     const BOOL res = TerminateThread(handle, exit_code);
-    PANIC(!res);
+    ASSERT(res);
 }
 
-hsemaphore semaphore_create(s32 init_count, s32 max_count)
+semaphore_handle create_semaphore(s32 init_count, s32 max_count)
 {
     return CreateSemaphore(NULL, (LONG)init_count, (LONG)max_count, NULL);
 }
 
-bool semaphore_release(hsemaphore handle, s32 count, s32* prev_count)
+bool release_semaphore(semaphore_handle handle, s32 count, s32* prev_count)
 {
     return ReleaseSemaphore(handle, count, (LPLONG)prev_count);
 }
 
-bool semaphore_wait(hsemaphore handle, u32 ms)
+bool wait_semaphore(semaphore_handle handle, u32 ms)
 {
     const DWORD res = WaitForSingleObjectEx(handle, ms, FALSE);
     return win32_wait_res_check(handle, res);
 }
 
-hmutex mutex_create(bool signaled)
+mutex_handle create_mutex(bool signaled)
 {
     return CreateMutex(NULL, (LONG)signaled, NULL);
 }
 
-bool mutex_release(hmutex handle)
+bool release_mutex(mutex_handle handle)
 {
     return ReleaseMutex(handle);
 }
 
-bool mutex_wait(hmutex handle, u32 ms)
+bool wait_mutex(mutex_handle handle, u32 ms)
 {
     const DWORD res = WaitForSingleObjectEx(handle, ms, FALSE);
     return win32_wait_res_check(handle, res);
 }
 
-void critical_section_init(hcritsec handle, u32 spin_count)
+void init_critical_section(critical_section_handle handle, u32 spin_count)
 {
     if (spin_count > 0)
         InitializeCriticalSectionAndSpinCount((LPCRITICAL_SECTION)handle, spin_count);
@@ -116,52 +116,52 @@ void critical_section_init(hcritsec handle, u32 spin_count)
         InitializeCriticalSection((LPCRITICAL_SECTION)handle);
 }
 
-void critical_section_enter(hcritsec handle)
+void enter_critical_section(critical_section_handle handle)
 {
     EnterCriticalSection((LPCRITICAL_SECTION)handle);
 }
 
-bool critical_section_try_enter(hcritsec handle)
+bool try_enter_critical_section(critical_section_handle handle)
 {
     return TryEnterCriticalSection((LPCRITICAL_SECTION)handle);
 }
 
-void critical_section_leave(hcritsec handle)
+void leave_critical_section(critical_section_handle handle)
 {
     LeaveCriticalSection((LPCRITICAL_SECTION)handle);
 }
 
-void critical_section_delete(hcritsec handle)
+void delete_critical_section(critical_section_handle handle)
 {
     DeleteCriticalSection((LPCRITICAL_SECTION)handle);
 }
 
-void barrier_read()
+void read_barrier()
 {
     _ReadBarrier();
 }
 
-void barrier_write()
+void write_barrier()
 {
     _WriteBarrier();
 }
 
-void barrier_memory()
+void memory_barrier()
 {
     _ReadWriteBarrier();
 }
 
-void fence_read()
+void read_fence()
 {
     _mm_lfence();
 }
 
-void fence_write()
+void write_fence()
 {
     _mm_sfence();
 }
 
-void fence_memory()
+void memory_fence()
 {
     _mm_mfence();
 }

@@ -17,15 +17,15 @@ struct Workq_Entry
 // Supports multiple producers multiple consumers thread model.
 struct Workq
 {
-    hsemaphore      semaphore;
-    Workq_Entry     entries[WORKQ_MAX_ENTRIES];
-    volatile u32    entry_to_add;
-    volatile u32    entry_to_process;
-    volatile u32    added_entry_count;
-    volatile u32    processed_entry_count;
+    semaphore_handle    semaphore;
+    Workq_Entry         entries[WORKQ_MAX_ENTRIES];
+    volatile u32        entry_to_add;
+    volatile u32        entry_to_process;
+    volatile u32        added_entry_count;
+    volatile u32        processed_entry_count;
 };
 
-Workq   workq_create(hsemaphore semaphore);
+Workq   workq_create(semaphore_handle semaphore);
 bool    workq_active(Workq* wq);
 void    workq_add(Workq* wq, void* data, workq_callback callback);
 bool    workq_process(Workq* wq);

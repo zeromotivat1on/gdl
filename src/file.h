@@ -17,11 +17,11 @@ typedef void*   hfile; // file handle
 // Core
 // ----
 
-hfile   file_open(const char* fpath, s32 open, s32 access);
-bool    file_close(hfile handle);
+hfile   open_file(const char* fpath, s32 open, s32 access);
+bool    close_file(hfile handle);
 
-bool    file_read_sync(hfile handle, u8* buffer, u64 size, u64* nbytes);
-bool    file_write_sync(hfile handle, u8* buffer, u64 size, u64* nbytes);
+bool    read_file_sync(hfile handle, u8* buffer, u64 size, u64* nbytes);
+bool    write_file_sync(hfile handle, u8* buffer, u64 size, u64* nbytes);
 
 // -----
 // Extra
@@ -29,24 +29,24 @@ bool    file_write_sync(hfile handle, u8* buffer, u64 size, u64* nbytes);
 
 // Convenient wrappers to read/write from/to existing file.
 
-inline bool file_read_sync(const char* fpath, u8* buffer, u64 size, u64* nbytes)
+inline bool read_file_sync(const char* fpath, u8* buffer, u64 size, u64* nbytes)
 {
-    if (hfile handle = file_open(fpath, FILE_OPEN_EXISTING, FILE_ACCESS_READ))
+    if (hfile handle = open_file(fpath, FILE_OPEN_EXISTING, FILE_ACCESS_READ))
     {
-        const bool res = file_read_sync(handle, buffer, size, nbytes);
-        file_close(handle);
+        const bool res = read_file_sync(handle, buffer, size, nbytes);
+        close_file(handle);
         return res;
     }
 
     return false;
 }
 
-inline bool file_write_sync(const char* fpath, u8* buffer, u64 size, u64* nbytes)
+inline bool write_file_sync(const char* fpath, u8* buffer, u64 size, u64* nbytes)
 {
-    if (hfile handle = file_open(fpath, FILE_OPEN_EXISTING, FILE_ACCESS_WRITE))
+    if (hfile handle = open_file(fpath, FILE_OPEN_EXISTING, FILE_ACCESS_WRITE))
     {
-        const bool res = file_write_sync(handle, buffer, size, nbytes);
-        file_close(handle);
+        const bool res = write_file_sync(handle, buffer, size, nbytes);
+        close_file(handle);
         return res;
     }
 

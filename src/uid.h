@@ -3,23 +3,23 @@
 #include "hash.h"
 #include "time.h"
 
-#define UID uid_gen()
+#define UID generate_uid()
 
 typedef u64 uid;
 
-inline uid uid_hash(u64 n)
+inline uid hash_uid(u64 n)
 {
     return hash_pcg64(n);
 }
 
-inline uid uid_gen()
+inline uid generate_uid()
 {
-    const u64 ctime = (u64)(time_curr() << 32);
-    const u64 stime = (u64)time_sys_boot();
-    return uid_hash(ctime + stime);
+    const u64 high = (u64)(current_time() << 32);
+    const u64 low = (u64)time_since_sys_boot();
+    return hash_uid(high + low);
 }
 
-inline uid uid_gen(u64 input)
+inline uid generate_uid(u64 input)
 {
-    return uid_hash(input);
+    return hash_uid(input);
 }
