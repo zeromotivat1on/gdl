@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "input.h"
 #include "str.h"
-#include "win.h"
-#include "win32_win.h"
+#include "window.h"
+#include "win32_window.h"
 
 void init_input_tables()
 {
