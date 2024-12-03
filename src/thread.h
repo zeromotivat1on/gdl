@@ -10,13 +10,13 @@ extern const s32 THREAD_CREATE_IMMEDIATE;
 extern const s32 THREAD_CREATE_SUSPENDED;
 
 typedef void*	hthread; // thread handle
-typedef u32     (*ThreadEntry)(void*);
+typedef u32     (*thread_entry)(void*);
 
 u64         thread_curr_id();
 void        thread_sleep(u32 ms);
 bool        thread_active(hthread handle);
 
-hthread		thread_create(ThreadEntry entry, void* userdata, s32 create_type);
+hthread		thread_create(thread_entry entry, void* userdata, s32 create_type);
 void        thread_resume(hthread handle);
 void        thread_suspend(hthread handle);
 void        thread_terminate(hthread handle);

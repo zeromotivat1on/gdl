@@ -51,7 +51,7 @@ bool thread_active(hthread handle)
     return exit_code == STILL_ACTIVE;
 }
 
-hthread thread_create(ThreadEntry entry, void* userdata, s32 create_type)
+hthread thread_create(thread_entry entry, void* userdata, s32 create_type)
 {
     return CreateThread(0, 0, (LPTHREAD_START_ROUTINE)entry, userdata, create_type, NULL);
 }

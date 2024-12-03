@@ -79,7 +79,7 @@ static LRESULT CALLBACK win32_window_proc(HWND hwnd, UINT umsg, WPARAM wparam, L
     return DefWindowProcW(hwnd, umsg, wparam, lparam);
 }
 
-bool window_init(Window* win, WindowInfo* info)
+bool window_init(Window* win, Window_Info* info)
 {
     memset(win, 0, WINDOW_ALLOC_SIZE);
     

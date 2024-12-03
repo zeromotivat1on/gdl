@@ -17,14 +17,14 @@ typedef void(*window_char_callback)(Window* win, u32 character);
 // Types
 // -----
 
-enum CursorFlags : u8
+enum Cursor_Flags : u8
 {
     CURSOR_VISIBLE = BIT(0),
     CURSOR_LOCKED = BIT(1),
     CURSOR_CONSTRAINED = BIT(2),
 };
 
-struct WindowInfo
+struct Window_Info
 {
     char*   title;
 	u16     width;
@@ -66,7 +66,7 @@ inline constexpr u16 WINDOW_ALLOC_SIZE = sizeof(Window);
 // Core
 // ----
 
-bool    window_init(Window* win, WindowInfo* info);     // init window in preallocated memory
+bool    window_init(Window* win, Window_Info* info);    // init window in preallocated memory
 void    window_show(Window* win);                       // display window
 void    window_destroy(Window* win);                    // destroy the window
 void    window_update(Window* win);                     // poll window events

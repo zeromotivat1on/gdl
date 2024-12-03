@@ -3,8 +3,7 @@
 #include "hash.h"
 #include "time.h"
 
-#define UID()   uid_gen()
-#define UID(n)  uid_gen(n)
+#define UID uid_gen()
 
 typedef u64 uid;
 

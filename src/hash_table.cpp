@@ -3,12 +3,12 @@
 #include "hash.h"
 #include "mem.h"
 
-static inline bool hash_table_key_valid(const HashTable* ht, const void* key, u64 key_hash, u32 key_idx)
+static inline bool hash_table_key_valid(const Hash_Table* ht, const void* key, u64 key_hash, u32 key_idx)
 {
     return ht->hashed_keys[key_idx] == key_hash && memcmp(key, ht->keys + key_idx * ht->key_size, ht->key_size) == 0;
 }
 
-void hash_table_init(HashTable* ht, Arena* arena, u32 max_item_count, u32 key_size, u32 value_size, hash_table_hash_func hash_func)
+void hash_table_init(Hash_Table* ht, Arena* arena, u32 max_item_count, u32 key_size, u32 value_size, hash_table_hash_func hash_func)
 {
     ASSERT(hash_func);
     
@@ -22,7 +22,7 @@ void hash_table_init(HashTable* ht, Arena* arena, u32 max_item_count, u32 key_si
     ht->key_size = key_size;
 }
 
-void* hash_table_get(const HashTable* ht, const void* key)
+void* hash_table_get(const Hash_Table* ht, const void* key)
 {
     ASSERT(key);
     
@@ -47,7 +47,7 @@ void* hash_table_get(const HashTable* ht, const void* key)
     return nullptr;
 }
 
-void hash_table_insert(HashTable* ht, const void* key, const void* value)
+void hash_table_insert(Hash_Table* ht, const void* key, const void* value)
 {
     ASSERT(key);
     ASSERT(value);
@@ -79,7 +79,7 @@ void hash_table_insert(HashTable* ht, const void* key, const void* value)
     memcpy(ht->values + idx * ht->value_size, value, ht->value_size);
 }
 
-bool hash_table_remove(HashTable* ht, const void* key)
+bool hash_table_remove(Hash_Table* ht, const void* key)
 {
     ASSERT(key)
     
@@ -108,7 +108,7 @@ bool hash_table_remove(HashTable* ht, const void* key)
     return false;
 }
 
-void hash_table_rehash(HashTable* ht, Arena* arena, u32 max_item_count)
+void hash_table_rehash(Hash_Table* ht, Arena* arena, u32 max_item_count)
 {
     u8* new_keys = arena_push_size(arena, max_item_count * ht->key_size);
     u8* new_values = arena_push_size(arena, max_item_count * ht->value_size);

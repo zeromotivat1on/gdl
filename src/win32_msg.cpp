@@ -8,7 +8,7 @@ void* stdout_handle()
     return handle;
 }
 
-void msg_va(void* stream, MsgCategory category, const char* msg, va_list args)
+void msg_va(void* stream, Msg_Category category, const char* msg, va_list args)
 {
     static char buffer[2][2048];
     

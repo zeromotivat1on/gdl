@@ -1,6 +1,6 @@
 #pragma once
 
-enum MsgCategory
+enum Msg_Category
 {
     MSG_VERBOSE,
     MSG_DEBUG,
@@ -15,9 +15,9 @@ inline const char* MSG_NAMES[MSG_COUNT] = { "Verbose", "Debug", "Log", "Warning"
 
 void* stdout_handle(); // standart output handle
 
-void msg_va(void* stream, MsgCategory category, const char* msg, va_list args);
+void msg_va(void* stream, Msg_Category category, const char* msg, va_list args);
 
-inline void msg(void* stream, MsgCategory category, const char* msg, ...)
+inline void msg(void* stream, Msg_Category category, const char* msg, ...)
 {
     va_list args;
     va_start(args, msg);
@@ -25,7 +25,7 @@ inline void msg(void* stream, MsgCategory category, const char* msg, ...)
     va_end(args);
 }
 
-inline void msg(MsgCategory category, const char* msg, ...)
+inline void msg(Msg_Category category, const char* msg, ...)
 {
     va_list args;
     va_start(args, msg);

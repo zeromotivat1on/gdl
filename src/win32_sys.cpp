@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "sys.h"
 
-void sys_mem_status(SysMemStatus* status)
+void sys_mem_status(Sys_Mem_Status* status)
 {
     if (!status) return;
 
@@ -16,7 +16,7 @@ void sys_mem_status(SysMemStatus* status)
     }
 }
 
-void sys_info(SysInfo* info)
+void sys_info(Sys_Info* info)
 {
     if (!info) return;
 

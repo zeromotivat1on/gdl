@@ -3,13 +3,13 @@
 #include "thread.h"
 
 // Max simultaneous work queue entries to process.
-#define WORKQ_MAX_ENTRIES   256
+inline constexpr u16 WORKQ_MAX_ENTRIES = 256;
 
-typedef void (*WorkqCallback)(const struct Workq*, void*);
+typedef void (*workq_callback)(const struct Workq*, void*);
 
-struct WorkqEntry
+struct Workq_Entry
 {
-    WorkqCallback   callback;
+    workq_callback  callback;
     void*           data;
 };
 
@@ -18,7 +18,7 @@ struct WorkqEntry
 struct Workq
 {
     hsemaphore      semaphore;
-    WorkqEntry      entries[WORKQ_MAX_ENTRIES];
+    Workq_Entry     entries[WORKQ_MAX_ENTRIES];
     volatile u32    entry_to_add;
     volatile u32    entry_to_process;
     volatile u32    added_entry_count;
@@ -27,6 +27,6 @@ struct Workq
 
 Workq   workq_create(hsemaphore semaphore);
 bool    workq_active(Workq* wq);
-void    workq_add(Workq* wq, void* data, WorkqCallback callback);
+void    workq_add(Workq* wq, void* data, workq_callback callback);
 bool    workq_process(Workq* wq);
 void    workq_wait(Workq* wq, u32 ms);

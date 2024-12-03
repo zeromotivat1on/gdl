@@ -14,7 +14,7 @@ bool workq_active(Workq* wq)
     return wq->processed_entry_count != wq->added_entry_count;
 }
 
-void workq_add(Workq* wq, void* data, WorkqCallback callback)
+void workq_add(Workq* wq, void* data, workq_callback callback)
 {
     const u32 entry_to_add = wq->entry_to_add;
     const u32 next_entry_to_add = (entry_to_add + 1) % ARRAY_COUNT(wq->entries);
@@ -24,7 +24,7 @@ void workq_add(Workq* wq, void* data, WorkqCallback callback)
     const u32 idx = atomic_cmp_swap((volatile s32*)&wq->entry_to_add, next_entry_to_add, entry_to_add);
     if (idx == entry_to_add)
     {
-        WorkqEntry& entry = wq->entries[entry_to_add];
+        Workq_Entry& entry = wq->entries[entry_to_add];
         entry.callback = callback;
         entry.data = data;
 
@@ -45,7 +45,7 @@ bool workq_process(Workq* wq)
     const u32 idx = atomic_cmp_swap((volatile s32*)&wq->entry_to_process, next_entry_to_process, entry_to_process);
     if (idx == entry_to_process)
     {
-        WorkqEntry& entry = wq->entries[entry_to_process];
+        Workq_Entry& entry = wq->entries[entry_to_process];
         entry.callback(wq, entry.data);
         atomic_increment((volatile s32*)&wq->processed_entry_count);
     }

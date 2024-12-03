@@ -8,7 +8,7 @@
 // Types
 // -----
 
-enum ButtonAction : s8
+enum Button_Action : s8
 {
     RELEASE = 0,
     PRESS   = 1,
@@ -143,7 +143,7 @@ enum Key : s16
     KEY_COUNT,
 };
 
-enum MouseButton : s16
+enum Mouse_Button : s16
 {
     MOUSE_BUTTON_INVALID = -1,
 
@@ -154,7 +154,7 @@ enum MouseButton : s16
     MOUSE_BUTTON_COUNT,
 };
 
-enum GamepadButton : s16
+enum Gamepad_Button : s16
 {
     GAMEPAD_BUTTON_INVALID = -1,
 
@@ -187,7 +187,7 @@ enum GamepadButton : s16
     GAMEPAD_X = GAMEPAD_FACE_LEFT,
 };
 
-enum MouseAxis : s16
+enum Mouse_Axis : s16
 {
     MOUSE_AXIS_INVALID = -1,
 
@@ -203,7 +203,7 @@ enum MouseAxis : s16
     MOUSE_AXIS_COUNT,
 };
 
-enum GamepadAxis : s16
+enum Gamepad_Axis : s16
 {
     GAMEPAD_AXIS_INVALID = -1,
 
@@ -217,7 +217,7 @@ enum GamepadAxis : s16
     GAMEPAD_AXIS_COUNT,
 };
 
-struct InputTables
+struct Input_Tables
 {
     s16     virtual_keys[KEY_COUNT];    // key to virtual keycode
     s16     scancodes[KEY_COUNT];       // key to keyboard scancode
@@ -231,9 +231,9 @@ struct InputTables
 
 struct Window;
 
-inline InputTables g_input_tables;
+inline Input_Tables g_input_tables;
 
-void        input_tables_init();
+void        init_input_tables();
 
 bool        key_up(Window* win, s16 key);
 bool        key_down(Window* win, s16 key);

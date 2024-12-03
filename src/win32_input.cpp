@@ -4,7 +4,7 @@
 #include "win.h"
 #include "win32_win.h"
 
-void input_tables_init()
+void init_input_tables()
 {
     memset(g_input_tables.virtual_keys, KEY_INVALID, sizeof(g_input_tables.virtual_keys));
     memset(g_input_tables.scancodes, KEY_INVALID, sizeof(g_input_tables.scancodes));

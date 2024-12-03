@@ -4,7 +4,7 @@
 // System
 // ------
 
-struct SysMemStatus
+struct Sys_Mem_Status
 {
     u64 phys_total;
     u64 phys_avail;
@@ -12,12 +12,12 @@ struct SysMemStatus
     u64 virt_avail;
 };
 
-struct SysInfo
+struct Sys_Info
 {
     u32 page_size;
     u32 alloc_gran;
     u32 lg_core_num;
 };
 
-void sys_mem_status(SysMemStatus* status);
-void sys_info(SysInfo* info);
+void sys_mem_status(Sys_Mem_Status* status);
+void sys_info(Sys_Info* info);

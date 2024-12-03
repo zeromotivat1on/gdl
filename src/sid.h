@@ -7,16 +7,16 @@
 
 typedef u64 sid;
 
-inline HashTable g_sid_table;
+inline Hash_Table g_sid_table;
 
-inline u64 sid_hash_table_hash(void* value)
+inline u64 sid_table_hash(void* value)
 {
     return *(sid*)value;
 }
 
 inline void sid_init(Arena* arena, u32 max_sid_count, u32 max_sid_size)
 {
-    hash_table_init(&g_sid_table, arena, max_sid_count, sizeof(u64), max_sid_size, (hash_table_hash_func)sid_hash_table_hash);
+    hash_table_init(&g_sid_table, arena, max_sid_count, sizeof(u64), max_sid_size, (hash_table_hash_func)sid_table_hash);
 }
 
 inline sid sid_hash(const char* str)
