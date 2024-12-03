@@ -24,5 +24,5 @@
 #include "src/time.h"
 #include "src/uid.h"
 #include "src/vector.h"
-#include "src/win.h"
+#include "src/window.h"
 #include "src/workq.h"
