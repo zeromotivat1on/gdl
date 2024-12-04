@@ -13,7 +13,7 @@
 #include "src/hash_table.h"
 #include "src/input.h"
 #include "src/matrix.h"
-#include "src/mem.h"
+#include "src/memory.h"
 #include "src/msg.h"
 #include "src/quat.h"
 #include "src/sid.h"
