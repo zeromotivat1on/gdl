@@ -2,11 +2,10 @@
 #include "workq.h"
 #include "thread.h"
 
-Workq workq_create(semaphore_handle semaphore)
+void workq_init(Workq* wq, semaphore_handle semaphore)
 {
-    Workq wq = STRUCT_ZERO(Workq);
-    wq.semaphore = semaphore;
-    return wq;
+    *wq = STRUCT_ZERO(Workq);
+    wq->semaphore = semaphore;
 }
 
 bool workq_active(Workq* wq)
@@ -19,7 +18,7 @@ void workq_add(Workq* wq, void* data, workq_callback callback)
     const u32 entry_to_add = wq->entry_to_add;
     const u32 next_entry_to_add = (entry_to_add + 1) % ARRAY_COUNT(wq->entries);
 
-    PANIC(next_entry_to_add == wq->entry_to_process);
+    ASSERT(next_entry_to_add != wq->entry_to_process); // overflow
 
     const u32 idx = atomic_cmp_swap((volatile s32*)&wq->entry_to_add, next_entry_to_add, entry_to_add);
     if (idx == entry_to_add)

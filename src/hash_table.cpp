@@ -1,14 +1,14 @@
 #include "pch.h"
 #include "hash_table.h"
 #include "hash.h"
-#include "mem.h"
+#include "memory.h"
 
-static inline bool hash_table_key_valid(const Hash_Table* ht, const void* key, u64 key_hash, u32 key_idx)
+static inline bool table_key_valid(const Hash_Table* ht, const void* key, u64 key_hash, u32 key_idx)
 {
     return ht->hashed_keys[key_idx] == key_hash && memcmp(key, ht->keys + key_idx * ht->key_size, ht->key_size) == 0;
 }
 
-void hash_table_init(Hash_Table* ht, Arena* arena, u32 max_item_count, u32 key_size, u32 value_size, hash_table_hash_func hash_func)
+void table_init(Hash_Table* ht, Arena* arena, u32 max_item_count, u32 key_size, u32 value_size, table_hash_func hash_func)
 {
     ASSERT(hash_func);
     
@@ -22,7 +22,7 @@ void hash_table_init(Hash_Table* ht, Arena* arena, u32 max_item_count, u32 key_s
     ht->key_size = key_size;
 }
 
-void* hash_table_get(const Hash_Table* ht, const void* key)
+void* table_find(const Hash_Table* ht, const void* key)
 {
     ASSERT(key);
     
@@ -31,7 +31,7 @@ void* hash_table_get(const Hash_Table* ht, const void* key)
 
     while (ht->hashed_keys[idx] != 0)
     {
-        if (hash_table_key_valid(ht, key, hash, idx))
+        if (table_key_valid(ht, key, hash, idx))
         {
             return ht->values + idx * ht->value_size;
         }
@@ -47,7 +47,7 @@ void* hash_table_get(const Hash_Table* ht, const void* key)
     return nullptr;
 }
 
-void hash_table_insert(Hash_Table* ht, const void* key, const void* value)
+void table_insert(Hash_Table* ht, const void* key, const void* value)
 {
     ASSERT(key);
     ASSERT(value);
@@ -57,7 +57,7 @@ void hash_table_insert(Hash_Table* ht, const void* key, const void* value)
 
     while (ht->hashed_keys[idx] != 0)
     {
-        if (hash_table_key_valid(ht, key, hash, idx))
+        if (table_key_valid(ht, key, hash, idx))
         {
             memcpy(ht->values + idx * ht->value_size, value, ht->value_size);
             return;
@@ -72,14 +72,14 @@ void hash_table_insert(Hash_Table* ht, const void* key, const void* value)
     }
 
     ht->item_count++;
-    PANIC(ht->item_count > ht->max_item_count);
+    ASSERT(ht->item_count <= ht->max_item_count);
     
     ht->hashed_keys[idx] = hash;
     memcpy(ht->keys + idx * ht->key_size, key, ht->key_size);
     memcpy(ht->values + idx * ht->value_size, value, ht->value_size);
 }
 
-bool hash_table_remove(Hash_Table* ht, const void* key)
+bool table_remove(Hash_Table* ht, const void* key)
 {
     ASSERT(key)
     
@@ -88,7 +88,7 @@ bool hash_table_remove(Hash_Table* ht, const void* key)
 
     while (ht->hashed_keys[idx] != 0)
     {
-        if (hash_table_key_valid(ht, key, hash, idx))
+        if (table_key_valid(ht, key, hash, idx))
         {
             ht->item_count--;
             ht->hashed_keys[idx] = 0;
@@ -108,7 +108,7 @@ bool hash_table_remove(Hash_Table* ht, const void* key)
     return false;
 }
 
-void hash_table_rehash(Hash_Table* ht, Arena* arena, u32 max_item_count)
+void table_rehash(Hash_Table* ht, Arena* arena, u32 max_item_count)
 {
     u8* new_keys = arena_push_size(arena, max_item_count * ht->key_size);
     u8* new_values = arena_push_size(arena, max_item_count * ht->value_size);

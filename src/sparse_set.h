@@ -15,10 +15,10 @@ struct Sparse_Set
     u32     max_sparse_count;
 };
 
-void        sparse_set_init(Sparse_Set* ss, Arena* arena, u32 max_dense_count, u32 max_sparse_count, u32 dense_item_size);
-bool        sparse_set_has(const Sparse_Set* ss, u32 idx);
-bool        sparse_set_insert(Sparse_Set* ss, u32 idx, const void* dense_item);
-bool        sparse_set_insert_zero(Sparse_Set* ss, u32 idx);
-bool        sparse_set_remove(Sparse_Set* ss, u32 idx);
-void*       sparse_set_get(const Sparse_Set* ss, u32 idx);
-void        sparse_set_clear(Sparse_Set* ss);
+void    sparse_init(Sparse_Set* ss, Arena* arena, u32 max_dense_count, u32 max_sparse_count, u32 dense_item_size);
+bool    sparse_has(const Sparse_Set* ss, u32 idx);
+bool    sparse_insert(Sparse_Set* ss, u32 idx, const void* dense_item);
+bool    sparse_insert_zero(Sparse_Set* ss, u32 idx);
+bool    sparse_remove(Sparse_Set* ss, u32 idx);
+void*   sparse_get(const Sparse_Set* ss, u32 idx);
+void    sparse_clear(Sparse_Set* ss);

@@ -25,7 +25,7 @@ struct Workq
     volatile u32        processed_entry_count;
 };
 
-Workq   workq_create(semaphore_handle semaphore);
+void    workq_init(Workq* wq, semaphore_handle semaphore);
 bool    workq_active(Workq* wq);
 void    workq_add(Workq* wq, void* data, workq_callback callback);
 bool    workq_process(Workq* wq);

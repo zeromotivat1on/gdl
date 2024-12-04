@@ -59,13 +59,13 @@ thread_handle create_thread(thread_entry entry, void* userdata, s32 create_type)
 void resume_thread(thread_handle handle)
 {
     const DWORD res = ResumeThread(handle);
-    PANIC(res == INVALID_THREAD_RESULT);
+    ASSERT(res != INVALID_THREAD_RESULT);
 }
 
 void suspend_thread(thread_handle handle)
 {
     const DWORD res = SuspendThread(handle);
-    PANIC(res == INVALID_THREAD_RESULT);
+    ASSERT(res != INVALID_THREAD_RESULT);
 }
 
 void terminate_thread(thread_handle handle)

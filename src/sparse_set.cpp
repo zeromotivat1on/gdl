@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "sparse_set.h"
-#include "mem.h"
+#include "memory.h"
 
-void sparse_set_init(Sparse_Set* ss, Arena* arena, u32 max_dense_count, u32 max_sparse_count, u32 dense_item_size)
+void sparse_init(Sparse_Set* ss, Arena* arena, u32 max_dense_count, u32 max_sparse_count, u32 dense_item_size)
 {
     ss->dense_items = arena_push_size(arena, max_dense_count * dense_item_size);
     ss->dense_indices = arena_push_array(arena, max_dense_count, u32);
@@ -15,7 +15,7 @@ void sparse_set_init(Sparse_Set* ss, Arena* arena, u32 max_dense_count, u32 max_
     memset(ss->sparse_indices, 0xFF, max_sparse_count * sizeof(u32));
 }
 
-bool sparse_set_has(const Sparse_Set* ss, u32 idx)
+bool sparse_has(const Sparse_Set* ss, u32 idx)
 {
     ASSERT(idx < ss->max_sparse_count);
     
@@ -23,11 +23,11 @@ bool sparse_set_has(const Sparse_Set* ss, u32 idx)
     return dense_idx < ss->dense_count && dense_idx != INVALID_DENSE_INDEX;
 }
 
-bool sparse_set_insert(Sparse_Set* ss, u32 idx, const void* dense_item)
+bool sparse_insert(Sparse_Set* ss, u32 idx, const void* dense_item)
 {
     ASSERT(idx < ss->max_sparse_count);
 
-    if (sparse_set_has(ss, idx))
+    if (sparse_has(ss, idx))
         return false;
 
     const u32 last_dense_idx = ss->dense_count++; 
@@ -38,11 +38,11 @@ bool sparse_set_insert(Sparse_Set* ss, u32 idx, const void* dense_item)
     return true;
 }
 
-bool sparse_set_insert_zero(Sparse_Set* ss, u32 idx)
+bool sparse_insert_zero(Sparse_Set* ss, u32 idx)
 {
     ASSERT(idx < ss->max_sparse_count);
 
-    if (sparse_set_has(ss, idx))
+    if (sparse_has(ss, idx))
         return false;
 
     const u32 last_dense_idx = ss->dense_count++; 
@@ -53,11 +53,11 @@ bool sparse_set_insert_zero(Sparse_Set* ss, u32 idx)
     return true;
 }
 
-bool sparse_set_remove(Sparse_Set* ss, u32 idx)
+bool sparse_remove(Sparse_Set* ss, u32 idx)
 {
     ASSERT(idx < ss->max_sparse_count);
 
-    if (!sparse_set_has(ss, idx))
+    if (!sparse_has(ss, idx))
         return false;
 
     const u32 last_dense_idx = --ss->dense_count;
@@ -74,7 +74,7 @@ bool sparse_set_remove(Sparse_Set* ss, u32 idx)
     return true;
 }
 
-void* sparse_set_get(const Sparse_Set* ss, u32 idx)
+void* sparse_get(const Sparse_Set* ss, u32 idx)
 {
     ASSERT(idx < ss->max_sparse_count);
 
@@ -87,7 +87,7 @@ void* sparse_set_get(const Sparse_Set* ss, u32 idx)
     return nullptr;
 }
 
-void sparse_set_clear(Sparse_Set* ss)
+void sparse_clear(Sparse_Set* ss)
 {
     ss->dense_count = 0;
 }

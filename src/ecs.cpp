@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "ecs.h"
 #include "hash.h"
-#include "mem.h"
+#include "memory.h"
 #include "sparse_set.h"
 
 static u64 ecs_hash_component_type(const void* item)
@@ -21,7 +21,7 @@ void init_ecs(Ecs* ecs, Arena* arena, u32 max_entities, u16 max_component_type_c
     ecs->free_entities = arena_push_array(arena, max_entities, Entity);
     memset(ecs->free_entities, INVALID_ENTITY, max_entities * sizeof(Entity));
 
-    hash_table_init(&ecs->components_table, arena, max_component_type_count, sizeof(sid), sizeof(Sparse_Set), ecs_hash_component_type);
+    table_init(&ecs->components_table, arena, max_component_type_count, sizeof(sid), sizeof(Sparse_Set), ecs_hash_component_type);
 }
 
 Entity new_entity(Ecs* ecs)
@@ -68,32 +68,32 @@ void delete_entity(Ecs* ecs, Entity e)
     }
 }
 
-void iterate_entities(Ecs* ecs, const sid* cts, u8 cts_count, entity_iterate_callback callback)
+void iterate_entities(Ecs* ecs, const sid* cs, u8 count, entity_iterate_callback callback)
 {
-    ASSERT(cts_count > 0);
+    ASSERT(count > 0);
 
-    Sparse_Set* ct_sparse_set = (Sparse_Set*)hash_table_get(&ecs->components_table, &cts[0]);
+    Sparse_Set* component_set = (Sparse_Set*)table_find(&ecs->components_table, &cs[0]);
 
-    if (!ct_sparse_set)
+    if (!component_set)
     {
-        msg_error("[gdl]: Failed to get component sparse set from sid (%u)", cts[0]);
+        msg_error("[gdl]: Failed to get component sparse set from sid (%u)", cs[0]);
         return;
     }
     
-    u64 smallest_dense_count = ct_sparse_set->dense_count;
+    u64 smallest_dense_count = component_set->dense_count;
     u64 smallest_set_index = 0;
     
-    for (u64 i = 1; i < cts_count; ++i)
+    for (u64 i = 1; i < count; ++i)
     {
-        ct_sparse_set = (Sparse_Set*)hash_table_get(&ecs->components_table, &cts[i]);
+        component_set = (Sparse_Set*)table_find(&ecs->components_table, &cs[i]);
 
-        if (!ct_sparse_set)
+        if (!component_set)
         {
-            msg_error("[gdl]: Failed to get component sparse set from sid (%u)", cts[i]);
+            msg_error("[gdl]: Failed to get component sparse set from sid (%u)", cs[i]);
             return;
         }
         
-        const u64 dense_count = ct_sparse_set->dense_count;
+        const u64 dense_count = component_set->dense_count;
         if (dense_count < smallest_dense_count)
         {
             smallest_set_index = i;
@@ -101,19 +101,19 @@ void iterate_entities(Ecs* ecs, const sid* cts, u8 cts_count, entity_iterate_cal
         }
     }
 
-    const Sparse_Set* smallest_set = (Sparse_Set*)hash_table_get(&ecs->components_table, &cts[smallest_set_index]);
+    const Sparse_Set* smallest_set = (Sparse_Set*)table_find(&ecs->components_table, &cs[smallest_set_index]);
     for (u64 i = 0; i < smallest_set->dense_count; ++i)
     {
         const Entity e = smallest_set->dense_indices[i];
         bool has_all_components = true;
 
-        for (u64 j = 0; j < cts_count; ++j)
+        for (u64 j = 0; j < count; ++j)
         {
             if (j == smallest_set_index)
                 continue;
 
-            const Sparse_Set* other_set = (Sparse_Set*)hash_table_get(&ecs->components_table, &cts[j]);
-            if (!sparse_set_has(other_set, e))
+            const Sparse_Set* other_set = (Sparse_Set*)table_find(&ecs->components_table, &cs[j]);
+            if (!sparse_has(other_set, e))
             {
                 has_all_components = false;
                 break;
@@ -127,47 +127,47 @@ void iterate_entities(Ecs* ecs, const sid* cts, u8 cts_count, entity_iterate_cal
     }
 }
 
-void regtister_component(Ecs* ecs, Arena* arena, sid ct, u16 ct_size)
+void regtister_component(Ecs* ecs, Arena* arena, sid c, u16 size)
 {
     Sparse_Set component_set;
-    sparse_set_init(&component_set, arena, ecs->max_entity_count, ecs->max_entity_count, ct_size);
-    hash_table_insert(&ecs->components_table, &ct, &component_set);
+    sparse_init(&component_set, arena, ecs->max_entity_count, ecs->max_entity_count, size);
+    table_insert(&ecs->components_table, &c, &component_set);
 }
 
-bool add_component(Ecs* ecs, Entity e, sid ct)
+bool add_component(Ecs* ecs, Entity e, sid c)
 {
     ASSERT(e != INVALID_ENTITY);
     ASSERT(e < ecs->max_entity_count);
 
-    if (Sparse_Set* ct_sparse_set = (Sparse_Set*)hash_table_get(&ecs->components_table, &ct))
+    if (Sparse_Set* component_set = (Sparse_Set*)table_find(&ecs->components_table, &c))
     {
-        return sparse_set_insert_zero(ct_sparse_set, e);
+        return sparse_insert_zero(component_set, e);
     }
     
     return false;
 }
 
-void* get_component(Ecs* ecs, Entity e, sid ct)
+void* get_component(Ecs* ecs, Entity e, sid c)
 {
     ASSERT(e != INVALID_ENTITY);
     ASSERT(e < ecs->max_entity_count);
    
-    if (Sparse_Set* ct_sparse_set = (Sparse_Set*)hash_table_get(&ecs->components_table, &ct))
+    if (Sparse_Set* component_set = (Sparse_Set*)table_find(&ecs->components_table, &c))
     {
-        return sparse_set_get(ct_sparse_set, e);
+        return sparse_get(component_set, e);
     }
     
     return nullptr;
 }
 
-bool delete_component(Ecs* ecs, Entity e, sid ct)
+bool delete_component(Ecs* ecs, Entity e, sid c)
 {
     ASSERT(e != INVALID_ENTITY);
     ASSERT(e < ecs->max_entity_count);
 
-    if (Sparse_Set* ct_sparse_set = (Sparse_Set*)hash_table_get(&ecs->components_table, &ct))
+    if (Sparse_Set* component_set = (Sparse_Set*)table_find(&ecs->components_table, &c))
     {
-        return sparse_set_remove(ct_sparse_set, e);
+        return sparse_remove(component_set, e);
     }
 
     return false;

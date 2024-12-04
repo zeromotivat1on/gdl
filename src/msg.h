@@ -11,7 +11,7 @@ enum Msg_Category
     MSG_COUNT
 };
 
-inline const char* MSG_NAMES[MSG_COUNT] = { "Verbose", "Debug", "Log", "Warning", "Error", "Critical" };
+inline const char* g_msg_names[MSG_COUNT] = { "Verbose", "Debug", "Log", "Warning", "Error", "Critical" };
 
 void* stdout_handle(); // standart output handle
 

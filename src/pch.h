@@ -81,17 +81,10 @@ using f64 = double;
 #endif // ^^^ WIN32
 
 #define ASSERT(x)   if (!(x)) { do_assert(MACRO_STRING(x), __FILE__, __LINE__); }
-#define PANIC(x)    if ((x)) { do_panic(MACRO_STRING(x), __FILE__, __LINE__); }
 
 inline void do_assert(const char* cond, const char* filename, u32 line)
 {
-    msg_critical("Assert (%s) at (%s:%u)", cond, filename, line);
-    DEBUG_BREAK();
-}
-
-inline void do_panic(const char* cond, const char* filename, u32 line)
-{
-    msg_critical("Panic (%s) at (%s:%u)", cond, filename, line);
+    msg_critical("Assert (%s) failed at (%s:%u)", cond, filename, line);
     DEBUG_BREAK();
 }
 #endif // ^^^ NOT_BUILD_RELEASE

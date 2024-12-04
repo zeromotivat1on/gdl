@@ -287,7 +287,7 @@ inline mat2 mat2::inverse() const
 {
 	mat2 invMat = *this;
 	const bool res = invMat.inverse_self();
-	PANIC(!res);
+	ASSERT(res);
 	return invMat;
 }
 
@@ -640,7 +640,7 @@ inline mat3 mat3::inverse() const
 {
 	mat3 invMat = *this;
 	const bool res = invMat.inverse_self();
-	PANIC(!res);
+	ASSERT(res);
 	return invMat;
 }
 
@@ -1080,7 +1080,7 @@ inline mat4 mat4::inverse() const
 {
 	mat4 invMat = *this;
 	const bool res = invMat.inverse_self();
-	PANIC(!res);
+	ASSERT(res);
 	return invMat;
 }
 
