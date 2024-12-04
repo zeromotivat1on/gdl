@@ -15,7 +15,7 @@ struct Ecs
     Entity*     entities;
     Entity*     free_entities;
 
-    Hash_Table   components_table;   // sid to SparseSet
+    Hash_Table  components_table;   // sid to SparseSet
 
     u32         entity_count;
     u32         max_entity_count;
