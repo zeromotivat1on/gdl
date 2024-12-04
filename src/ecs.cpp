@@ -131,7 +131,7 @@ void regtister_component(Ecs* ecs, Arena* arena, sid c, u16 size)
 {
     Sparse_Set component_set;
     sparse_init(&component_set, arena, ecs->max_entity_count, ecs->max_entity_count, size);
-    table_insert(&ecs->components_table, &c, &component_set);
+    table_add(&ecs->components_table, &c, &component_set);
 }
 
 bool add_component(Ecs* ecs, Entity e, sid c)

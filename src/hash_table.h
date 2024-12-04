@@ -22,7 +22,7 @@ struct Hash_Table
 
 void    table_init(Hash_Table* ht, Arena* arena, u32 max_item_count, u32 key_size, u32 value_size, table_hash_func hash_func);
 void*   table_find(const Hash_Table* ht, const void* key);
-void    table_insert(Hash_Table* ht, const void* key, const void* value);
+void    table_add(Hash_Table* ht, const void* key, const void* value);
 bool    table_remove(Hash_Table* ht, const void* key);
 void    table_rehash(Hash_Table* ht, Arena* arena, u32 max_item_count);
 

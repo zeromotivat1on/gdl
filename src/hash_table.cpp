@@ -47,10 +47,11 @@ void* table_find(const Hash_Table* ht, const void* key)
     return nullptr;
 }
 
-void table_insert(Hash_Table* ht, const void* key, const void* value)
+void table_add(Hash_Table* ht, const void* key, const void* value)
 {
     ASSERT(key);
     ASSERT(value);
+    ASSERT(table_load_factor(ht) < 1.0f); // avoid infinite loop
     
     const u64 hash = ht->hash_func(key);
     u32 idx = hash % ht->max_item_count;
