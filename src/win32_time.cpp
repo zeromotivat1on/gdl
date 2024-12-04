@@ -1,12 +1,12 @@
 #include "pch.h"
 #include "time.h"
 
-u64 time_curr()
+u64 current_time()
 {
     return performance_counter() * 1000ull / performance_frequency();
 }
 
-u64 time_sys_boot()
+u64 time_since_sys_boot()
 {
     return GetTickCount64();
 }
