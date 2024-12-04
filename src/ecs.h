@@ -29,7 +29,7 @@ void    iterate_entities(Ecs* ecs, const sid* cs, u8 count, entity_iterate_callb
 void    regtister_component(Ecs* ecs, Arena* arena, sid c, u16 size);
 bool    add_component(Ecs* ecs, Entity e, sid c);
 void*   get_component(Ecs* ecs, Entity e, sid c);
-bool    delete_component(Ecs* ecs, Entity e, sid c);
+bool    remove_component(Ecs* ecs, Entity e, sid c);
 
 #define register_component_struct(ecs, arena, c)    regtister_component(ecs, arena, SID(#c), sizeof(c))
 #define add_component_struct(ecs, e, c)             add_component(ecs, e, SID(#c))

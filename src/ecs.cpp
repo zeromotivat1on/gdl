@@ -160,7 +160,7 @@ void* get_component(Ecs* ecs, Entity e, sid c)
     return nullptr;
 }
 
-bool delete_component(Ecs* ecs, Entity e, sid c)
+bool remove_component(Ecs* ecs, Entity e, sid c)
 {
     ASSERT(e != INVALID_ENTITY);
     ASSERT(e < ecs->max_entity_count);
