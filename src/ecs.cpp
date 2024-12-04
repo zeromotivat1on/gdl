@@ -64,7 +64,7 @@ void delete_entity(Ecs* ecs, Entity e)
             continue;
 
         const sid key = *(sid*)(ecs->components_table.keys + i * ecs->components_table.key_size);
-        delete_component(ecs, e, key);
+        remove_component(ecs, e, key);
     }
 }
 
