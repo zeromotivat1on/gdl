@@ -27,7 +27,8 @@ inline sid hash_sid(const char* str)
 inline sid generate_sid(const char* str)
 {
     const sid hash = hash_sid(str);
-    hash_table_add(&g_sid_table, &hash, str);
+    if (is_unique_sid(hash))
+        hash_table_add(&g_sid_table, &hash, str);
     return hash;
 }
 
