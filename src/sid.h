@@ -23,7 +23,17 @@ inline sid hash_sid(const char* str)
 {
     return hash_fnv(str);
 }
-    
+
+inline bool is_unique_sid(sid n)
+{
+    return hash_table_find(&g_sid_table, &n) == nullptr;
+}
+
+inline bool is_unique_sid(const char* str)
+{
+    return is_unique_sid(hash_sid(str));
+}
+
 inline sid generate_sid(const char* str)
 {
     const sid hash = hash_sid(str);
@@ -35,14 +45,4 @@ inline sid generate_sid(const char* str)
 inline const char* string_from_sid(sid n)
 {
     return (const char*)hash_table_find(&g_sid_table, &n);
-}
-
-inline bool is_unique_sid(sid n)
-{
-    return hash_table_find(&g_sid_table, &n) == nullptr;
-}
-
-inline bool is_unique_sid(const char* str)
-{
-    return is_unique_sid(hash_sid(str));
 }
