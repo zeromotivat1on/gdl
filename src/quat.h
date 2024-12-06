@@ -248,3 +248,20 @@ inline f32 *quat::ptr()
 {
 	return &x;
 }
+
+// -----
+// Extra
+// -----
+
+inline quat quat_from_axis_angle(const vec3& axes, f32 deg)
+{
+    const f32 factor = gdl::sin(gdl::rad(deg / 2.0f));
+
+    const f32 x = axes.x * factor;
+    const f32 y = axes.y * factor;
+    const f32 z = axes.z * factor;
+
+    const f32 w = gdl::cos(gdl::rad(deg / 2.0f));
+
+    return quat(x, y, z, w).normalize();
+}
