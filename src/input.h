@@ -240,8 +240,6 @@ bool        key_down(Window* win, s16 key);
 bool        key_pressed(Window* win, s16 key);
 bool        key_released(Window* win, s16 key);
 
-const char* key_name(s16 key);
-
 bool        mouse_up(Window* win, s16 button);
 bool        mouse_down(Window* win, s16 button);
 bool        mouse_pressed(Window* win, s16 button);
@@ -254,3 +252,8 @@ bool        gamepad_released(Window* win, u8 gamepad, s16 button);
 
 s16         mouse_axis(Window* win, s16 axis);
 f32         gamepad_axis(Window* win, u8 gamepad, s16 axis);
+
+inline const char* key_name(s16 key)
+{
+    return g_input_tables.keynames[key];
+}

@@ -21,7 +21,7 @@ void init_ecs(Ecs* ecs, Arena* arena, u32 max_entities, u16 max_component_type_c
     ecs->free_entities = arena_push_array(arena, max_entities, Entity);
     memset(ecs->free_entities, INVALID_ENTITY, max_entities * sizeof(Entity));
 
-    table_init(&ecs->components_table, arena, max_component_type_count, sizeof(sid), sizeof(Sparse_Set), ecs_hash_component_type);
+    hash_table_init(&ecs->components_table, arena, max_component_type_count, sizeof(sid), sizeof(Sparse_Set), ecs_hash_component_type);
 }
 
 Entity new_entity(Ecs* ecs)
@@ -60,7 +60,7 @@ void delete_entity(Ecs* ecs, Entity e)
 
     for (u32 i = 0; i < ecs->components_table.max_item_count; ++i)
     {
-        if (ecs->components_table.hashed_keys[i] == 0)
+        if (ecs->components_table.hashes[i] == 0)
             continue;
 
         const sid key = *(sid*)(ecs->components_table.keys + i * ecs->components_table.key_size);
@@ -72,7 +72,7 @@ void iterate_entities(Ecs* ecs, const sid* cs, u8 count, entity_iterate_callback
 {
     ASSERT(count > 0);
 
-    Sparse_Set* component_set = (Sparse_Set*)table_find(&ecs->components_table, &cs[0]);
+    Sparse_Set* component_set = (Sparse_Set*)hash_table_find(&ecs->components_table, &cs[0]);
 
     if (!component_set)
     {
@@ -85,7 +85,7 @@ void iterate_entities(Ecs* ecs, const sid* cs, u8 count, entity_iterate_callback
     
     for (u64 i = 1; i < count; ++i)
     {
-        component_set = (Sparse_Set*)table_find(&ecs->components_table, &cs[i]);
+        component_set = (Sparse_Set*)hash_table_find(&ecs->components_table, &cs[i]);
 
         if (!component_set)
         {
@@ -101,7 +101,7 @@ void iterate_entities(Ecs* ecs, const sid* cs, u8 count, entity_iterate_callback
         }
     }
 
-    const Sparse_Set* smallest_set = (Sparse_Set*)table_find(&ecs->components_table, &cs[smallest_set_index]);
+    const Sparse_Set* smallest_set = (Sparse_Set*)hash_table_find(&ecs->components_table, &cs[smallest_set_index]);
     for (u64 i = 0; i < smallest_set->dense_count; ++i)
     {
         const Entity e = smallest_set->dense_indices[i];
@@ -112,8 +112,8 @@ void iterate_entities(Ecs* ecs, const sid* cs, u8 count, entity_iterate_callback
             if (j == smallest_set_index)
                 continue;
 
-            const Sparse_Set* other_set = (Sparse_Set*)table_find(&ecs->components_table, &cs[j]);
-            if (!sparse_has(other_set, e))
+            const Sparse_Set* other_set = (Sparse_Set*)hash_table_find(&ecs->components_table, &cs[j]);
+            if (!sparse_set_has(other_set, e))
             {
                 has_all_components = false;
                 break;
@@ -127,11 +127,11 @@ void iterate_entities(Ecs* ecs, const sid* cs, u8 count, entity_iterate_callback
     }
 }
 
-void regtister_component(Ecs* ecs, Arena* arena, sid c, u16 size)
+void register_component(Ecs* ecs, Arena* arena, sid c, u16 size)
 {
     Sparse_Set component_set;
-    sparse_init(&component_set, arena, ecs->max_entity_count, ecs->max_entity_count, size);
-    table_add(&ecs->components_table, &c, &component_set);
+    sparse_set_init(&component_set, arena, ecs->max_entity_count, ecs->max_entity_count, size);
+    hash_table_add(&ecs->components_table, &c, &component_set);
 }
 
 bool add_component(Ecs* ecs, Entity e, sid c)
@@ -139,9 +139,9 @@ bool add_component(Ecs* ecs, Entity e, sid c)
     ASSERT(e != INVALID_ENTITY);
     ASSERT(e < ecs->max_entity_count);
 
-    if (Sparse_Set* component_set = (Sparse_Set*)table_find(&ecs->components_table, &c))
+    if (Sparse_Set* component_set = (Sparse_Set*)hash_table_find(&ecs->components_table, &c))
     {
-        return sparse_insert_zero(component_set, e);
+        return sparse_set_add_zero(component_set, e);
     }
     
     return false;
@@ -152,9 +152,9 @@ void* get_component(Ecs* ecs, Entity e, sid c)
     ASSERT(e != INVALID_ENTITY);
     ASSERT(e < ecs->max_entity_count);
    
-    if (Sparse_Set* component_set = (Sparse_Set*)table_find(&ecs->components_table, &c))
+    if (Sparse_Set* component_set = (Sparse_Set*)hash_table_find(&ecs->components_table, &c))
     {
-        return sparse_get(component_set, e);
+        return sparse_set_get(component_set, e);
     }
     
     return nullptr;
@@ -165,9 +165,9 @@ bool remove_component(Ecs* ecs, Entity e, sid c)
     ASSERT(e != INVALID_ENTITY);
     ASSERT(e < ecs->max_entity_count);
 
-    if (Sparse_Set* component_set = (Sparse_Set*)table_find(&ecs->components_table, &c))
+    if (Sparse_Set* component_set = (Sparse_Set*)hash_table_find(&ecs->components_table, &c))
     {
-        return sparse_remove(component_set, e);
+        return sparse_set_remove(component_set, e);
     }
 
     return false;

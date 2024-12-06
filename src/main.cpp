@@ -14,9 +14,9 @@ int main()
 {
     //test_window();
     //test_workq();
-    //test_sparse_set();
-    //test_hash_table();
-    //test_sid();
+    test_sparse_set();
+    test_hash_table();
+    test_sid();
     test_ecs();
     
     return 0;
@@ -26,9 +26,9 @@ int main()
 
 void test_window()
 {
-    input_tables_init();
+    init_input_tables();
     
-    WindowInfo winfo = STRUCT_ZERO(WindowInfo);
+    Window_Info winfo = STRUCT_ZERO(Window_Info);
     winfo.title = "GDL Window";
     winfo.width = 1280;
     winfo.height = 720;
@@ -38,14 +38,14 @@ void test_window()
     Window* win = (Window*)alloca(WINDOW_ALLOC_SIZE);
     memset(win, 0, WINDOW_ALLOC_SIZE);
 
-    if (!window_init(win, &winfo))
+    if (!init_window(win, &winfo))
     {
         return;
     }
     
-    while(window_active(win))
+    while(is_window_active(win))
     {
-        window_update(win);
+        update_window(win);
 
         for (s16 key = 0; key < KEY_COUNT; ++key)
         {
@@ -63,21 +63,21 @@ void test_window()
             }
         }
 
-        thread_sleep(33);
+        sleep_thread(33);
     }
 }
 
 // Workq
 
-hcritsec g_crit_section = nullptr;
+critical_section_handle g_crit_section = nullptr;
 volatile s32 g_callback_call_count = 0;
 volatile s32 g_thread_add_count = 0;
 
 void test_workq_callback(const Workq* wq, void* data)
 {
-    critical_section_try_enter(g_crit_section);
-    msg_log("Thread (%u) workq callback with data (%s)", thread_curr_id(), (const char*)data);
-    critical_section_leave(g_crit_section);
+    try_enter_critical_section(g_crit_section);
+    msg_log("Thread (%u) workq callback with data (%s)", current_thread_id(), (const char*)data);
+    leave_critical_section(g_crit_section);
     
     atomic_increment(&g_callback_call_count);
 }
@@ -107,7 +107,7 @@ u32 test_workq_thread_add(void* data)
     {
         workq_add(wq, "String Producer", test_workq_callback);
         atomic_increment(&g_thread_add_count);
-        thread_sleep(1);
+        sleep_thread(1);
     }
 
     return 0;
@@ -115,12 +115,13 @@ u32 test_workq_thread_add(void* data)
 
 void test_workq()
 {
-    msg_log("Thread (%u) workq setup", thread_curr_id());
+    msg_log("Thread (%u) workq setup", current_thread_id());
 
     g_crit_section = ::operator new(CRITICAL_SECTION_ALLOC_SIZE);
-    critical_section_init(g_crit_section, 0);
+    init_critical_section(g_crit_section, 0);
     
-    Workq wq = workq_create(semaphore_create(0, 5));
+    Workq wq;
+    workq_init(&wq, create_semaphore(0, 5));
 
     workq_add(&wq, "String A1", test_workq_callback);
     workq_add(&wq, "String A2", test_workq_callback);
@@ -132,23 +133,23 @@ void test_workq()
     workq_add(&wq, "String A8", test_workq_callback);
     workq_add(&wq, "String A9", test_workq_callback);
 
-    thread_create(test_workq_thread_add, &wq, THREAD_CREATE_IMMEDIATE);
-    thread_sleep(100);
+    create_thread(test_workq_thread_add, &wq, THREAD_CREATE_IMMEDIATE);
+    sleep_thread(100);
     
-    thread_create(test_workq_thread_process, &wq, THREAD_CREATE_IMMEDIATE);
-    thread_create(test_workq_thread_process, &wq, THREAD_CREATE_IMMEDIATE);
-    thread_create(test_workq_thread_process, &wq, THREAD_CREATE_IMMEDIATE);
-    thread_create(test_workq_thread_process, &wq, THREAD_CREATE_IMMEDIATE);
-    thread_create(test_workq_thread_process, &wq, THREAD_CREATE_IMMEDIATE);
+    create_thread(test_workq_thread_process, &wq, THREAD_CREATE_IMMEDIATE);
+    create_thread(test_workq_thread_process, &wq, THREAD_CREATE_IMMEDIATE);
+    create_thread(test_workq_thread_process, &wq, THREAD_CREATE_IMMEDIATE);
+    create_thread(test_workq_thread_process, &wq, THREAD_CREATE_IMMEDIATE);
+    create_thread(test_workq_thread_process, &wq, THREAD_CREATE_IMMEDIATE);
 
     while(workq_active(&wq)) {}
 
-    critical_section_delete(g_crit_section);
+    delete_critical_section(g_crit_section);
     
     msg_log("Workq entries done %d out of (%d + 9) = %d", g_callback_call_count, g_thread_add_count, g_thread_add_count + 9);
 }
 
-// SparseSet
+// Sparse_Set
 
 void test_sparse_set()
 {
@@ -156,24 +157,24 @@ void test_sparse_set()
     void* mem = alloca(size);
     Arena arena = arena_create(mem, size);
     
-    SparseSet ss;
+    Sparse_Set ss;
     sparse_set_init(&ss, &arena, 10, 10, sizeof(u64));
 
     for (s32 i = 0; i < 10; ++i)
     {
         const u64 val = i + 10;
-        sparse_set_insert(&ss, i, &val);
+        sparse_set_add(&ss, i, &val);
     }
 
     for (s32 i = 0; i < 10; ++i)
     {
         if (u64* item = (u64*)sparse_set_get(&ss, i))
         {
-            msg_log("Sparse set item (%u) at index (%u)\n", *item, i);
+            msg_log("Sparse set item (%u) at index (%u)", *item, i);
         }
     }
 
-    msg_log("Removing some items from sparse set\n");
+    msg_log("Removing some items from sparse set");
     sparse_set_remove(&ss, 0);
     sparse_set_remove(&ss, 1);
     sparse_set_remove(&ss, 2);
@@ -182,21 +183,21 @@ void test_sparse_set()
     {
         if (u64* item = (u64*)sparse_set_get(&ss, i))
         {
-            msg_log("Sparse set item (%u) at index (%u)\n", *item, i);
+            msg_log("Sparse set item (%u) at index (%u)", *item, i);
         }
     }
 
-    msg_log("Adding some items to sparse set\n");
+    msg_log("Adding some items to sparse set");
     const u64 val_to_add = 12345;
-    sparse_set_insert(&ss, 0, &val_to_add);
-    sparse_set_insert_zero(&ss, 1);
-    sparse_set_insert_zero(&ss, 2);
+    sparse_set_add(&ss, 0, &val_to_add);
+    sparse_set_add_zero(&ss, 1);
+    sparse_set_add_zero(&ss, 2);
     
     for (s32 i = 0; i < 10; ++i)
     {
         if (u64* item = (u64*)sparse_set_get(&ss, i))
         {
-            msg_log("Sparse set item (%u) at index (%u)\n", *item, i);
+            msg_log("Sparse set item (%u) at index (%u)", *item, i);
         }
     }
 }
@@ -212,20 +213,20 @@ void test_hash_table()
     void* mem = alloca(size);
     Arena arena = arena_create(mem, size);
 
-    HashTable ht;
+    Hash_Table ht;
     hash_table_init(&ht, &arena, item_count, key_size, val_size, (hash_table_hash_func)hash_pcg32);
     msg_log("Hash table load factor = %.3f", hash_table_load_factor(&ht));
     
     const u64 val = 1;
     const u32 key = 12345;
     
-    hash_table_insert(&ht, &key, &val);
-    msg_log("Hash table key-value (%u, %u)", key, *(u64*)hash_table_get(&ht, &key));
+    hash_table_add(&ht, &key, &val);
+    msg_log("Hash table key-value (%u, %u)", key, *(u64*)hash_table_find(&ht, &key));
     msg_log("Hash table load factor = %.3f", hash_table_load_factor(&ht));
     
     hash_table_remove(&ht, &key);
     msg_log("Hash table remove at (%u)", key);
-    msg_log("Hash table has value at (%u) = %d", key, hash_table_get(&ht, &key) != nullptr);
+    msg_log("Hash table has value at (%u) = %d", key, hash_table_find(&ht, &key) != nullptr);
     msg_log("Hash table load factor = %.3f", hash_table_load_factor(&ht));
 }
 
@@ -240,18 +241,18 @@ void test_sid()
     void* mem = alloca(size);
     Arena arena = arena_create(mem, size);
     
-    sid_init(&arena, sid_count, sid_size);
+    init_sid(&arena, sid_count, sid_size);
 
     const sid test_sid = SID("TransformComponent");
-    msg_log("Sid hash = %u, value = %s", test_sid, sid_str(test_sid));
+    msg_log("Sid hash = %u, value = %s", test_sid, string_from_sid(test_sid));
     msg_log("Sid table load factor = %.3f", hash_table_load_factor(&g_sid_table));
 
     const sid test_sid_same_1 = SID("TransformComponent1");
     const sid test_sid_same_2 = SID("TransformComponent2");
     const sid test_sid_same_3 = SID("TransformComponent3");
-    msg_log("Sid hash = %u, value = %s", test_sid_same_1, sid_str(test_sid_same_1));
-    msg_log("Sid hash = %u, value = %s", test_sid_same_2, sid_str(test_sid_same_2));
-    msg_log("Sid hash = %u, value = %s", test_sid_same_3, sid_str(test_sid_same_3));
+    msg_log("Sid hash = %u, value = %s", test_sid_same_1, string_from_sid(test_sid_same_1));
+    msg_log("Sid hash = %u, value = %s", test_sid_same_2, string_from_sid(test_sid_same_2));
+    msg_log("Sid hash = %u, value = %s", test_sid_same_3, string_from_sid(test_sid_same_3));
     msg_log("Sid table load factor = %.3f", hash_table_load_factor(&g_sid_table));
 }
 
@@ -264,21 +265,21 @@ void test_ecs()
     void* mem = alloca(size);
     Arena arena = arena_create(mem, size);
 
-    sid_init(&arena, 32, 64);
+    init_sid(&arena, 32, 64);
     
-    ECS ecs;
-    ecs_init(&ecs, &arena, 100, 8);
+    Ecs ecs;
+    init_ecs(&ecs, &arena, 100, 8);
 
-    ecs_component_reg(&ecs, &arena, SID("vec2"), sizeof(vec2));
+    register_component(&ecs, &arena, SID("vec2"), sizeof(vec2));
     // ^^^ function version ^^^ // vvv macro version vvv
-    ecs_component_reg_struct(&ecs, &arena, vec2);
+    register_component_struct(&ecs, &arena, vec2);
     
-    const Entity e0 = ecs_entity_new(&ecs);
-    ecs_component_add(&ecs, e0, SID("vec2"));
+    const Entity e0 = new_entity(&ecs);
+    add_component(&ecs, e0, SID("vec2"));
 
-    vec2* e0vec2 = (vec2*)ecs_component_get(&ecs, e0, SID("vec2"));
+    vec2* e0vec2 = (vec2*)get_component(&ecs, e0, SID("vec2"));
     // ^^^ function version ^^^ // vvv macro version vvv
-    e0vec2 = ecs_component_get_struct(&ecs, e0, vec2);
+    e0vec2 = get_component_struct(&ecs, e0, vec2);
     
     e0vec2->x = 10.12f;
     e0vec2->y = 20.96f;
@@ -286,7 +287,7 @@ void test_ecs()
     msg_log("Ecs entity (%u) component (%s) = (%.2f, %.2f)", e0, "vec2", e0vec2->x, e0vec2->y);
 
     // NOTE: now if item in sparse set is removed, dense item data is zeroed, maybe come up with a better solution?
-    ecs_entity_del(&ecs, e0);
+    delete_entity(&ecs, e0);
     msg_log("Deleted entity (%u)", e0);
     // return nullptr
     //e0vec2 = (vec2*)ecs_component_get(&ecs, e0, SID("vec2"));
