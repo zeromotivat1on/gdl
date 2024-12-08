@@ -9,6 +9,8 @@ s32 FILE_ACCESS_EXEC    = GENERIC_EXECUTE;
 s32 FILE_CREATE_NEW     = CREATE_NEW;
 s32 FILE_OPEN_EXISTING  = OPEN_EXISTING;
 
+file_handle INVALID_FILE_HANDLE = INVALID_HANDLE_VALUE;
+
 file_handle open_file(const char* path, s32 open, s32 access)
 {
     wchar_t wide_path[512];

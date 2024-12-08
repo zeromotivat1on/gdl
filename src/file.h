@@ -13,6 +13,8 @@ extern s32 FILE_OPEN_EXISTING;  // open existing file or fail
 
 typedef void*   file_handle;
 
+extern file_handle INVALID_FILE_HANDLE;
+
 // ----
 // Core
 // ----
