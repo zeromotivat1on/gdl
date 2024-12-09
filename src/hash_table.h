@@ -1,14 +1,16 @@
 #pragma once
 
-typedef u64(*hash_table_hash_func)(const void* key);
-typedef bool(*hash_table_cmp_func)(const void* lkey, const void* rkey, u32 key_size);
-
 struct Arena;
 
 struct Hash_Table
 {
-    hash_table_hash_func    hash_func;
-    hash_table_cmp_func     cmp_func;
+    using Hash_Func = u64(const void* key);
+    using Cmp_Func = bool(const void* lkey, const void* rkey, u32 key_size);
+
+    static bool default_cmp_func(const void* lkey, const void* rkey, u32 key_size);
+    
+    Hash_Func*  hash_func;
+    Cmp_Func*   cmp_func;
 
     u8*     keys;
     u8*     values;
@@ -17,15 +19,11 @@ struct Hash_Table
     u32     max_item_count;
     u32     key_size;
     u32     value_size;
+
+    void    init(Arena* arena, u32 max_item_count, u32 key_size, u32 value_size, Hash_Func hash_func, Cmp_Func cmp_func = nullptr);
+    void*   find(const void* key) const;
+    void*   add(const void* key, const void* value);
+    bool    remove(const void* key);
+    void    rehash(Arena* arena, u32 max_item_count);
+    f32     load_factor() const;
 };
-
-void    hash_table_init(Hash_Table* ht, Arena* arena, u32 max_item_count, u32 key_size, u32 value_size, hash_table_hash_func hash_func, hash_table_cmp_func cmp_func = nullptr);
-void*   hash_table_find(const Hash_Table* ht, const void* key);
-void*   hash_table_add(Hash_Table* ht, const void* key, const void* value);
-bool    hash_table_remove(Hash_Table* ht, const void* key);
-void    hash_table_rehash(Hash_Table* ht, Arena* arena, u32 max_item_count);
-
-inline f32 hash_table_load_factor(Hash_Table* ht)
-{
-    return (f32)ht->item_count / (f32)ht->max_item_count;
-}

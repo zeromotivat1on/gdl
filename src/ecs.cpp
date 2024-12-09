@@ -9,70 +9,70 @@ static u64 ecs_hash_component_type(const void* item)
     return (u64)*(sid*)item;
 }
 
-void init_ecs(Ecs* ecs, Arena* arena, u32 max_entities, u16 max_component_type_count)
+void Ecs::init(Arena* arena, u32 max_entities, u16 max_component_type_count)
 {
-    ecs->max_entity_count = max_entities;
+    max_entity_count = max_entities;
     
-    ecs->entity_count = 0;
-    ecs->entities = arena_push_array(arena, max_entities, Entity);
-    memset(ecs->entities, INVALID_ENTITY, max_entities * sizeof(Entity));
+    entity_count = 0;
+    entities = arena_push_array(arena, max_entities, Entity);
+    memset(entities, INVALID_ENTITY, max_entities * sizeof(Entity));
 
-    ecs->free_entity_count = 0;
-    ecs->free_entities = arena_push_array(arena, max_entities, Entity);
-    memset(ecs->free_entities, INVALID_ENTITY, max_entities * sizeof(Entity));
+    free_entity_count = 0;
+    free_entities = arena_push_array(arena, max_entities, Entity);
+    memset(free_entities, INVALID_ENTITY, max_entities * sizeof(Entity));
 
-    hash_table_init(&ecs->components_table, arena, max_component_type_count, sizeof(sid), sizeof(Sparse_Set), ecs_hash_component_type);
+    components_table.init(arena, max_component_type_count, sizeof(sid), sizeof(Sparse_Set), ecs_hash_component_type);
 }
 
-Entity new_entity(Ecs* ecs)
+Entity Ecs::new_entity()
 {
-    if (ecs->free_entity_count > 0)
+    if (free_entity_count > 0)
     {
-        const u32 last_free_idx = --ecs->free_entity_count;
-        const u32 idx = ecs->free_entities[last_free_idx];
-        ecs->entities[idx] = idx;
-        ecs->free_entities[idx] = INVALID_ENTITY;
-        return ecs->entities[idx];
+        const u32 last_free_idx = --free_entity_count;
+        const u32 idx = free_entities[last_free_idx];
+        entities[idx] = idx;
+        free_entities[idx] = INVALID_ENTITY;
+        return entities[idx];
     }
 
-    const u32 idx = ecs->entity_count++;
-    ASSERT(idx < ecs->max_entity_count);
-    ecs->entities[idx] = idx;
-    return ecs->entities[idx];
+    const u32 idx = entity_count++;
+    ASSERT(idx < max_entity_count);
+    entities[idx] = idx;
+    return entities[idx];
 }
 
-void delete_entity(Ecs* ecs, Entity e)
+void Ecs::delete_entity(Entity e)
 {
     ASSERT(e != INVALID_ENTITY);
-    ASSERT(e < ecs->max_entity_count);
+    ASSERT(e < max_entity_count);
 
-    if (ecs->entities[e] == INVALID_ENTITY)
+    if (entities[e] == INVALID_ENTITY)
     {
         msg_warning("[gdl]: Attempt to delete invalid entity (%d)", e);
         return;
     }
 
-    ecs->entity_count--;
-    ecs->entities[e] = INVALID_ENTITY;
-    const u32 idx = ecs->free_entity_count++;
-    ASSERT(idx < ecs->max_entity_count);
-    ecs->free_entities[idx] = e;
+    entity_count--;
+    entities[e] = INVALID_ENTITY;
+    const u32 idx = free_entity_count++;
+    ASSERT(idx < max_entity_count);
+    free_entities[idx] = e;
 
-    for (u32 i = 0; i < ecs->components_table.max_item_count; ++i)
+    for (u32 i = 0; i < components_table.max_item_count; ++i)
     {
-        if (ecs->components_table.hashes[i] == 0)
+        if (components_table.hashes[i] == 0)
             continue;
 
-        const sid key = *(sid*)(ecs->components_table.keys + i * ecs->components_table.key_size);
-        remove_component(ecs, e, key);
+        const sid key = *(sid*)(components_table.keys + i * components_table.key_size);
+        remove_component(e, key);
     }
 }
 
-void iterate_entities(Ecs* ecs, const sid* cs, u8 count, entity_iterate_callback callback)
+void Ecs::iterate_entities(const sid* cs, u8 count, Iterate_Callback callback) const
 {
     ASSERT(count > 0);
 
-    Sparse_Set* component_set = (Sparse_Set*)hash_table_find(&ecs->components_table, &cs[0]);
+    Sparse_Set* component_set = (Sparse_Set*)components_table.find(&cs[0]);
 
     if (!component_set)
     {
@@ -85,7 +85,7 @@ void iterate_entities(Ecs* ecs, const sid* cs, u8 count, entity_iterate_callback
     
     for (u64 i = 1; i < count; ++i)
     {
-        component_set = (Sparse_Set*)hash_table_find(&ecs->components_table, &cs[i]);
+        component_set = (Sparse_Set*)components_table.find(&cs[i]);
 
         if (!component_set)
         {
@@ -101,7 +101,7 @@ void iterate_entities(Ecs* ecs, const sid* cs, u8 count, entity_iterate_callback
         }
     }
 
-    const Sparse_Set* smallest_set = (Sparse_Set*)hash_table_find(&ecs->components_table, &cs[smallest_set_index]);
+    const Sparse_Set* smallest_set = (Sparse_Set*)components_table.find(&cs[smallest_set_index]);
     for (u64 i = 0; i < smallest_set->dense_count; ++i)
     {
         const Entity e = smallest_set->dense_indices[i];
@@ -112,8 +112,8 @@ void iterate_entities(Ecs* ecs, const sid* cs, u8 count, entity_iterate_callback
             if (j == smallest_set_index)
                 continue;
 
-            const Sparse_Set* other_set = (Sparse_Set*)hash_table_find(&ecs->components_table, &cs[j]);
-            if (!sparse_set_has(other_set, e))
+            const Sparse_Set* other_set = (Sparse_Set*)components_table.find(&cs[j]);
+            if (!other_set->has(e))
             {
                 has_all_components = false;
                 break;
@@ -122,52 +122,52 @@ void iterate_entities(Ecs* ecs, const sid* cs, u8 count, entity_iterate_callback
 
         if (has_all_components)
         {
-            callback(ecs, e);
+            callback(this, e);
         }
     }
 }
 
-void register_component(Ecs* ecs, Arena* arena, sid c, u16 size)
+void Ecs::register_component(Arena* arena, sid c, u16 size)
 {
     Sparse_Set component_set;
-    sparse_set_init(&component_set, arena, ecs->max_entity_count, ecs->max_entity_count, size);
-    hash_table_add(&ecs->components_table, &c, &component_set);
+    component_set.init(arena, max_entity_count, max_entity_count, size);
+    components_table.add(&c, &component_set);
 }
 
-bool add_component(Ecs* ecs, Entity e, sid c)
+bool Ecs::add_component(Entity e, sid c)
 {
     ASSERT(e != INVALID_ENTITY);
-    ASSERT(e < ecs->max_entity_count);
+    ASSERT(e < max_entity_count);
 
-    if (Sparse_Set* component_set = (Sparse_Set*)hash_table_find(&ecs->components_table, &c))
+    if (Sparse_Set* component_set = (Sparse_Set*)components_table.find(&c))
     {
-        return sparse_set_add_zero(component_set, e);
+        return component_set->add_zero(e);
     }
     
     return false;
 }
 
-void* get_component(Ecs* ecs, Entity e, sid c)
+void* Ecs::get_component(Entity e, sid c) const
 {
     ASSERT(e != INVALID_ENTITY);
-    ASSERT(e < ecs->max_entity_count);
+    ASSERT(e < max_entity_count);
    
-    if (Sparse_Set* component_set = (Sparse_Set*)hash_table_find(&ecs->components_table, &c))
+    if (Sparse_Set* component_set = (Sparse_Set*)components_table.find(&c))
     {
-        return sparse_set_get(component_set, e);
+        return component_set->get(e);
     }
     
     return nullptr;
 }
 
-bool remove_component(Ecs* ecs, Entity e, sid c)
+bool Ecs::remove_component(Entity e, sid c)
 {
     ASSERT(e != INVALID_ENTITY);
-    ASSERT(e < ecs->max_entity_count);
+    ASSERT(e < max_entity_count);
 
-    if (Sparse_Set* component_set = (Sparse_Set*)hash_table_find(&ecs->components_table, &c))
+    if (Sparse_Set* component_set = (Sparse_Set*)components_table.find(&c))
     {
-        return sparse_set_remove(component_set, e);
+        return component_set->remove(e);
     }
 
     return false;

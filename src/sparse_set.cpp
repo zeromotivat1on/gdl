@@ -2,92 +2,92 @@
 #include "sparse_set.h"
 #include "memory.h"
 
-void sparse_set_init(Sparse_Set* ss, Arena* arena, u32 max_dense_count, u32 max_sparse_count, u32 dense_item_size)
+void Sparse_Set::init(Arena* arena, u32 max_dense_count, u32 max_sparse_count, u32 dense_item_size)
 {
-    ss->dense_items = arena_push_size(arena, max_dense_count * dense_item_size);
-    ss->dense_indices = arena_push_array(arena, max_dense_count, u32);
-    ss->sparse_indices = arena_push_array(arena, max_sparse_count, u32);
-    ss->dense_count = 0;
-    ss->dense_item_size = dense_item_size;
-    ss->max_dense_count = max_dense_count;
-    ss->max_sparse_count = max_sparse_count;
+    this->dense_items = arena_push_size(arena, max_dense_count * dense_item_size);
+    this->dense_indices = arena_push_array(arena, max_dense_count, u32);
+    this->sparse_indices = arena_push_array(arena, max_sparse_count, u32);
+    this->dense_count = 0;
+    this->dense_item_size = dense_item_size;
+    this->max_dense_count = max_dense_count;
+    this->max_sparse_count = max_sparse_count;
 
-    memset(ss->sparse_indices, 0xFF, max_sparse_count * sizeof(u32));
+    memset(this->sparse_indices, 0xFF, max_sparse_count * sizeof(u32));
 }
 
-bool sparse_set_has(const Sparse_Set* ss, u32 idx)
+bool Sparse_Set::has(u32 idx) const
 {
-    ASSERT(idx < ss->max_sparse_count);
+    ASSERT(idx < max_sparse_count);
     
-    const u32 dense_idx = ss->sparse_indices[idx];
-    return dense_idx < ss->dense_count && dense_idx != INVALID_DENSE_INDEX;
+    const u32 dense_idx = sparse_indices[idx];
+    return dense_idx < dense_count && dense_idx != INVALID_DENSE_INDEX;
 }
 
-bool sparse_set_add(Sparse_Set* ss, u32 idx, const void* dense_item)
+bool Sparse_Set::add(u32 idx, const void* dense_item)
 {
-    ASSERT(idx < ss->max_sparse_count);
+    ASSERT(idx < max_sparse_count);
 
-    if (sparse_set_has(ss, idx))
+    if (has(idx))
         return false;
 
-    const u32 last_dense_idx = ss->dense_count++; 
-    ss->sparse_indices[idx] = last_dense_idx;
-    ss->dense_indices[last_dense_idx] = idx;
-    memcpy(ss->dense_items + last_dense_idx * ss->dense_item_size, dense_item, ss->dense_item_size);
+    const u32 last_dense_idx = dense_count++; 
+    sparse_indices[idx] = last_dense_idx;
+    dense_indices[last_dense_idx] = idx;
+    memcpy(dense_items + last_dense_idx * dense_item_size, dense_item, dense_item_size);
 
     return true;
 }
 
-bool sparse_set_add_zero(Sparse_Set* ss, u32 idx)
+bool Sparse_Set::add_zero(u32 idx)
 {
-    ASSERT(idx < ss->max_sparse_count);
+    ASSERT(idx < max_sparse_count);
 
-    if (sparse_set_has(ss, idx))
+    if (has(idx))
         return false;
 
-    const u32 last_dense_idx = ss->dense_count++; 
-    ss->sparse_indices[idx] = last_dense_idx;
-    ss->dense_indices[last_dense_idx] = idx;
-    memset(ss->dense_items + last_dense_idx * ss->dense_item_size, 0, ss->dense_item_size);
+    const u32 last_dense_idx = dense_count++; 
+    sparse_indices[idx] = last_dense_idx;
+    dense_indices[last_dense_idx] = idx;
+    memset(dense_items + last_dense_idx * dense_item_size, 0, dense_item_size);
 
     return true;
 }
 
-bool sparse_set_remove(Sparse_Set* ss, u32 idx)
+bool Sparse_Set::remove(u32 idx)
 {
-    ASSERT(idx < ss->max_sparse_count);
+    ASSERT(idx < max_sparse_count);
 
-    if (!sparse_set_has(ss, idx))
+    if (!has(idx))
         return false;
 
-    const u32 last_dense_idx = --ss->dense_count;
-    const u32 dense_idx = ss->sparse_indices[idx];
-    const u32 last_dense_item_idx = ss->dense_indices[last_dense_idx];
+    const u32 last_dense_idx = --dense_count;
+    const u32 dense_idx = sparse_indices[idx];
+    const u32 last_dense_item_idx = dense_indices[last_dense_idx];
 
-    ss->sparse_indices[last_dense_item_idx] = dense_idx;
-    ss->dense_indices[dense_idx] = last_dense_item_idx;
-    ss->sparse_indices[idx] = INVALID_DENSE_INDEX;
+    sparse_indices[last_dense_item_idx] = dense_idx;
+    dense_indices[dense_idx] = last_dense_item_idx;
+    sparse_indices[idx] = INVALID_DENSE_INDEX;
     
-    memcpy(ss->dense_items + dense_idx * ss->dense_item_size, ss->dense_items + last_dense_idx * ss->dense_item_size, ss->dense_item_size);
-    memset(ss->dense_items + last_dense_idx * ss->dense_item_size, 0, ss->dense_item_size);
+    memcpy(dense_items + dense_idx * dense_item_size, dense_items + last_dense_idx * dense_item_size, dense_item_size);
+    memset(dense_items + last_dense_idx * dense_item_size, 0, dense_item_size);
     
     return true;
 }
 
-void* sparse_set_get(const Sparse_Set* ss, u32 idx)
+void* Sparse_Set::get(const u32 idx) const
 {
-    ASSERT(idx < ss->max_sparse_count);
+    ASSERT(idx < max_sparse_count);
 
-    const u32 dense_idx = ss->sparse_indices[idx];
-    if (dense_idx < ss->dense_count)
+    const u32 dense_idx = sparse_indices[idx];
+    if (dense_idx < dense_count && dense_idx != INVALID_DENSE_INDEX)
     {
-        return ss->dense_items + dense_idx * ss->dense_item_size;    
+        return dense_items + dense_idx * dense_item_size;    
     }
     
     return nullptr;
 }
 
-void sparse_set_clear(Sparse_Set* ss)
+void Sparse_Set::clear()
 {
-    ss->dense_count = 0;
+    dense_count = 0;
 }

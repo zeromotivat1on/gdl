@@ -36,51 +36,50 @@ bool    vm_release(void* vm);
 
 struct Arena
 {
-    u8* base;
-    u64 size;
-    u64 used;
+    u8*     base;
+    u64     size;
+    u64     used;
+
+    void    init(void* base, u64 size);
+    void    clear();
+    void*   push(u64 size);
+    void*   push_zero(u64 size);
+    void    pop(u64 size);
 };
 
-#define arena_push_size(arena, size)            (u8*)arena_push_zero(arena, size)
-#define arena_push_struct(arena, type)          (type*)arena_push_zero(arena, sizeof(type))
-#define arena_push_array(arena, count, type)    (type*)arena_push_zero(arena, sizeof(type) * count)
+#define arena_push_size(arena, size)            (u8*)arena->push_zero(size)
+#define arena_push_struct(arena, type)          (type*)arena->push_zero(sizeof(type))
+#define arena_push_array(arena, count, type)    (type*)arena->push_zero(sizeof(type) * count)
 
-inline void arena_init(Arena* arena, void* base, u64 size)
+inline void Arena::init(void* base, u64 size)
 {
-    arena->base = (u8*)base;
-    arena->size = size;
-    arena->used = 0;
+    this->base = (u8*)base;
+    this->size = size;
+    this->used = 0;
 }
 
-inline Arena arena_create(void* base, u64 size)
+inline void Arena::clear()
 {
-    Arena arena = STRUCT_ZERO(Arena);
-    arena_init(&arena, base, size);
-    return arena;
+    used = 0;
 }
 
-inline void* arena_push(Arena* arena, u64 size)
+inline void* Arena::push(u64 size)
 {
-    ASSERT(arena->used + size <= arena->size);
-    void* data = arena->base + arena->used;
-    arena->used += size;
+    ASSERT(used + size <= this->size);
+    void* data = base + used;
+    used += size;
     return data;
 }
 
-inline void* arena_push_zero(Arena* arena, u64 size)
+inline void* Arena::push_zero(u64 size)
 {
-    void* data = arena_push(arena, size);
+    void* data = push(size);
     memset(data, 0, size);
     return data;
 }
 
-inline void arena_pop(Arena* arena, u64 size)
+inline void Arena::pop(u64 size)
 {
-    ASSERT(arena->used >= size);
-    arena->used -= size;
-}
-
-inline void arena_clear(Arena* arena)
-{
-    arena->used = 0;
+    ASSERT(used >= size);
+    used -= size;
 }

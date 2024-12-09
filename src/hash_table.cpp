@@ -3,44 +3,44 @@
 #include "hash.h"
 #include "memory.h"
 
-static inline bool hash_table_default_cmp(const void* lkey, const void* rkey, u32 key_size)
+bool Hash_Table::default_cmp_func(const void* lkey, const void* rkey, u32 key_size)
 {
     return memcmp(lkey, rkey, key_size) == 0;
 }
 
-void hash_table_init(Hash_Table* ht, Arena* arena, u32 max_item_count, u32 key_size, u32 value_size, hash_table_hash_func hash_func, hash_table_cmp_func cmp_func)
+void Hash_Table::init(Arena* arena, u32 max_item_count, u32 key_size, u32 value_size, Hash_Func hash_func, Cmp_Func cmp_func)
 {
     ASSERT(hash_func);
     
-    ht->hash_func = hash_func;
-    ht->cmp_func = cmp_func ? cmp_func : hash_table_default_cmp;
-    ht->keys = arena_push_size(arena, max_item_count * key_size);
-    ht->values = arena_push_size(arena, max_item_count * value_size);
-    ht->hashes = (u64*)arena_push_zero(arena, max_item_count * sizeof(u64));
-    ht->item_count = 0;
-    ht->max_item_count = max_item_count;
-    ht->value_size = value_size;
-    ht->key_size = key_size;
+    this->hash_func = hash_func;
+    this->cmp_func = cmp_func ? cmp_func : Hash_Table::default_cmp_func;
+    this->keys = (u8*)arena->push_zero(max_item_count * key_size);
+    this->values = (u8*)arena->push_zero(max_item_count * value_size);
+    this->hashes = (u64*)arena->push_zero(max_item_count * sizeof(u64));
+    this->item_count = 0;
+    this->max_item_count = max_item_count;
+    this->value_size = value_size;
+    this->key_size = key_size;
 }
 
-void* hash_table_find(const Hash_Table* ht, const void* key)
+void* Hash_Table::find(const void* key) const
 {
     ASSERT(key);
     
-    const u64 hash = ht->hash_func(key);
-    u32 idx = hash % ht->max_item_count;
+    const u64 hash = hash_func(key);
+    u32 idx = hash % max_item_count;
 
-    while (ht->hashes[idx] != 0)
+    while (hashes[idx] != 0)
     {
-        const void* table_key = ht->keys + idx * ht->key_size;
-        if (ht->hashes[idx] == hash && ht->cmp_func(key, table_key, ht->key_size))
+        const void* table_key = keys + idx * key_size;
+        if (hashes[idx] == hash && cmp_func(key, table_key, key_size))
         {
-            return ht->values + idx * ht->value_size;
+            return values + idx * value_size;
         }
         
         idx++;
         
-        if (idx >= ht->max_item_count)
+        if (idx >= max_item_count)
         {
             idx = 0;
         }
@@ -49,57 +49,57 @@ void* hash_table_find(const Hash_Table* ht, const void* key)
     return nullptr;
 }
 
-void* hash_table_add(Hash_Table* ht, const void* key, const void* value)
+void* Hash_Table::add(const void* key, const void* value)
 {
     ASSERT(key);
     ASSERT(value);
-    ASSERT(hash_table_load_factor(ht) < 1.0f);
+    ASSERT(load_factor() < 1.0f);
     
-    const u64 hash = ht->hash_func(key);
-    u32 idx = hash % ht->max_item_count;
+    const u64 hash = hash_func(key);
+    u32 idx = hash % max_item_count;
 
-    while (ht->hashes[idx] != 0)
+    while (hashes[idx] != 0)
     {
         idx++;
         
-        if (idx >= ht->max_item_count)
+        if (idx >= max_item_count)
         {
             idx = 0;
         }
     }
 
-    ht->item_count++;
-    ASSERT(ht->item_count <= ht->max_item_count);
+    item_count++;
+    ASSERT(item_count <= max_item_count);
     
-    ht->hashes[idx] = hash;
-    memcpy(ht->keys + idx * ht->key_size, key, ht->key_size);
-    memcpy(ht->values + idx * ht->value_size, value, ht->value_size);
+    hashes[idx] = hash;
+    memcpy(keys + idx * key_size, key, key_size);
+    memcpy(values + idx * value_size, value, value_size);
 
-    return ht->values + idx * ht->value_size;
+    return values + idx * value_size;
 }
 
-bool hash_table_remove(Hash_Table* ht, const void* key)
+bool Hash_Table::remove(const void* key)
 {
     ASSERT(key)
     
-    const u64 hash = ht->hash_func(key);
-    u32 idx = hash % ht->max_item_count;
+    const u64 hash = hash_func(key);
+    u32 idx = hash % max_item_count;
 
-    while (ht->hashes[idx] != 0)
+    while (hashes[idx] != 0)
     {
-        const void* table_key = ht->keys + idx * ht->key_size;
-        if (ht->hashes[idx] == hash && ht->cmp_func(key, table_key, ht->key_size))
+        const void* table_key = keys + idx * key_size;
+        if (hashes[idx] == hash && cmp_func(key, table_key, key_size))
         {
-            ht->item_count--;
-            ht->hashes[idx] = 0;
-            memset(ht->keys + idx * ht->key_size, 0, ht->key_size);
-            memset(ht->values + idx * ht->value_size, 0, ht->value_size);
+            item_count--;
+            hashes[idx] = 0;
+            memset(keys + idx * key_size, 0, key_size);
+            memset(values + idx * value_size, 0, value_size);
             return true;
         }
 
         idx++;
         
-        if (idx >= ht->max_item_count)
+        if (idx >= max_item_count)
         {
             idx = 0;
         }
@@ -108,31 +108,36 @@ bool hash_table_remove(Hash_Table* ht, const void* key)
     return false;
 }
 
-void hash_table_rehash(Hash_Table* ht, Arena* arena, u32 max_item_count)
+void Hash_Table::rehash(Arena* arena, u32 max_item_count)
 {
-    u8* new_keys = arena_push_size(arena, max_item_count * ht->key_size);
-    u8* new_values = arena_push_size(arena, max_item_count * ht->value_size);
-    u64* new_hashes = (u64*)arena_push_zero(arena, max_item_count * sizeof(u64));
+    u8* new_keys = (u8*)arena->push(max_item_count * key_size);
+    u8* new_values = (u8*)arena->push(max_item_count * value_size);
+    u64* new_hashes = (u64*)arena->push(max_item_count * sizeof(u64));
 
-    for (u32 i = 0; i < ht->max_item_count; ++i)
+    for (u32 i = 0; i < max_item_count; ++i)
     {
-        if (ht->hashes[i] == 0)
+        if (hashes[i] == 0)
             continue;
 
-        u32 new_idx = ht->hashes[i] % max_item_count;
+        u32 new_idx = hashes[i] % max_item_count;
 
         while (new_hashes[new_idx] != 0)
         {
             new_idx = (new_idx + 1) % max_item_count;
         }
        
-        new_hashes[new_idx] = ht->hashes[i];
-        memcpy(new_keys + new_idx * ht->key_size, ht->keys + i * ht->key_size, ht->key_size);
-        memcpy(new_values + new_idx * ht->value_size, ht->values + i * ht->value_size, ht->value_size);
+        new_hashes[new_idx] = hashes[i];
+        memcpy(new_keys + new_idx * key_size, keys + i * key_size, key_size);
+        memcpy(new_values + new_idx * value_size, values + i * value_size, value_size);
     }
 
-    ht->keys = new_keys;
-    ht->values = new_values;
-    ht->hashes = new_hashes;
-    ht->max_item_count = max_item_count;
+    keys = new_keys;
+    values = new_values;
+    hashes = new_hashes;
+    max_item_count = max_item_count;
+}
+
+f32 Hash_Table::load_factor() const
+{
+    return (f32)item_count / (f32)max_item_count;
 }
