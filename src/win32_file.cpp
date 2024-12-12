@@ -23,6 +23,17 @@ bool close_file(file_handle handle)
     return CloseHandle(handle);
 }
 
+s64 file_size(file_handle handle)
+{
+    LARGE_INTEGER size;
+    if (!GetFileSizeEx(handle, &size))
+    {
+        return INDEX_NONE;
+    }
+
+    return size.QuadPart;
+}
+
 bool read_file_sync(file_handle handle, u8* buffer, u64 size, u64* bytes_read)
 {
     return ReadFile(handle, buffer, (DWORD)size, (LPDWORD)bytes_read, NULL);

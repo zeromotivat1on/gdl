@@ -22,6 +22,7 @@ extern file_handle INVALID_FILE_HANDLE;
 file_handle open_file(const char* fpath, s32 open, s32 access);
 bool        close_file(file_handle handle);
 
+s64         file_size(file_handle handle);
 bool        read_file_sync(file_handle handle, u8* buffer, u64 size, u64* bytes_read);
 bool        write_file_sync(file_handle handle, u8* buffer, u64 size, u64* bytes_read);
 
