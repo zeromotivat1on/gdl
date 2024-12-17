@@ -45,6 +45,7 @@ struct Arena
     void*   push(u64 size);
     void*   push_zero(u64 size);
     void    pop(u64 size);
+    Arena   subarena(u64 size);
 };
 
 #define arena_push_size(arena, size)            (u8*)arena->push_zero(size)
@@ -89,4 +90,9 @@ inline void Arena::pop(u64 size)
 {
     ASSERT(used >= size);
     used -= size;
+}
+
+inline Arena Arena::subarena(u64 size)
+{
+    return create_arena(push(size), size);
 }
